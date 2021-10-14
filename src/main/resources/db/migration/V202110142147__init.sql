@@ -18,11 +18,9 @@ CREATE TABLE IF NOT EXISTS roles
 );
 
 INSERT INTO roles
-VALUES (101, 'admin');
-INSERT INTO roles
-VALUES (102, 'master');
-INSERT INTO roles
-VALUES (103, 'client');
+VALUES (101, 'admin'),
+       (102, 'master'),
+       (103, 'client');
 
 CREATE TABLE IF NOT EXISTS user_role
 (
@@ -41,4 +39,6 @@ CREATE TABLE IF NOT EXISTS records
     time      ENUM ('NINE', 'THIRTEEN', 'SEVENTEEN'),
     PRIMARY KEY (record_id),
     FOREIGN KEY (user_id) REFERENCES users (user_id)
-)
+);
+
+COMMIT;
