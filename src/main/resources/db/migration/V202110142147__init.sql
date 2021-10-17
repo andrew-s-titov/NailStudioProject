@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users
     user_id    IDENTITY NOT NULL,
     first_name VARCHAR(50),
     last_name  VARCHAR(50),
-    phone      VARCHAR(12) UNIQUE,
+    phone      VARCHAR(13) UNIQUE,
     e_mail     VARCHAR(255),
     discount   ENUM ('ZERO', 'TWO', 'THREE', 'FIVE', 'TEN') DEFAULT 'ZERO',
     PRIMARY KEY (user_id)
