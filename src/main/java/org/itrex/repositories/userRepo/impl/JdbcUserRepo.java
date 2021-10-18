@@ -25,8 +25,11 @@ public class JdbcUserRepo implements UserRepo {
     private static final String SELECT_ALL_QUERY = String.format("SELECT * FROM %s", TABLE_NAME);
     private static final String INSERT_USER_QUERY = String.format("INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, ?, ?)",
             TABLE_NAME, FIRSTNAME_COLUMN, LASTNAME_COLUMN, PHONE_COLUMN, EMAIL_COLUMN);
+    private static final String CHANGE_USER_EMAIL_QUERY = String.format("UPDATE %s SET %s = ? WHERE %s = ?",
+            TABLE_NAME, EMAIL_COLUMN, USER_ID_COLUMN);
     private static final String CHANGE_USER_DISCOUNT_QUERY = String.format("UPDATE %s SET %s = ? WHERE %s = ?",
             TABLE_NAME, DISCOUNT_COLUMN, USER_ID_COLUMN);
+    private static final String DELETE_USER_QUERY = String.format("DELETE FROM %s WHERE %s = ?", TABLE_NAME, USER_ID_COLUMN);
 
     private final DataSource connectionSource;
 
@@ -88,17 +91,36 @@ public class JdbcUserRepo implements UserRepo {
 
     @Override
     public void addUserList(List<User> users) {
-
-    }
-
-    @Override
-    public void deleteUser(User user) {
-
+        try (Connection con = connectionSource.getConnection()) {
+            con.setAutoCommit(false);
+            try {
+                for (User user : users) {
+                    insertUser(user, con);
+                }
+                con.commit();
+            } catch (SQLException ex) {
+                // TODO: exception handling (logging)
+                ex.printStackTrace();
+                con.rollback();
+            } finally {
+                con.setAutoCommit(true);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
     public void changeEmail(User user, String newEmail) {
-
+        try (Connection con = connectionSource.getConnection();
+             PreparedStatement stm = con.prepareStatement(CHANGE_USER_EMAIL_QUERY)) {
+            stm.setString(1, newEmail);
+            stm.setLong(2, user.getUserId());
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            // TODO: exception handling (logging)
+            ex.printStackTrace();
+        }
     }
 
     @Override

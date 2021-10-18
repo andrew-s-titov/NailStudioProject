@@ -11,4 +11,6 @@ public interface RecordRepo {
     void addRecord(Record record);
 
     void deleteRecord(Record record);
+
+    void deleteRecordsForUser(User user);
 }

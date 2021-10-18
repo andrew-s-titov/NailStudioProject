@@ -68,11 +68,9 @@ public class App {
         records = recordRepo.selectAll();
         for (Record record : records) {
             System.out.println(record);
-            for (User user : users) {
-                if (user.getUserId() == record.getUserId()) {
-                    System.out.println(user);
-                }
-            }
+            users.stream()
+                    .filter((u) -> u.getUserId() == record.getUserId())
+                    .forEach(System.out::println);
         }
 
         // * * * close connection * * *

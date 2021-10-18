@@ -1,6 +1,7 @@
 package org.itrex.repositories.recordRepo.impl;
 
 import org.itrex.entities.Record;
+import org.itrex.entities.User;
 import org.itrex.entities.enums.RecordTime;
 import org.itrex.repositories.recordRepo.RecordRepo;
 
@@ -24,6 +25,10 @@ public class JdbcRecordRepo implements RecordRepo {
     private static final String SELECT_ALL_QUERY = String.format("SELECT * FROM %s", TABLE_NAME);
     private static final String INSERT_RECORD_QUERY = String.format("INSERT INTO %s (%s, %s, %s) VALUES (?, ?, ?)",
             TABLE_NAME, USER_ID_COLUMN, DATE_COLUMN, TIME_COLUMN);
+    private static final String DELETE_RECORD_QUERY = String.format("DELETE FROM %s WHERE %s = ?",
+            TABLE_NAME, RECORD_ID_COLUMN);
+    private static final String DELETE_USER_RECORD_QUERY = String.format("DELETE FROM %s WHERE %s = ?",
+            TABLE_NAME, USER_ID_COLUMN);
 
     private final DataSource connectionSource;
 
@@ -57,12 +62,19 @@ public class JdbcRecordRepo implements RecordRepo {
     @Override
     public void addRecord(Record record) {
         try (Connection con = connectionSource.getConnection();
-             PreparedStatement stm = con.prepareStatement(INSERT_RECORD_QUERY);) {
+             PreparedStatement stm = con.prepareStatement(INSERT_RECORD_QUERY, Statement.RETURN_GENERATED_KEYS)) {
             stm.setLong(1, record.getUserId());
             stm.setDate(2, record.getRecordDate());
             stm.setString(3, record.getRecordTime().name());
-            stm.executeUpdate();
 
+            int affectedRows = stm.executeUpdate();
+
+            if (affectedRows == 1) {
+                ResultSet keys = stm.getGeneratedKeys();
+                if (keys.next()) {
+                    record.setRecordId(keys.getInt(RECORD_ID_COLUMN));
+                }
+            }
         } catch (SQLException ex) {
             // TODO: exception handling (logging)
             ex.printStackTrace();
@@ -71,6 +83,25 @@ public class JdbcRecordRepo implements RecordRepo {
 
     @Override
     public void deleteRecord(Record record) {
+        try (Connection con = connectionSource.getConnection();
+             PreparedStatement stm = con.prepareStatement(DELETE_RECORD_QUERY)) {
+            stm.setLong(1, record.getRecordId());
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            // TODO: exception handling (logging)
+            ex.printStackTrace();
+        }
+    }
 
+    @Override
+    public void deleteRecordsForUser(User user) {
+        try (Connection con = connectionSource.getConnection();
+             PreparedStatement stm = con.prepareStatement(DELETE_USER_RECORD_QUERY)) {
+            stm.setLong(1, user.getUserId());
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            // TODO: exception handling (logging)
+            ex.printStackTrace();
+        }
     }
 }

@@ -12,8 +12,6 @@ public interface UserRepo {
 
     void addUserList(List<User> users);
 
-    void deleteUser(User user);
-
     void changeEmail(User user, String newEmail);
 
     void changeDiscount(User user, Discount discount);
