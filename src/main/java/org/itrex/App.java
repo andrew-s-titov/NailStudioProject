@@ -55,12 +55,12 @@ public class App {
         }
 
         Record record1 = new Record();
-        record1.setUserId(user2.getUserId());
+        record1.setUser(user2);
         record1.setDate(Date.valueOf("2021-10-18"));
         record1.setTime(RecordTime.SEVENTEEN);
 
         Record record2 = new Record();
-        record2.setUserId(user1.getUserId());
+        record2.setUser(user2);
         record2.setDate(Date.valueOf("2021-10-18"));
         record2.setTime(RecordTime.NINE);
 
@@ -70,21 +70,16 @@ public class App {
         records = recordRepo.selectAll();
         for (Record record : records) {
             System.out.println(record);
-            users.stream()
-                    .filter((u) -> u.getUserId() == record.getUserId())
-                    .forEach(System.out::println);
+            System.out.println(record.getUser());
         }
 
         recordRepo.deleteRecord(record1);
         recordRepo.deleteRecord(record2);
-//        recordRepo.deleteRecordsForUser(user1);
 
         records = recordRepo.selectAll();
         for (Record record : records) {
             System.out.println(record);
-            users.stream()
-                    .filter((u) -> u.getUserId() == record.getUserId())
-                    .forEach(System.out::println);
+            System.out.println(record.getUser());
         }
         System.out.println("Records left: " + records.size());
 

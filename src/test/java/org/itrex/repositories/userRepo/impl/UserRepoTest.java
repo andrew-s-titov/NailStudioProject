@@ -33,6 +33,8 @@ public class UserRepoTest extends RepositoryTestBaseHibernate {
         Assertions.assertEquals("T", users.get(0).getLastName());
         Assertions.assertEquals("+375293000000", users.get(0).getPhone());
         Assertions.assertEquals("wow@gmail.com", users.get(0).getEmail());
+        Assertions.assertEquals(3, users.get(2).getUserId());
+        Assertions.assertEquals("+1946484888", users.get(2).getPhone());
     }
 
     @Test
@@ -72,12 +74,13 @@ public class UserRepoTest extends RepositoryTestBaseHibernate {
         user1.setPhone("+375-29-333-33-33");
         user1.setEmail("freshmeat@yahoo.com");
 
+
         User user2 = new User();
-        user2.setFirstName("Freddy");
-        user2.setLastName("Krueger");
+        user2.setFirstName("Edward");
+        user2.setLastName("Scissorshands");
         // should be unique
         user2.setPhone("+375293000000");
-        user2.setEmail("freshmeat@yahoo.com");
+        user2.setEmail("holdme@yahoo.com");
 
         // when
         List<User> usersBeforeAdding = repo.selectAll();
@@ -107,7 +110,7 @@ public class UserRepoTest extends RepositoryTestBaseHibernate {
 
         User user2 = new User();
         user2.setFirstName("Edward");
-        user2.setLastName("Scissorhands");
+        user2.setLastName("Scissorshands");
         user2.setPhone("18000001111");
         user2.setEmail("holdme@yahoo.com");
 
@@ -133,36 +136,22 @@ public class UserRepoTest extends RepositoryTestBaseHibernate {
     @DisplayName("changeEmail with valid data - 'e_mail' field should be changed for a user")
     public void changeEmail() {
         // given
-        User user1 = new User();
-        user1.setUserId(1);
-        user1.setFirstName("Andrew");
-        user1.setLastName("T");
-        user1.setPhone("+375293000000");
-        user1.setEmail("wow@gmail.com");
-        String newEmail = "myNewEmail@mail.ru";
+        User user1 = getSession().find(User.class, 1L);
+        String newEmail = "my_new_email@mail.ru";
 
         // when
         repo.changeEmail(user1, newEmail);
         List<User> users = repo.selectAll();
 
         // then
-        Assertions.assertEquals(newEmail, users.stream()
-                .filter(u -> u.getUserId() == user1.getUserId())
-                .map(User::getEmail)
-                .findAny()
-                .get());
+        Assertions.assertEquals(newEmail, user1.getEmail());
     }
 
     @Test
     @DisplayName("changeDiscount with valid data - 'discount' field should be changed for a user")
     public void changeDiscount() {
         // given
-        User user1 = new User();
-        user1.setUserId(1);
-        user1.setFirstName("Andrew");
-        user1.setLastName("T");
-        user1.setPhone("+375293000000");
-        user1.setEmail("wow@gmail.com");
+        User user1 = getSession().find(User.class, 1L);
         Discount newDiscount = Discount.TEN;
 
         // when
@@ -170,10 +159,6 @@ public class UserRepoTest extends RepositoryTestBaseHibernate {
         List<User> users = repo.selectAll();
 
         // then
-        Assertions.assertEquals(newDiscount, users.stream()
-                .filter(u -> u.getUserId() == user1.getUserId())
-                .map(User::getDiscount)
-                .findAny()
-                .get());
+        Assertions.assertEquals(newDiscount, user1.getDiscount());
     }
 }

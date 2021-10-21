@@ -29,10 +29,10 @@ public class RecordRepoTest extends RepositoryTestBaseHibernate {
 
         // then
         Assertions.assertEquals(recordsTableInitialTestSize, records.size());
-        Assertions.assertEquals(1, records.get(0).getUserId());
+        Assertions.assertEquals(1, records.get(0).getUser().getUserId());
         Assertions.assertEquals(Date.valueOf("2021-10-18"), records.get(0).getDate());
         Assertions.assertEquals(RecordTime.NINE, records.get(0).getTime());
-        Assertions.assertEquals(2, records.get(3).getUserId());
+        Assertions.assertEquals(2, records.get(3).getUser().getUserId());
         Assertions.assertEquals(RecordTime.SEVENTEEN, records.get(3).getTime());
     }
 
@@ -40,8 +40,10 @@ public class RecordRepoTest extends RepositoryTestBaseHibernate {
     @DisplayName("addRecord with valid data - records table should contain added record")
     public void addRecord() {
         // given
+        long userId = 1L;
+        User user1 = getSession().find(User.class, userId);
         Record record1 = new Record();
-        record1.setUserId(2);
+        record1.setUser(user1);
         record1.setDate(Date.valueOf("2021-10-19"));
         record1.setTime(RecordTime.NINE);
 
@@ -54,7 +56,7 @@ public class RecordRepoTest extends RepositoryTestBaseHibernate {
         Assertions.assertEquals(recordsTableInitialTestSize, recordsBeforeAdding.size());
         Assertions.assertEquals(recordsTableInitialTestSize + 1, records.size());
         Assertions.assertEquals(1, records.stream()
-                .filter(r -> r.getUserId() == record1.getUserId())
+                .filter(r -> r.getUser().getUserId() == userId)
                 .filter(r -> r.getDate().equals(record1.getDate()))
                 .filter(r -> r.getTime().equals(record1.getTime()))
                 .count());
@@ -83,12 +85,9 @@ public class RecordRepoTest extends RepositoryTestBaseHibernate {
     @DisplayName("deleteRecordForUser with valid data - records table shouldn't contain records for the user")
     public void deleteRecordsForUser() {
         // given
-        User user1 = new User();
-        user1.setUserId(1);
-        user1.setFirstName("Andrew");
-        user1.setLastName("T");
-        user1.setPhone("+375293000000");
-        user1.setEmail("wow@gmail.com");
+        long userId = 1L;
+        // this user has 2 records
+        User user1 = getSession().find(User.class, userId);
 
         // when
         List<Record> recordsBeforeDeleting = repo.selectAll();
@@ -99,7 +98,7 @@ public class RecordRepoTest extends RepositoryTestBaseHibernate {
         Assertions.assertEquals(recordsTableInitialTestSize, recordsBeforeDeleting.size());
         Assertions.assertEquals(recordsTableInitialTestSize - 2, recordsAfterDeleting.size());
         Assertions.assertEquals(0, recordsAfterDeleting.stream()
-                        .filter(r -> r.getUserId() == user1.getUserId())
+                        .filter(r -> r.getUser().getUserId() == userId)
                         .count());
     }
 }

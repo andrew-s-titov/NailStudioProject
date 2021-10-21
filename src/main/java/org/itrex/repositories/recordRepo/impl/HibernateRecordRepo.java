@@ -31,15 +31,19 @@ public class HibernateRecordRepo implements RecordRepo {
         Transaction txn = session.beginTransaction();
         session.delete(record);
         txn.commit();
+
+        record.getUser().getRecords().remove(record);
     }
 
     @Override
     public void deleteRecordsForUser(User user) {
         Transaction txn = session.beginTransaction();
         long id = user.getUserId();
-        session.createQuery("DELETE FROM Record WHERE userId = :id")
+        session.createQuery("DELETE FROM Record WHERE user_id = :id")
                 .setParameter("id", id)
                 .executeUpdate();
         txn.commit();
+
+        user.getRecords().clear();
     }
 }

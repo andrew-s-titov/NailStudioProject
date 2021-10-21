@@ -11,10 +11,7 @@ public class Record {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "record_id")
-    private long recordId;
-
-    @Column(name = "user_id")
-    private long userId;
+    private Long recordId;
 
     @Column(name = "date", nullable = false)
     private Date date;
@@ -23,20 +20,16 @@ public class Record {
     @Enumerated(value = EnumType.STRING)
     private RecordTime time;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     public long getRecordId() {
         return recordId;
     }
 
     public void setRecordId(long recordId) {
         this.recordId = recordId;
-    }
-
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(long userId) {
-        this.userId = userId;
     }
 
     public Date getDate() {
@@ -55,11 +48,19 @@ public class Record {
         this.time = recordTime;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public String toString() {
         return "* * * Record #" +
                 recordId + ": " +
-                "user ID #" + userId + ", " +
+                "user ID #" + user.getUserId() + ", " +
                 date + ", " +
                 time.digitsText + " * * *";
     }
