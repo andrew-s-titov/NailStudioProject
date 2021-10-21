@@ -29,7 +29,6 @@ public class JdbcUserRepo implements UserRepo {
             TABLE_NAME, EMAIL_COLUMN, USER_ID_COLUMN);
     private static final String CHANGE_USER_DISCOUNT_QUERY = String.format("UPDATE %s SET %s = ? WHERE %s = ?",
             TABLE_NAME, DISCOUNT_COLUMN, USER_ID_COLUMN);
-    private static final String DELETE_USER_QUERY = String.format("DELETE FROM %s WHERE %s = ?", TABLE_NAME, USER_ID_COLUMN);
 
     private final DataSource connectionSource;
 

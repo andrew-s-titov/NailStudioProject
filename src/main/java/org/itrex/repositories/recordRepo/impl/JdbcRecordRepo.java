@@ -46,8 +46,8 @@ public class JdbcRecordRepo implements RecordRepo {
                 Record record = new Record();
                 record.setRecordId(rs.getLong(RECORD_ID_COLUMN));
                 record.setUserId(rs.getLong(USER_ID_COLUMN));
-                record.setRecordDate(rs.getDate(DATE_COLUMN));
-                record.setRecordTime(RecordTime.valueOf(rs.getString(TIME_COLUMN)));
+                record.setDate(rs.getDate(DATE_COLUMN));
+                record.setTime(RecordTime.valueOf(rs.getString(TIME_COLUMN)));
 
                 records.add(record);
             }
@@ -64,8 +64,8 @@ public class JdbcRecordRepo implements RecordRepo {
         try (Connection con = connectionSource.getConnection();
              PreparedStatement stm = con.prepareStatement(INSERT_RECORD_QUERY, Statement.RETURN_GENERATED_KEYS)) {
             stm.setLong(1, record.getUserId());
-            stm.setDate(2, record.getRecordDate());
-            stm.setString(3, record.getRecordTime().name());
+            stm.setDate(2, record.getDate());
+            stm.setString(3, record.getTime().name());
 
             int affectedRows = stm.executeUpdate();
 

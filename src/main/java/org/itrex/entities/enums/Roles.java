@@ -5,7 +5,7 @@ public enum Roles {
     MASTER(102),
     CLIENT(103);
 
-    public final int  roleId;
+    public final int roleId;
 
     Roles(int roleId) {
         this.roleId = roleId;

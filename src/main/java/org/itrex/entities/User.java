@@ -2,12 +2,30 @@ package org.itrex.entities;
 
 import org.itrex.entities.enums.Discount;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "users", schema = "public")
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private long userId;
+
+    @Column(name = "first_name", nullable = false)
     private String firstName;
+
+    @Column(name = "last_name", nullable = false)
     private String lastName;
+
+    @Column(name = "phone", unique = true, nullable = false)
     private String phone;
+
+    @Column(name = "e_mail")
     private String email;
+
+    @Column(name = "discount")
+    @Enumerated(value = EnumType.STRING)
     private Discount discount = Discount.ZERO;
 
     public long getUserId() {

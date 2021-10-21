@@ -2,13 +2,26 @@ package org.itrex.entities;
 
 import org.itrex.entities.enums.RecordTime;
 
+import javax.persistence.*;
 import java.sql.Date;
 
+@Entity
+@Table(name = "records", schema = "public")
 public class Record {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "record_id")
     private long recordId;
+
+    @Column(name = "user_id")
     private long userId;
-    private Date recordDate;
-    private RecordTime recordTime;
+
+    @Column(name = "date", nullable = false)
+    private Date date;
+
+    @Column(name = "time", nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    private RecordTime time;
 
     public long getRecordId() {
         return recordId;
@@ -26,20 +39,20 @@ public class Record {
         this.userId = userId;
     }
 
-    public Date getRecordDate() {
-        return recordDate;
+    public Date getDate() {
+        return date;
     }
 
-    public void setRecordDate(Date recordDate) {
-        this.recordDate = recordDate;
+    public void setDate(Date recordDate) {
+        this.date = recordDate;
     }
 
-    public RecordTime getRecordTime() {
-        return recordTime;
+    public RecordTime getTime() {
+        return time;
     }
 
-    public void setRecordTime(RecordTime recordTime) {
-        this.recordTime = recordTime;
+    public void setTime(RecordTime recordTime) {
+        this.time = recordTime;
     }
 
     @Override
@@ -47,7 +60,7 @@ public class Record {
         return "* * * Record #" +
                 recordId + ": " +
                 "user ID #" + userId + ", " +
-                recordDate + ", " +
-                recordTime.digitsText + " * * *";
+                date + ", " +
+                time.digitsText + " * * *";
     }
 }

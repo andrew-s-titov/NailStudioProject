@@ -29,10 +29,10 @@ public class JdbcRecordRepoTest extends RepositoryTestBase {
         // then
         Assertions.assertEquals(recordsTableInitialTestSize, records.size());
         Assertions.assertEquals(1, records.get(0).getUserId());
-        Assertions.assertEquals(Date.valueOf("2021-10-18"), records.get(0).getRecordDate());
-        Assertions.assertEquals(RecordTime.NINE, records.get(0).getRecordTime());
+        Assertions.assertEquals(Date.valueOf("2021-10-18"), records.get(0).getDate());
+        Assertions.assertEquals(RecordTime.NINE, records.get(0).getTime());
         Assertions.assertEquals(3, records.get(1).getUserId());
-        Assertions.assertEquals(RecordTime.THIRTEEN, records.get(1).getRecordTime());
+        Assertions.assertEquals(RecordTime.THIRTEEN, records.get(1).getTime());
     }
 
     @Test
@@ -41,8 +41,8 @@ public class JdbcRecordRepoTest extends RepositoryTestBase {
         // given
         Record record1 = new Record();
         record1.setUserId(2);
-        record1.setRecordDate(Date.valueOf("2021-10-19"));
-        record1.setRecordTime(RecordTime.NINE);
+        record1.setDate(Date.valueOf("2021-10-19"));
+        record1.setTime(RecordTime.NINE);
 
         // when
         List<Record> recordsBeforeAdding = repo.selectAll();
@@ -54,8 +54,8 @@ public class JdbcRecordRepoTest extends RepositoryTestBase {
         Assertions.assertEquals(recordsTableInitialTestSize + 1, records.size());
         Assertions.assertEquals(1, records.stream()
                 .filter(r -> r.getUserId() == record1.getUserId())
-                .filter(r -> r.getRecordDate().equals(record1.getRecordDate()))
-                .filter(r -> r.getRecordTime().equals(record1.getRecordTime()))
+                .filter(r -> r.getDate().equals(record1.getDate()))
+                .filter(r -> r.getTime().equals(record1.getTime()))
                 .count());
     }
 
@@ -66,8 +66,8 @@ public class JdbcRecordRepoTest extends RepositoryTestBase {
         Record record1 = new Record();
         record1.setRecordId(1);
         record1.setUserId(1);
-        record1.setRecordDate(Date.valueOf("2021-10-18"));
-        record1.setRecordTime(RecordTime.NINE);
+        record1.setDate(Date.valueOf("2021-10-18"));
+        record1.setTime(RecordTime.NINE);
 
         // when
         List<Record> recordsBeforeDeleting = repo.selectAll();

@@ -1,20 +1,20 @@
 package org.itrex;
 
-import org.h2.jdbcx.JdbcConnectionPool;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.itrex.entities.Record;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.Discount;
 import org.itrex.entities.enums.RecordTime;
 import org.itrex.migrationService.FlywayService;
 import org.itrex.repositories.recordRepo.RecordRepo;
-import org.itrex.repositories.recordRepo.impl.JdbcRecordRepo;
+import org.itrex.repositories.recordRepo.impl.HibernateRecordRepo;
 import org.itrex.repositories.userRepo.UserRepo;
-import org.itrex.repositories.userRepo.impl.JdbcUserRepo;
+import org.itrex.repositories.userRepo.impl.HibernateUserRepo;
+import org.itrex.util.HibernateUtil;
 
 import java.sql.Date;
 import java.util.List;
-
-import static org.itrex.dbProperties.H2Properties.*;
 
 public class App {
 
@@ -22,9 +22,11 @@ public class App {
         FlywayService flyway = new FlywayService();
         flyway.migrate();
 
-        JdbcConnectionPool jdbcConnectionPool = JdbcConnectionPool.create(DB_URL, DB_USER, DB_PASSWORD);
-        UserRepo userRepo = new JdbcUserRepo(jdbcConnectionPool);
-        RecordRepo recordRepo = new JdbcRecordRepo(jdbcConnectionPool);
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        Session session = sessionFactory.openSession();
+
+        UserRepo userRepo = new HibernateUserRepo(session);
+        RecordRepo recordRepo = new HibernateRecordRepo(session);
 
         List<User> users;
         List<Record> records;
@@ -45,6 +47,7 @@ public class App {
         userRepo.addUser(user2);
 
         userRepo.changeDiscount(user1, Discount.TEN);
+        userRepo.changeEmail(user2, "bbritvaNEW@mail.ru");
 
         users = userRepo.selectAll();
         for (User user : users) {
@@ -53,17 +56,16 @@ public class App {
 
         Record record1 = new Record();
         record1.setUserId(user2.getUserId());
-        record1.setRecordDate(Date.valueOf("2021-10-18"));
-        record1.setRecordTime(RecordTime.SEVENTEEN);
+        record1.setDate(Date.valueOf("2021-10-18"));
+        record1.setTime(RecordTime.SEVENTEEN);
 
         Record record2 = new Record();
         record2.setUserId(user1.getUserId());
-        record2.setRecordDate(Date.valueOf("2021-10-18"));
-        record2.setRecordTime(RecordTime.NINE);
+        record2.setDate(Date.valueOf("2021-10-18"));
+        record2.setTime(RecordTime.NINE);
 
         recordRepo.addRecord(record1);
         recordRepo.addRecord(record2);
-
 
         records = recordRepo.selectAll();
         for (Record record : records) {
@@ -73,7 +75,20 @@ public class App {
                     .forEach(System.out::println);
         }
 
+        recordRepo.deleteRecord(record1);
+        recordRepo.deleteRecordsForUser(user1);
+
+        records = recordRepo.selectAll();
+        for (Record record : records) {
+            System.out.println(record);
+            users.stream()
+                    .filter((u) -> u.getUserId() == record.getUserId())
+                    .forEach(System.out::println);
+        }
+        System.out.println("Records left: " + records.size());
+
         // * * * close connection * * *
-        jdbcConnectionPool.dispose();
+        session.close();
+        HibernateUtil.closeFactory();
     }
 }
