@@ -1,9 +1,10 @@
 package org.itrex.repositories.recordRepo.impl;
 
-import org.itrex.RepositoryTestBase;
+import org.itrex.RepositoryTestBaseHibernate;
 import org.itrex.entities.Record;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.RecordTime;
+import org.itrex.repositories.recordRepo.RecordRepo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,17 +12,17 @@ import org.junit.jupiter.api.Test;
 import java.sql.Date;
 import java.util.List;
 
-public class JdbcRecordRepoTest extends RepositoryTestBase {
-    private final JdbcRecordRepo repo;
-    private final int recordsTableInitialTestSize = 2;
+public class RecordRepoTest extends RepositoryTestBaseHibernate {
+    private final RecordRepo repo;
+    private final int recordsTableInitialTestSize = 4;
 
-    public JdbcRecordRepoTest() {
+    public RecordRepoTest() {
         super();
-        repo = new JdbcRecordRepo(getConnectionPool());
+        repo = new HibernateRecordRepo(getSession());
     }
 
     @Test
-    @DisplayName("selectAll with valid data - should have 2 records")
+    @DisplayName("selectAll with valid data - should have 4 records")
     public void selectAll() {
         // given & when
         List<Record> records = repo.selectAll();
@@ -31,8 +32,8 @@ public class JdbcRecordRepoTest extends RepositoryTestBase {
         Assertions.assertEquals(1, records.get(0).getUserId());
         Assertions.assertEquals(Date.valueOf("2021-10-18"), records.get(0).getDate());
         Assertions.assertEquals(RecordTime.NINE, records.get(0).getTime());
-        Assertions.assertEquals(3, records.get(1).getUserId());
-        Assertions.assertEquals(RecordTime.THIRTEEN, records.get(1).getTime());
+        Assertions.assertEquals(2, records.get(3).getUserId());
+        Assertions.assertEquals(RecordTime.SEVENTEEN, records.get(3).getTime());
     }
 
     @Test
@@ -63,14 +64,10 @@ public class JdbcRecordRepoTest extends RepositoryTestBase {
     @DisplayName("deleteRecord with valid data - records table shouldn't contain deleted record")
     public void deleteRecord() {
         // given
-        Record record1 = new Record();
-        record1.setRecordId(1);
-        record1.setUserId(1);
-        record1.setDate(Date.valueOf("2021-10-18"));
-        record1.setTime(RecordTime.NINE);
+        List<Record> recordsBeforeDeleting = repo.selectAll();
+        Record record1 = recordsBeforeDeleting.get(0);
 
         // when
-        List<Record> recordsBeforeDeleting = repo.selectAll();
         repo.deleteRecord(record1);
         List<Record> recordsAfterDeleting = repo.selectAll();
 
@@ -100,7 +97,7 @@ public class JdbcRecordRepoTest extends RepositoryTestBase {
 
         // then
         Assertions.assertEquals(recordsTableInitialTestSize, recordsBeforeDeleting.size());
-        Assertions.assertEquals(recordsTableInitialTestSize - 1, recordsAfterDeleting.size());
+        Assertions.assertEquals(recordsTableInitialTestSize - 2, recordsAfterDeleting.size());
         Assertions.assertEquals(0, recordsAfterDeleting.stream()
                         .filter(r -> r.getUserId() == user1.getUserId())
                         .count());

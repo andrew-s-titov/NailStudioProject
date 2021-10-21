@@ -1,23 +1,23 @@
 package org.itrex.repositories.userRepo.impl;
 
-import org.itrex.RepositoryTestBase;
+import org.itrex.RepositoryTestBaseHibernate;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.Discount;
+import org.itrex.repositories.userRepo.UserRepo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class JdbcUserRepoTest extends RepositoryTestBase {
-    private final JdbcUserRepo repo;
+public class UserRepoTest extends RepositoryTestBaseHibernate {
+    private final UserRepo repo;
     private final int usersTableInitialTestSize = 3;
 
-    public JdbcUserRepoTest() {
+    public UserRepoTest() {
         super();
-        repo = new JdbcUserRepo(getConnectionPool());
+        repo = new HibernateUserRepo(getSession());
     }
 
     @Test
@@ -81,8 +81,13 @@ public class JdbcUserRepoTest extends RepositoryTestBase {
 
         // when
         List<User> usersBeforeAdding = repo.selectAll();
-        repo.addUser(user1);
-        repo.addUser(user2);
+        try {
+            repo.addUser(user1);
+            repo.addUser(user2);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         List<User> usersAfterAdding = repo.selectAll();
 
         // then
@@ -134,7 +139,7 @@ public class JdbcUserRepoTest extends RepositoryTestBase {
         user1.setLastName("T");
         user1.setPhone("+375293000000");
         user1.setEmail("wow@gmail.com");
-        String newEmail = "mynewemal@mail.ru";
+        String newEmail = "myNewEmail@mail.ru";
 
         // when
         repo.changeEmail(user1, newEmail);

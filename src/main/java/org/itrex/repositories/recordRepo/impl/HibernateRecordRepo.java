@@ -10,15 +10,6 @@ import java.util.List;
 
 
 public class HibernateRecordRepo implements RecordRepo {
-    private static final String TABLE_NAME = "records";
-    private static final String RECORD_ID_COLUMN = "record_id";
-    private static final String USER_ID_COLUMN = "user_id";
-
-    private static final String DELETE_RECORD_QUERY = String.format("DELETE FROM %s WHERE %s = ?",
-            TABLE_NAME, RECORD_ID_COLUMN);
-    private static final String DELETE_USER_RECORD_QUERY = String.format("DELETE FROM %s WHERE %s = ?",
-            TABLE_NAME, USER_ID_COLUMN);
-
     private final Session session;
 
     public HibernateRecordRepo(Session session) {
@@ -37,14 +28,16 @@ public class HibernateRecordRepo implements RecordRepo {
 
     @Override
     public void deleteRecord(Record record) {
+        Transaction txn = session.beginTransaction();
         session.delete(record);
+        txn.commit();
     }
 
     @Override
     public void deleteRecordsForUser(User user) {
         Transaction txn = session.beginTransaction();
         long id = user.getUserId();
-        session.createQuery("DELETE from Record WHERE userId = :id")
+        session.createQuery("DELETE FROM Record WHERE userId = :id")
                 .setParameter("id", id)
                 .executeUpdate();
         txn.commit();

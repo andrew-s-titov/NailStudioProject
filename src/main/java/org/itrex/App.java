@@ -76,7 +76,8 @@ public class App {
         }
 
         recordRepo.deleteRecord(record1);
-        recordRepo.deleteRecordsForUser(user1);
+        recordRepo.deleteRecord(record2);
+//        recordRepo.deleteRecordsForUser(user1);
 
         records = recordRepo.selectAll();
         for (Record record : records) {
