@@ -17,5 +17,6 @@
         <mapping class="org.itrex.entities.User"/>
         <mapping class="org.itrex.entities.Record"/>
         <mapping class="org.itrex.entities.Role"/>
+
     </session-factory>
 </hibernate-configuration>

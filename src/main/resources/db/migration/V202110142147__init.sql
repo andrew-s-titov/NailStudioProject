@@ -11,18 +11,18 @@ CREATE TABLE IF NOT EXISTS users
 
 CREATE TABLE IF NOT EXISTS roles
 (
-    role_id   INT         NOT NULL,
-    role_name VARCHAR(20) NOT NULL,
+    role_id   IDENTITY NOT NULL,
+    role_name ENUM ('ADMIN', 'MASTER', 'CLIENT'),
     PRIMARY KEY (role_id),
     UNIQUE (role_name)
 );
 
-INSERT INTO roles
-VALUES (101, 'ADMIN'),
-       (102, 'MASTER'),
-       (103, 'CLIENT');
+INSERT INTO roles (role_name)
+VALUES ('ADMIN'),
+       ('MASTER'),
+       ('CLIENT');
 
-CREATE TABLE IF NOT EXISTS user_role
+CREATE TABLE IF NOT EXISTS users_roles
 (
     user_id BIGINT NOT NULL,
     role_id INT    NOT NULL,

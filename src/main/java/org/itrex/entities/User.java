@@ -4,7 +4,9 @@ import org.itrex.entities.enums.Discount;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users", schema = "public")
@@ -30,8 +32,14 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private Discount discount = Discount.ZERO;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Record> records = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(name = "users_roles", schema = "public",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> userRoles = new HashSet<>();
 
     public long getUserId() {
         return userId;
@@ -89,11 +97,16 @@ public class User {
         this.records = records;
     }
 
+    public Set<Role> getUserRoles() {
+        return userRoles;
+    }
+
     @Override
     public String toString() {
         return "- - - User #" + userId + ": " +
                 firstName + " " + lastName + ", " +
-                phone + ", " + email + ", " +
-                "discount: " + discount + " - - -";
+                phone + ", " + email +
+                ", discount: " + discount +
+                ", roles: " + userRoles + " - - -";
     }
 }

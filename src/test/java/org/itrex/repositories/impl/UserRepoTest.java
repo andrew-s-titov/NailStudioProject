@@ -1,14 +1,16 @@
-package org.itrex.repositories.userRepo.impl;
+package org.itrex.repositories.impl;
 
+import org.hibernate.query.Query;
 import org.itrex.RepositoryTestBaseHibernate;
+import org.itrex.entities.Record;
+import org.itrex.entities.Role;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.Discount;
-import org.itrex.repositories.userRepo.UserRepo;
+import org.itrex.repositories.UserRepo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class UserRepoTest extends RepositoryTestBaseHibernate {
@@ -48,19 +50,12 @@ public class UserRepoTest extends RepositoryTestBaseHibernate {
         user1.setEmail("freshmeat@yahoo.com");
 
         // when
-        List<User> usersBeforeAdding = repo.selectAll();
         repo.addUser(user1);
-        List<User> usersAfterAdding = repo.selectAll();
 
         // then
-        Assertions.assertEquals(usersTableInitialTestSize, usersBeforeAdding.size());
-        Assertions.assertEquals(usersTableInitialTestSize + 1, usersAfterAdding.size());
-        Assertions.assertEquals(1, usersAfterAdding.stream()
-                .filter(u -> u.getFirstName().equals(user1.getFirstName()))
-                .filter(u -> u.getLastName().equals(user1.getLastName()))
-                .filter(u -> u.getPhone().equals(user1.getPhone()))
-                .filter(u -> u.getEmail().equals(user1.getEmail()))
-                .count());
+        long usersCount = getSession().createQuery("FROM User", User.class).getResultList().stream()
+                .filter(u -> u.getPhone().equals("1900909Fred")).count();
+        Assertions.assertEquals(1, usersCount);
     }
 
     @Test
@@ -74,7 +69,6 @@ public class UserRepoTest extends RepositoryTestBaseHibernate {
         user1.setPhone("+375-29-333-33-33");
         user1.setEmail("freshmeat@yahoo.com");
 
-
         User user2 = new User();
         user2.setFirstName("Edward");
         user2.setLastName("Scissorshands");
@@ -83,53 +77,12 @@ public class UserRepoTest extends RepositoryTestBaseHibernate {
         user2.setEmail("holdme@yahoo.com");
 
         // when
-        List<User> usersBeforeAdding = repo.selectAll();
-        try {
-            repo.addUser(user1);
-            repo.addUser(user2);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        List<User> usersAfterAdding = repo.selectAll();
+        repo.addUser(user1);
+        repo.addUser(user2);
 
         // then
-        Assertions.assertEquals(usersTableInitialTestSize, usersBeforeAdding.size());
-        Assertions.assertEquals(usersTableInitialTestSize, usersAfterAdding.size());
-    }
-
-    @Test
-    @DisplayName("addAllUser with valid data - users table should contain added users from the list")
-    public void addUserList() {
-        // given
-        User user1 = new User();
-        user1.setFirstName("Freddy");
-        user1.setLastName("Krueger");
-        user1.setPhone("+375293333333");
-        user1.setEmail("freshmeat@yahoo.com");
-
-        User user2 = new User();
-        user2.setFirstName("Edward");
-        user2.setLastName("Scissorshands");
-        user2.setPhone("18000001111");
-        user2.setEmail("holdme@yahoo.com");
-
-        List<User> listToAdd = Arrays.asList(user1, user2);
-
-        // when
-        List<User> usersBeforeAdding = repo.selectAll();
-        repo.addUserList(listToAdd);
-        List<User> usersAfterAdding = repo.selectAll();
-
-        // then
-        Assertions.assertEquals(usersTableInitialTestSize, usersBeforeAdding.size());
-        Assertions.assertEquals(usersTableInitialTestSize + listToAdd.size(), usersAfterAdding.size());
-        Assertions.assertEquals(1, usersAfterAdding.stream()
-                .filter(u -> u.getPhone().equals(user1.getPhone()))
-                .count());
-        Assertions.assertEquals(1, usersAfterAdding.stream()
-                .filter(u -> u.getPhone().equals(user2.getPhone()))
-                .count());
+        Assertions.assertEquals(usersTableInitialTestSize,
+                getSession().createQuery("FROM User", User.class).getResultList().size());
     }
 
     @Test
@@ -141,10 +94,10 @@ public class UserRepoTest extends RepositoryTestBaseHibernate {
 
         // when
         repo.changeEmail(user1, newEmail);
-        List<User> users = repo.selectAll();
 
         // then
         Assertions.assertEquals(newEmail, user1.getEmail());
+        Assertions.assertEquals(newEmail, getSession().get(User.class, 1L).getEmail());
     }
 
     @Test
@@ -156,9 +109,47 @@ public class UserRepoTest extends RepositoryTestBaseHibernate {
 
         // when
         repo.changeDiscount(user1, newDiscount);
-        List<User> users = repo.selectAll();
 
         // then
         Assertions.assertEquals(newDiscount, user1.getDiscount());
+        Assertions.assertEquals(newDiscount, getSession().get(User.class, 1L).getDiscount());
+    }
+
+    @Test
+    @DisplayName("deleteUser with valid data - should delete user, users table shouldn't contain user, all records" +
+            "for user should be deleted")
+    public void deleteUser() {
+        // given
+        Long userId = 1L;
+        User user1 = getSession().get(User.class, userId); // this user1 has 2 records
+
+        // when
+        repo.deleteUser(user1);
+
+        // then
+        Assertions.assertNull(getSession().get(User.class, userId));
+
+        Query<Record> query = getSession().createQuery("FROM Record WHERE user_id=:userId", Record.class);
+        query.setParameter("userId", userId);
+        Assertions.assertEquals(0, query.getResultList().size());
+    }
+
+    @Test
+    @DisplayName("addRole with valid data - should add 1 row into ManyToMany join table")
+    public void addRole() {
+        // given
+        Role client = getSession().get(Role.class, 1L);
+        User user1 = getSession().get(User.class, 1L);
+
+        // when
+        repo.addRole(user1, client);
+
+        // then
+        Assertions.assertTrue(user1.getUserRoles().contains(client));
+        Assertions.assertTrue(client.getUsers().contains(user1));
+        Assertions.assertEquals(1, getSession().get(Role.class, 1L).getUsers().size());
+        Assertions.assertEquals(1, getSession().get(User.class, 1L).getUserRoles().size());
+        Assertions.assertEquals(1, getSession().createSQLQuery("SELECT * FROM users_roles;")
+                .getResultList().size());
     }
 }

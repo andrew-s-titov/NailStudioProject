@@ -1,20 +1,25 @@
 package org.itrex.entities;
 
+import org.itrex.entities.enums.RoleType;
+
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "roles", schema = "public")
 public class Role {
-    /*
-    Won't it be more sufficient to use ENUM for roles? With params.
-    It's not going to be changed a lot
-     */
+
     @Id
     @Column(name = "role_id")
     private long roleId;
 
     @Column(name = "role_name", nullable = false)
-    private String roleName;
+    @Enumerated(value = EnumType.STRING)
+    private RoleType roletype;
+
+    @ManyToMany(mappedBy = "userRoles")
+    private List<User> users = new ArrayList<>();
 
     public long getRoleId() {
         return roleId;
@@ -24,11 +29,12 @@ public class Role {
         this.roleId = roleId;
     }
 
-    public String getRoleName() {
-        return roleName;
+    public List<User> getUsers() {
+        return users;
     }
 
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
+    @Override
+    public String toString() {
+        return roletype.name();
     }
 }

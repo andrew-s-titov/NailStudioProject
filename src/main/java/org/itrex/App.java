@@ -3,14 +3,15 @@ package org.itrex;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.itrex.entities.Record;
+import org.itrex.entities.Role;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.Discount;
 import org.itrex.entities.enums.RecordTime;
 import org.itrex.migrationService.FlywayService;
-import org.itrex.repositories.recordRepo.RecordRepo;
-import org.itrex.repositories.recordRepo.impl.HibernateRecordRepo;
-import org.itrex.repositories.userRepo.UserRepo;
-import org.itrex.repositories.userRepo.impl.HibernateUserRepo;
+import org.itrex.repositories.RecordRepo;
+import org.itrex.repositories.impl.HibernateRecordRepo;
+import org.itrex.repositories.UserRepo;
+import org.itrex.repositories.impl.HibernateUserRepo;
 import org.itrex.util.HibernateUtil;
 
 import java.sql.Date;
@@ -31,6 +32,10 @@ public class App {
         List<User> users;
         List<Record> records;
 
+        Role admin = session.find(Role.class, 1L);
+        Role master = session.find(Role.class, 2L);
+        Role client = session.find(Role.class, 3L);
+
         User user1 = new User();
         user1.setFirstName("Andrew");
         user1.setLastName("T");
@@ -49,6 +54,11 @@ public class App {
         userRepo.changeDiscount(user1, Discount.TEN);
         userRepo.changeEmail(user2, "bbritvaNEW@mail.ru");
 
+        userRepo.addRole(user1, admin);
+        userRepo.addRole(user1, master);
+        userRepo.addRole(user2, client);
+
+        System.out.println(": : : : : Users after adding and altering : : : : :");
         users = userRepo.selectAll();
         for (User user : users) {
             System.out.println(user);
@@ -60,12 +70,14 @@ public class App {
         record1.setTime(RecordTime.SEVENTEEN);
 
         Record record2 = new Record();
-        record2.setUser(user2);
+        record2.setUser(user1);
         record2.setDate(Date.valueOf("2021-10-18"));
         record2.setTime(RecordTime.NINE);
 
         recordRepo.addRecord(record1);
         recordRepo.addRecord(record2);
+
+        System.out.println(": : : : : Records after adding : : : : :");
 
         records = recordRepo.selectAll();
         for (Record record : records) {
@@ -74,16 +86,17 @@ public class App {
         }
 
         recordRepo.deleteRecord(record1);
-        recordRepo.deleteRecord(record2);
+
+        userRepo.deleteUser(user1);
 
         records = recordRepo.selectAll();
         for (Record record : records) {
             System.out.println(record);
             System.out.println(record.getUser());
         }
-        System.out.println("Records left: " + records.size());
+        System.out.println(": : : : : Records left: " + records.size() + " : : : : :");
 
-        // * * * close connection * * *
+//         * * * close connection * * *
         session.close();
         HibernateUtil.closeFactory();
     }

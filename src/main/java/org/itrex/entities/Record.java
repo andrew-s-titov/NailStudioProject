@@ -54,6 +54,7 @@ public class Record {
 
     public void setUser(User user) {
         this.user = user;
+        user.getRecords().add(this);
     }
 
     @Override

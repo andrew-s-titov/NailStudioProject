@@ -11,11 +11,10 @@ import org.junit.jupiter.api.BeforeEach;
 
 public class RepositoryTestBaseHibernate {
     private final FlywayService flywayService = new FlywayService();
-    private final static SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-    private final Session session;
+    private static Session session;
 
     public RepositoryTestBaseHibernate() {
-        session = sessionFactory.openSession();
+        session = HibernateUtil.getSessionFactory().openSession();
     }
 
     @BeforeEach
@@ -26,6 +25,11 @@ public class RepositoryTestBaseHibernate {
     @AfterEach
     public void cleanDB() {
         flywayService.clean();
+    }
+
+    @AfterAll
+    public static void closeSession() {
+        session.close();
     }
 
     public Session getSession() {
