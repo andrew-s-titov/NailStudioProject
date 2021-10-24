@@ -29,6 +29,14 @@ public class Role {
         this.roleId = roleId;
     }
 
+    public RoleType getRoletype() {
+        return roletype;
+    }
+
+    public void setRoletype(RoleType roletype) {
+        this.roletype = roletype;
+    }
+
     public List<User> getUsers() {
         return users;
     }

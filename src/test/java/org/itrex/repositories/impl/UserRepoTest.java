@@ -138,8 +138,8 @@ public class UserRepoTest extends RepositoryTestBaseHibernate {
     @DisplayName("addRole with valid data - should add 1 row into ManyToMany join table")
     public void addRole() {
         // given
-        Role client = getSession().get(Role.class, 1L);
-        User user1 = getSession().get(User.class, 1L);
+        Role client = getSession().get(Role.class, 3L); // 2 users have this role
+        User user1 = getSession().get(User.class, 1L); // this user have 2 roles
 
         // when
         repo.addRole(user1, client);
@@ -147,9 +147,9 @@ public class UserRepoTest extends RepositoryTestBaseHibernate {
         // then
         Assertions.assertTrue(user1.getUserRoles().contains(client));
         Assertions.assertTrue(client.getUsers().contains(user1));
-        Assertions.assertEquals(1, getSession().get(Role.class, 1L).getUsers().size());
-        Assertions.assertEquals(1, getSession().get(User.class, 1L).getUserRoles().size());
-        Assertions.assertEquals(1, getSession().createSQLQuery("SELECT * FROM users_roles;")
+        Assertions.assertEquals(3, getSession().get(Role.class, 3L).getUsers().size());
+        Assertions.assertEquals(3, getSession().get(User.class, 1L).getUserRoles().size());
+        Assertions.assertEquals(5, getSession().createSQLQuery("SELECT * FROM users_roles;")
                 .getResultList().size());
     }
 }

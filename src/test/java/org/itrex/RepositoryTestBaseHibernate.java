@@ -1,7 +1,6 @@
 package org.itrex;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.itrex.migrationService.FlywayService;
 import org.itrex.util.HibernateUtil;
 import org.junit.jupiter.api.AfterAll;
