@@ -25,65 +25,47 @@ public class HibernateUserRepo implements UserRepo {
 
     @Override
     public void addUser(User user) {
-        Transaction txn = session.beginTransaction();
-        try {
-            session.save(user);
-            txn.commit();
-        } catch (HibernateException e) {
-            txn.rollback();
-            e.printStackTrace();
-            // TODO: logging
-        }
+        doInTransaction(() -> session.save(user));
     }
 
     @Override
     public void deleteUser(User user) {
-        Transaction txn = session.beginTransaction();
-        try {
+        doInTransaction(() -> {
             session.delete(user);
-            txn.commit();
-        } catch (HibernateException e) {
-            txn.rollback();
-            e.printStackTrace();
-            // TODO: logging
-        }
+        });
     }
 
     @Override
     public void changeEmail(User user, String newEmail) {
-        Transaction txn = session.beginTransaction();
-        try {
+        doInTransaction(() -> {
             user.setEmail(newEmail);
-            session.update(user);
-            txn.commit();
-        } catch (HibernateException e) {
-            txn.rollback();
-            e.printStackTrace();
-            // TODO: logging
-        }
+//            session.update(user);
+        });
     }
 
     @Override
     public void changeDiscount(User user, Discount discount) {
-        Transaction txn = session.beginTransaction();
-        try {
+        doInTransaction(() -> {
             user.setDiscount(discount);
-            session.update(user);
-            txn.commit();
-        } catch (HibernateException e) {
-            txn.rollback();
-            e.printStackTrace();
-            // TODO: logging
-        }
+//            session.update(user);
+        });
     }
 
-    public void addRole(User user, Role role) {
+    public void addRoleForUser(User user, Role role) {
+        // should be applied to a persistent User entity
+        // can be used with persistent Role entity or transient Role entity with the appropriate id
+        doInTransaction(() -> {
+            user.getUserRoles().add(role);
+//            role.getUsers().add(user);
+//            session.update(user);
+//            session.update(role);
+        });
+    }
+
+    private void doInTransaction(Runnable runnable) {
         Transaction txn = session.beginTransaction();
         try {
-            user.getUserRoles().add(role);
-            role.getUsers().add(user); // not necessary
-            session.update(user);
-            session.update(role);
+            runnable.run();
             txn.commit();
         } catch (HibernateException e) {
             txn.rollback();

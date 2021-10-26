@@ -151,7 +151,7 @@ public class JdbcUserRepo implements UserRepo {
     }
 
     @Override
-    public void addRole(User user, Role role) {
+    public void addRoleForUser(User user, Role role) {
         long userId = user.getUserId();
         long roleId = role.getRoleId();
 

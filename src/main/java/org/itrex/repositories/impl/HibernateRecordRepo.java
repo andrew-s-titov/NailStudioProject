@@ -10,7 +10,6 @@ import org.itrex.repositories.RecordRepo;
 
 import java.util.List;
 
-
 public class HibernateRecordRepo implements RecordRepo {
     private final Session session;
 
@@ -24,54 +23,44 @@ public class HibernateRecordRepo implements RecordRepo {
     }
 
     @Override
+    // maybe we should create methods addRecord and deleteRecord is User entity?
     public void addRecord(Record record) {
-        Transaction txn = session.beginTransaction();
-        try {
+        doInTransaction(() -> {
             session.save(record);
-            txn.commit();
-        } catch (HibernateException e) {
-            txn.rollback();
-            e.printStackTrace();
-            // TODO: logging
-        }
+        });
     }
 
     @Override
     public void changeRecordTime(Record record, RecordTime newTime) {
-        Transaction txn = session.beginTransaction();
-        try {
+        doInTransaction(() -> {
             record.setTime(newTime);
-            session.update(record);
-        } catch (HibernateException e) {
-            txn.rollback();
-            e.printStackTrace();
-            // TODO: logging
-        }
+//            session.update(record);
+        });
     }
 
     @Override
     public void deleteRecord(Record record) {
-        Transaction txn = session.beginTransaction();
-        try {
+        doInTransaction(() -> {
             session.delete(record);
             record.getUser().getRecords().remove(record);
-            txn.commit();
-        } catch (HibernateException e) {
-            txn.rollback();
-            e.printStackTrace();
-            // TODO: logging
-        }
+        });
     }
 
     @Override
     public void deleteRecordsForUser(User user) {
+        doInTransaction(() -> {
+        long id = user.getUserId();
+        session.createQuery("DELETE FROM Record WHERE user_id = :id")
+                .setParameter("id", id)
+                .executeUpdate();
+        user.getRecords().clear();
+        });
+    }
+
+    private void doInTransaction(Runnable runnable) {
         Transaction txn = session.beginTransaction();
         try {
-            long id = user.getUserId();
-            session.createQuery("DELETE FROM Record WHERE user_id = :id")
-                    .setParameter("id", id)
-                    .executeUpdate();
-            user.getRecords().clear();
+            runnable.run();
             txn.commit();
         } catch (HibernateException e) {
             txn.rollback();

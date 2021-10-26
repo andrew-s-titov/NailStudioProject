@@ -17,5 +17,5 @@ public interface UserRepo {
 
     void changeDiscount(User user, Discount discount);
 
-    void addRole(User user, Role role);
+    void addRoleForUser(User user, Role role);
 }

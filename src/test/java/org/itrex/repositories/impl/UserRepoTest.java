@@ -135,14 +135,14 @@ public class UserRepoTest extends RepositoryTestBaseHibernate {
     }
 
     @Test
-    @DisplayName("addRole with valid data - should add 1 row into ManyToMany join table")
-    public void addRole() {
+    @DisplayName("addRoleForUser with valid data - should add 1 row into ManyToMany join table")
+    public void addRoleForUser() {
         // given
         Role client = getSession().get(Role.class, 3L); // 2 users have this role
         User user1 = getSession().get(User.class, 1L); // this user have 2 roles
 
         // when
-        repo.addRole(user1, client);
+        repo.addRoleForUser(user1, client);
 
         // then
         Assertions.assertTrue(user1.getUserRoles().contains(client));

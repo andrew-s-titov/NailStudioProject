@@ -3,8 +3,8 @@ package org.itrex.entities;
 import org.itrex.entities.enums.RoleType;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "roles", schema = "public")
@@ -19,7 +19,7 @@ public class Role {
     private RoleType roletype;
 
     @ManyToMany(mappedBy = "userRoles")
-    private List<User> users = new ArrayList<>();
+    private Set<User> users = new HashSet<>();
 
     public long getRoleId() {
         return roleId;
@@ -37,7 +37,7 @@ public class Role {
         this.roletype = roletype;
     }
 
-    public List<User> getUsers() {
+    public Set<User> getUsers() {
         return users;
     }
 

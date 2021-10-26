@@ -204,8 +204,8 @@ public class JdbcUserRepoTest extends RepositoryTestBaseJDBC {
     }
 
     @Test
-    @DisplayName("addRole with valid data - should insert entry into many-to-many join table")
-    public void addRole() {
+    @DisplayName("addRoleForUser with valid data - should insert entry into many-to-many join table")
+    public void addRoleForUser() {
         // given
         long userId = 1;
         User user = new User();
@@ -230,7 +230,7 @@ public class JdbcUserRepoTest extends RepositoryTestBaseJDBC {
         role3.setRoletype(RoleType.CLIENT);
 
         // when
-        repo.addRole(user, role3);
+        repo.addRoleForUser(user, role3);
 
         // then
         Assertions.assertTrue(role3.getUsers().contains(user));

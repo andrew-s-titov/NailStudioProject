@@ -54,9 +54,9 @@ public class App {
         userRepo.changeDiscount(user1, Discount.TEN);
         userRepo.changeEmail(user2, "bbritvaNEW@mail.ru");
 
-        userRepo.addRole(user1, admin);
-        userRepo.addRole(user1, master);
-        userRepo.addRole(user2, client);
+        userRepo.addRoleForUser(user1, admin);
+        userRepo.addRoleForUser(user1, master);
+        userRepo.addRoleForUser(user2, client);
 
         System.out.println(": : : : : Users after adding and altering : : : : :");
         users = userRepo.selectAll();
@@ -65,7 +65,7 @@ public class App {
         }
 
         Record record1 = new Record();
-        record1.setUser(user2);
+        record1.setUser(user1);
         record1.setDate(Date.valueOf("2021-10-18"));
         record1.setTime(RecordTime.SEVENTEEN);
 

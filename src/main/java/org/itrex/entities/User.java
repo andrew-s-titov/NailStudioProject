@@ -1,5 +1,6 @@
 package org.itrex.entities;
 
+import org.hibernate.annotations.Fetch;
 import org.itrex.entities.enums.Discount;
 
 import javax.persistence.*;
@@ -93,12 +94,16 @@ public class User {
         return records;
     }
 
-    public void setRecords(List<Record> records) {
-        this.records = records;
-    }
+//    public void setRecords(List<Record> records) {
+//        this.records = records;
+//    }
 
     public Set<Role> getUserRoles() {
         return userRoles;
+    }
+
+    public void setUserRoles(Set<Role> userRoles) {
+        this.userRoles = userRoles;
     }
 
     @Override
