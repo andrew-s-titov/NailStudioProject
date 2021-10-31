@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS users
 (
     user_id    IDENTITY    NOT NULL,
+    password   BINARY(160) NOT NULL,
     first_name VARCHAR(50) NOT NULL,
     last_name  VARCHAR(50) NOT NULL,
     phone      VARCHAR(13) UNIQUE,
@@ -12,14 +13,14 @@ CREATE TABLE IF NOT EXISTS users
 CREATE TABLE IF NOT EXISTS roles
 (
     role_id   IDENTITY NOT NULL,
-    role_name ENUM ('ADMIN', 'MASTER', 'CLIENT'),
+    role_name ENUM ('ADMIN', 'STAFF', 'CLIENT'),
     PRIMARY KEY (role_id),
     UNIQUE (role_name)
 );
 
 INSERT INTO roles (role_name)
 VALUES ('ADMIN'),
-       ('MASTER'),
+       ('STAFF'),
        ('CLIENT');
 
 CREATE TABLE IF NOT EXISTS users_roles
@@ -37,6 +38,7 @@ CREATE TABLE IF NOT EXISTS records
     user_id   BIGINT                                 NOT NULL,
     date      DATE                                   NOT NULL,
     time      ENUM ('NINE', 'THIRTEEN', 'SEVENTEEN') NOT NULL,
+    UNIQUE (date, time),
     PRIMARY KEY (record_id),
     FOREIGN KEY (user_id) REFERENCES users (user_id)
 );

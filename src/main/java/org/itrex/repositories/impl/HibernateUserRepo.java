@@ -30,36 +30,21 @@ public class HibernateUserRepo implements UserRepo {
 
     @Override
     public void deleteUser(User user) {
-        doInTransaction(() -> {
-            session.delete(user);
-        });
+        doInTransaction(() -> session.delete(user));
     }
 
     @Override
     public void changeEmail(User user, String newEmail) {
-        doInTransaction(() -> {
-            user.setEmail(newEmail);
-//            session.update(user);
-        });
+        doInTransaction(() -> user.setEmail(newEmail));
     }
 
     @Override
     public void changeDiscount(User user, Discount discount) {
-        doInTransaction(() -> {
-            user.setDiscount(discount);
-//            session.update(user);
-        });
+        doInTransaction(() -> user.setDiscount(discount));
     }
 
     public void addRoleForUser(User user, Role role) {
-        // should be applied to a persistent User entity
-        // can be used with persistent Role entity or transient Role entity with the appropriate id
-        doInTransaction(() -> {
-            user.getUserRoles().add(role);
-//            role.getUsers().add(user);
-//            session.update(user);
-//            session.update(role);
-        });
+        doInTransaction(() -> user.getUserRoles().add(role));
     }
 
     private void doInTransaction(Runnable runnable) {

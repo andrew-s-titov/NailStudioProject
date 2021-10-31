@@ -8,11 +8,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 
-public class RepositoryTestBaseHibernate {
+public class TestBaseHibernate {
     private final FlywayService flywayService = new FlywayService();
     private static Session session;
 
-    public RepositoryTestBaseHibernate() {
+    public TestBaseHibernate() {
         session = HibernateUtil.getSessionFactory().openSession();
     }
 

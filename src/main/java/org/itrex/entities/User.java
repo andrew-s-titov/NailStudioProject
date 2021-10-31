@@ -1,6 +1,5 @@
 package org.itrex.entities;
 
-import org.hibernate.annotations.Fetch;
 import org.itrex.entities.enums.Discount;
 
 import javax.persistence.*;
@@ -16,6 +15,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long userId;
+
+    @Column(name = "password", nullable = false)
+    private byte[] password;
 
     @Column(name = "first_name", nullable = false)
     private String firstName;
@@ -33,7 +35,7 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private Discount discount = Discount.ZERO;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Record> records = new ArrayList<>();
 
     @ManyToMany
@@ -48,6 +50,14 @@ public class User {
 
     public void setUserId(long userId) {
         this.userId = userId;
+    }
+
+    public byte[] getPassword() {
+        return password;
+    }
+
+    public void setPassword(byte[] password) {
+        this.password = password;
     }
 
     public String getFirstName() {
@@ -94,9 +104,14 @@ public class User {
         return records;
     }
 
-//    public void setRecords(List<Record> records) {
-//        this.records = records;
-//    }
+    public void addRecord(Record record) {
+        records.add(record);
+        record.setUser(this);
+    }
+
+    public void removeRecord(Record record) {
+        records.remove(record);
+    }
 
     public Set<Role> getUserRoles() {
         return userRoles;

@@ -1,6 +1,6 @@
 package org.itrex.repositories.impl;
 
-import org.itrex.RepositoryTestBaseHibernate;
+import org.itrex.TestBaseHibernate;
 import org.itrex.entities.Record;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.RecordTime;
@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.sql.Date;
 import java.util.List;
 
-public class RecordRepoTest extends RepositoryTestBaseHibernate {
+public class RecordRepoTest extends TestBaseHibernate {
     private final RecordRepo repo;
     private final int recordsTableInitialTestSize = 4;
 
@@ -22,7 +22,7 @@ public class RecordRepoTest extends RepositoryTestBaseHibernate {
     }
 
     @Test
-    @DisplayName("selectAll with valid data - should have 4 records")
+    @DisplayName("selectAll with valid data - should have 4 records equal to testdata migration script")
     public void selectAll() {
         // given & when
         List<Record> records = repo.selectAll();
@@ -37,15 +37,15 @@ public class RecordRepoTest extends RepositoryTestBaseHibernate {
     }
 
     @Test
-    @DisplayName("addRecord with valid data - records table should contain added record")
+    @DisplayName("addRecord with valid data - records table should contain added Record")
     public void addRecord() {
         // given
         long userId = 1L;
-        User user1 = getSession().get(User.class, userId);
-        int recordsCount = user1.getRecords().size();
+        User user = getSession().get(User.class, userId);
+        int recordsCount = user.getRecords().size();
 
         Record record1 = new Record();
-        record1.setUser(user1);
+        record1.setUser(user);
         record1.setDate(Date.valueOf("2021-10-19"));
         record1.setTime(RecordTime.NINE);
 
@@ -81,7 +81,7 @@ public class RecordRepoTest extends RepositoryTestBaseHibernate {
     }
 
     @Test
-    @DisplayName("deleteRecord with valid data - records table shouldn't contain deleted record," +
+    @DisplayName("deleteRecord with valid data - records table shouldn't contain deleted Record;" +
             "method shouldn't delete user with this record")
     public void deleteRecord() {
         // given
@@ -104,15 +104,16 @@ public class RecordRepoTest extends RepositoryTestBaseHibernate {
     public void deleteRecordsForUser() {
         // given
         long userId = 1L;
-        User user1 = getSession().get(User.class, userId); // this user has 2 records
+        User user = getSession().get(User.class, userId); // this user has 2 records
 
         // when
-        repo.deleteRecordsForUser(user1);
+        repo.deleteRecordsForUser(user);
 
         // then
         Assertions.assertEquals(0, getSession().createQuery("FROM Record WHERE user_id=:id")
         .setParameter("id", userId).getResultList().size());
         Assertions.assertEquals(0, getSession().get(User.class, userId).getRecords().size());
+        Assertions.assertEquals(0, user.getRecords().size());
         Assertions.assertNotNull(getSession().get(User.class, userId));
     }
 }

@@ -23,38 +23,23 @@ public class HibernateRecordRepo implements RecordRepo {
     }
 
     @Override
-    // maybe we should create methods addRecord and deleteRecord is User entity?
     public void addRecord(Record record) {
-        doInTransaction(() -> {
-            session.save(record);
-        });
+        doInTransaction(() -> record.getUser().addRecord(record));
     }
 
     @Override
     public void changeRecordTime(Record record, RecordTime newTime) {
-        doInTransaction(() -> {
-            record.setTime(newTime);
-//            session.update(record);
-        });
+        doInTransaction(() -> record.setTime(newTime));
     }
 
     @Override
     public void deleteRecord(Record record) {
-        doInTransaction(() -> {
-            session.delete(record);
-            record.getUser().getRecords().remove(record);
-        });
+        doInTransaction(() -> record.getUser().removeRecord(record));
     }
 
     @Override
     public void deleteRecordsForUser(User user) {
-        doInTransaction(() -> {
-        long id = user.getUserId();
-        session.createQuery("DELETE FROM Record WHERE user_id = :id")
-                .setParameter("id", id)
-                .executeUpdate();
-        user.getRecords().clear();
-        });
+        doInTransaction(() -> user.getRecords().clear());
     }
 
     private void doInTransaction(Runnable runnable) {

@@ -1,5 +1,6 @@
 package org.itrex.entities;
 
+import org.hibernate.annotations.Immutable;
 import org.itrex.entities.enums.RecordTime;
 
 import javax.persistence.*;
@@ -20,6 +21,7 @@ public class Record {
     @Enumerated(value = EnumType.STRING)
     private RecordTime time;
 
+    @Immutable
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -54,7 +56,6 @@ public class Record {
 
     public void setUser(User user) {
         this.user = user;
-        user.getRecords().add(this);
     }
 
     @Override
