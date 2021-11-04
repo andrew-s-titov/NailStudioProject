@@ -4,7 +4,6 @@ import org.itrex.TestBaseHibernate;
 import org.itrex.entities.Record;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.RecordTime;
-import org.itrex.repositories.RecordRepo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,13 +11,14 @@ import org.junit.jupiter.api.Test;
 import java.sql.Date;
 import java.util.List;
 
-public class RecordRepoTest extends TestBaseHibernate {
-    private final RecordRepo repo;
+public class HibernateRecordRepoTest extends TestBaseHibernate {
+    private final HibernateRecordRepo repo;
     private final int recordsTableInitialTestSize = 4;
 
-    public RecordRepoTest() {
+    public HibernateRecordRepoTest() {
         super();
-        repo = new HibernateRecordRepo(getSession());
+        repo = getContext().getBean(HibernateRecordRepo.class);
+        repo.setSession(getSession());
     }
 
     @Test

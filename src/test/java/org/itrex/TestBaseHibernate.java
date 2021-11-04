@@ -1,15 +1,19 @@
 package org.itrex;
 
 import org.hibernate.Session;
+import org.itrex.config.SpringConfig;
 import org.itrex.migrationService.FlywayService;
 import org.itrex.util.HibernateUtil;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 
 public class TestBaseHibernate {
-    private final FlywayService flywayService = new FlywayService();
+    private final ApplicationContext context = new AnnotationConfigApplicationContext(SpringConfig.class);
+    private final FlywayService flywayService = context.getBean(FlywayService.class);
     private static Session session;
 
     public TestBaseHibernate() {
@@ -33,5 +37,9 @@ public class TestBaseHibernate {
 
     public Session getSession() {
         return session;
+    }
+
+    public ApplicationContext getContext() {
+        return context;
     }
 }

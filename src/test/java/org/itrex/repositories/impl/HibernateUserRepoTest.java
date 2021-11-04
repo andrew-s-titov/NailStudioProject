@@ -6,7 +6,6 @@ import org.itrex.entities.Record;
 import org.itrex.entities.Role;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.Discount;
-import org.itrex.repositories.UserRepo;
 import org.itrex.util.PasswordEncryption;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -16,13 +15,14 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
-public class UserRepoTest extends TestBaseHibernate {
-    private final UserRepo repo;
+public class HibernateUserRepoTest extends TestBaseHibernate {
+    private final HibernateUserRepo repo;
     private final int usersTableInitialTestSize = 3;
 
-    public UserRepoTest() {
+    public HibernateUserRepoTest() {
         super();
-        repo = new HibernateUserRepo(getSession());
+        repo = getContext().getBean(HibernateUserRepo.class);
+        repo.setSession(getSession());
     }
 
     @Test
