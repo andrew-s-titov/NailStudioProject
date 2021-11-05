@@ -9,6 +9,8 @@ import java.util.List;
 public interface UserRepo {
     List<User> selectAll();
 
+//    User getUserById(Serializable id);
+
     void addUser(User user);
 
     void deleteUser(User user);

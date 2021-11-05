@@ -9,6 +9,8 @@ import java.util.List;
 public interface RecordRepo {
     List<Record> selectAll();
 
+//    Record getRecordById(Serializable id);
+
     void addRecord(Record record);
 
     void changeRecordTime(Record record, RecordTime newTime);

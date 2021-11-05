@@ -20,9 +20,7 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
     private final int usersTableInitialTestSize = 3;
 
     public HibernateUserRepoTest() {
-        super();
         repo = getContext().getBean(HibernateUserRepo.class);
-        repo.setSession(getSession());
     }
 
     @Test
@@ -40,6 +38,7 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
         Assertions.assertEquals("wow@gmail.com", users.get(0).getEmail());
         Assertions.assertEquals(3, users.get(2).getUserId());
         Assertions.assertEquals("+1946484888", users.get(2).getPhone());
+        repo.closeRepoSession();
     }
 
     @Test
@@ -57,9 +56,10 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
         repo.addUser(user);
 
         // then
-        long usersCount = getSession().createQuery("FROM User", User.class).getResultList().stream()
+        long usersCount = repo.getCurrentSession().createQuery("FROM User", User.class).getResultList().stream()
                 .filter(u -> u.getPhone().equals("1900909Fred")).count();
         Assertions.assertEquals(1, usersCount);
+        repo.closeRepoSession();
     }
 
     @Test
@@ -88,14 +88,15 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
 
         // then
         Assertions.assertEquals(usersTableInitialTestSize,
-                getSession().createQuery("FROM User", User.class).getResultList().size());
+                repo.getCurrentSession().createQuery("FROM User", User.class).getResultList().size());
+        repo.closeRepoSession();
     }
 
     @Test
     @DisplayName("changeEmail with valid data - 'e_mail' field should be changed for a user")
     public void changeEmail() {
         // given
-        User user = getSession().find(User.class, 1L);
+        User user = repo.getCurrentSession().find(User.class, 1L);
         String newEmail = "my_new_email@mail.ru";
 
         // when
@@ -103,14 +104,15 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
 
         // then
         Assertions.assertEquals(newEmail, user.getEmail());
-        Assertions.assertEquals(newEmail, getSession().get(User.class, 1L).getEmail());
+        Assertions.assertEquals(newEmail, repo.getCurrentSession().get(User.class, 1L).getEmail());
+        repo.closeRepoSession();
     }
 
     @Test
     @DisplayName("changeDiscount with valid data - 'discount' field should be changed for a user")
     public void changeDiscount() {
         // given
-        User user = getSession().find(User.class, 1L);
+        User user = repo.getCurrentSession().find(User.class, 1L);
         Discount newDiscount = Discount.TEN;
 
         // when
@@ -118,7 +120,8 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
 
         // then
         Assertions.assertEquals(newDiscount, user.getDiscount());
-        Assertions.assertEquals(newDiscount, getSession().get(User.class, 1L).getDiscount());
+        Assertions.assertEquals(newDiscount, repo.getCurrentSession().get(User.class, 1L).getDiscount());
+        repo.closeRepoSession();
     }
 
     @Test
@@ -127,25 +130,26 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
     public void deleteUser() {
         // given
         Long userId = 1L;
-        User user = getSession().get(User.class, userId); // this user has 2 records
+        User user = repo.getCurrentSession().get(User.class, userId); // this user has 2 records
 
         // when
         repo.deleteUser(user);
 
         // then
-        Assertions.assertNull(getSession().get(User.class, userId));
+        Assertions.assertNull(repo.getCurrentSession().get(User.class, userId));
 
-        Query<Record> query = getSession().createQuery("FROM Record WHERE user_id=:userId", Record.class);
+        Query<Record> query = repo.getCurrentSession().createQuery("FROM Record WHERE user_id=:userId", Record.class);
         query.setParameter("userId", userId);
         Assertions.assertEquals(0, query.getResultList().size());
+        repo.closeRepoSession();
     }
 
     @Test
     @DisplayName("addRoleForUser with valid data - should add 1 row into ManyToMany join table")
     public void addRoleForUser() {
         // given
-        Role client = getSession().get(Role.class, 3L); // 2 users have this role
-        User user = getSession().get(User.class, 1L); // this user have 2 roles, doesn't have "client" role
+        Role client = repo.getCurrentSession().get(Role.class, 3L); // 2 users have this role
+        User user = repo.getCurrentSession().get(User.class, 1L); // this user have 2 roles, doesn't have "client" role
 
         // when
         repo.addRoleForUser(user, client);
@@ -153,9 +157,10 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
         // then
         Assertions.assertTrue(user.getUserRoles().contains(client));
         Assertions.assertTrue(client.getUsers().contains(user));
-        Assertions.assertEquals(3, getSession().get(Role.class, 3L).getUsers().size());
-        Assertions.assertEquals(3, getSession().get(User.class, 1L).getUserRoles().size());
-        Assertions.assertEquals(5, getSession().createSQLQuery("SELECT * FROM users_roles;")
+        Assertions.assertEquals(3, repo.getCurrentSession().get(Role.class, 3L).getUsers().size());
+        Assertions.assertEquals(3, repo.getCurrentSession().get(User.class, 1L).getUserRoles().size());
+        Assertions.assertEquals(5, repo.getCurrentSession().createSQLQuery("SELECT * FROM users_roles;")
                 .getResultList().size());
+        repo.closeRepoSession();
     }
 }

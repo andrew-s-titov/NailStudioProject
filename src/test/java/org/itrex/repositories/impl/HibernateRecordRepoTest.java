@@ -16,9 +16,7 @@ public class HibernateRecordRepoTest extends TestBaseHibernate {
     private final int recordsTableInitialTestSize = 4;
 
     public HibernateRecordRepoTest() {
-        super();
         repo = getContext().getBean(HibernateRecordRepo.class);
-        repo.setSession(getSession());
     }
 
     @Test
@@ -34,6 +32,7 @@ public class HibernateRecordRepoTest extends TestBaseHibernate {
         Assertions.assertEquals(RecordTime.NINE, records.get(0).getTime());
         Assertions.assertEquals(2, records.get(3).getUser().getUserId());
         Assertions.assertEquals(RecordTime.SEVENTEEN, records.get(3).getTime());
+        repo.closeRepoSession();
     }
 
     @Test
@@ -41,7 +40,7 @@ public class HibernateRecordRepoTest extends TestBaseHibernate {
     public void addRecord() {
         // given
         long userId = 1L;
-        User user = getSession().get(User.class, userId);
+        User user = repo.getCurrentSession().get(User.class, userId);
         int recordsCount = user.getRecords().size();
 
         Record record1 = new Record();
@@ -54,15 +53,16 @@ public class HibernateRecordRepoTest extends TestBaseHibernate {
 
         // then
         Assertions.assertEquals(recordsTableInitialTestSize + 1,
-                getSession().createQuery("FROM Record", Record.class).getResultList().size());
-        Assertions.assertEquals(recordsCount + 1, getSession().get(User.class, userId).getRecords().size());
+                repo.getCurrentSession().createQuery("FROM Record", Record.class).getResultList().size());
+        Assertions.assertEquals(recordsCount + 1, repo.getCurrentSession().get(User.class, userId).getRecords().size());
+        repo.closeRepoSession();
     }
 
     @Test
     @DisplayName("changeRecordTime with valid data - records table should update time for this record")
     public void changeRecordTime() {
         // given
-        Record record = getSession().get(Record.class, 1L); // time 09:00 'NINE'
+        Record record = repo.getCurrentSession().get(Record.class, 1L); // time 09:00 'NINE'
         RecordTime newTime = RecordTime.SEVENTEEN;
         long userId = record.getUser().getUserId();
 
@@ -71,13 +71,14 @@ public class HibernateRecordRepoTest extends TestBaseHibernate {
 
         // then
         Assertions.assertEquals(newTime, record.getTime());
-        Assertions.assertEquals(newTime, getSession().get(Record.class, 1L).getTime());
-        RecordTime time = getSession().get(User.class, userId).getRecords().stream()
+        Assertions.assertEquals(newTime, repo.getCurrentSession().get(Record.class, 1L).getTime());
+        RecordTime time = repo.getCurrentSession().get(User.class, userId).getRecords().stream()
                 .filter(r -> r.getRecordId() == 1L)
                 .findAny()
                 .get()
                 .getTime();
         Assertions.assertEquals(newTime, time);
+        repo.closeRepoSession();
     }
 
     @Test
@@ -85,17 +86,18 @@ public class HibernateRecordRepoTest extends TestBaseHibernate {
             "method shouldn't delete user with this record")
     public void deleteRecord() {
         // given
-        Record record = getSession().get(Record.class, 1L);
+        Record record = repo.getCurrentSession().get(Record.class, 1L);
         long userId = record.getUser().getUserId();
-        int recordsCount = getSession().get(User.class, userId).getRecords().size();
+        int recordsCount = repo.getCurrentSession().get(User.class, userId).getRecords().size();
 
         // when
         repo.deleteRecord(record);
 
         // then
-        Assertions.assertNull(getSession().get(Record.class, 1L));
-        Assertions.assertNotNull(getSession().get(User.class, userId));
-        Assertions.assertEquals(recordsCount - 1, getSession().get(User.class, userId).getRecords().size());
+        Assertions.assertNull(repo.getCurrentSession().get(Record.class, 1L));
+        Assertions.assertNotNull(repo.getCurrentSession().get(User.class, userId));
+        Assertions.assertEquals(recordsCount - 1, repo.getCurrentSession().get(User.class, userId).getRecords().size());
+        repo.closeRepoSession();
     }
 
     @Test
@@ -104,16 +106,17 @@ public class HibernateRecordRepoTest extends TestBaseHibernate {
     public void deleteRecordsForUser() {
         // given
         long userId = 1L;
-        User user = getSession().get(User.class, userId); // this user has 2 records
+        User user = repo.getCurrentSession().get(User.class, userId); // this user has 2 records
 
         // when
         repo.deleteRecordsForUser(user);
 
         // then
-        Assertions.assertEquals(0, getSession().createQuery("FROM Record WHERE user_id=:id")
+        Assertions.assertEquals(0, repo.getCurrentSession().createQuery("FROM Record WHERE user_id=:id")
         .setParameter("id", userId).getResultList().size());
-        Assertions.assertEquals(0, getSession().get(User.class, userId).getRecords().size());
+        Assertions.assertEquals(0, repo.getCurrentSession().get(User.class, userId).getRecords().size());
         Assertions.assertEquals(0, user.getRecords().size());
-        Assertions.assertNotNull(getSession().get(User.class, userId));
+        Assertions.assertNotNull(repo.getCurrentSession().get(User.class, userId));
+        repo.closeRepoSession();
     }
 }

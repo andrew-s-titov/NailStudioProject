@@ -1,7 +1,5 @@
 package org.itrex;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.itrex.config.SpringConfig;
 import org.itrex.entities.Record;
 import org.itrex.entities.Role;
@@ -10,6 +8,7 @@ import org.itrex.entities.enums.Discount;
 import org.itrex.entities.enums.RecordTime;
 import org.itrex.migrationService.FlywayService;
 import org.itrex.repositories.impl.HibernateRecordRepo;
+import org.itrex.repositories.impl.HibernateRoleRepo;
 import org.itrex.repositories.impl.HibernateUserRepo;
 import org.itrex.util.HibernateUtil;
 import org.itrex.util.PasswordEncryption;
@@ -27,21 +26,16 @@ public class App {
         ApplicationContext context = new AnnotationConfigApplicationContext(SpringConfig.class);
         context.getBean(FlywayService.class);
 
-        SessionFactory sessionFactory = context.getBean(SessionFactory.class);
-        Session session = sessionFactory.openSession();
-
         HibernateUserRepo userRepo = context.getBean(HibernateUserRepo.class);
         HibernateRecordRepo recordRepo = context.getBean(HibernateRecordRepo.class);
-
-        userRepo.setSession(session);
-        recordRepo.setSession(session);
+        HibernateRoleRepo roleRepo = context.getBean(HibernateRoleRepo.class);
 
         List<User> users;
         List<Record> records;
 
-        Role admin = session.find(Role.class, 1L);
-        Role staff = session.find(Role.class, 2L);
-        Role client = session.find(Role.class, 3L);
+        Role admin = roleRepo.getRoleByName("admin");
+        Role staff = roleRepo.getRoleByName("staff");
+        Role client = roleRepo.getRoleByName("client");
 
         User user1 = new User();
         user1.setFirstName("Andrew");
@@ -66,7 +60,6 @@ public class App {
         userRepo.addRoleForUser(user1, admin);
         userRepo.addRoleForUser(user1, staff);
         userRepo.addRoleForUser(user2, client);
-
 
         System.out.println(": : : : : Users after adding and altering : : : : :");
         users = userRepo.selectAll();
@@ -100,7 +93,10 @@ public class App {
         System.out.println(": : : : : Records left: " + records.size() + " : : : : :");
 
 //         * * * close connection * * *
-        session.close();
+        userRepo.closeRepoSession();
+        recordRepo.closeRepoSession();
+        roleRepo.closeRepoSession();
+
         HibernateUtil.closeFactory();
     }
 
