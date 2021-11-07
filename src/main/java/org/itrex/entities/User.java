@@ -117,10 +117,6 @@ public class User {
         return userRoles;
     }
 
-    public void setUserRoles(Set<Role> userRoles) {
-        this.userRoles = userRoles;
-    }
-
     @Override
     public String toString() {
         return "- - - User #" + userId + ": " +

@@ -10,4 +10,13 @@ public enum RecordTime {
     RecordTime(String digitsText) {
         this.digitsText = digitsText;
     }
+
+    public static RecordTime fromString(String text) {
+        for (RecordTime recordTime : RecordTime.values()) {
+            if (recordTime.digitsText.equalsIgnoreCase(text)) {
+                return recordTime;
+            }
+        }
+        return null;
+    }
 }

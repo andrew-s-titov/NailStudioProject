@@ -4,6 +4,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.itrex.entities.Role;
+import org.itrex.repositories.HibernateBaseRepoWithSessionManagement;
 import org.itrex.repositories.RoleRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class HibernateRoleRepo extends BaseHibernateRepoWithSessionManagement implements RoleRepo {
+public class HibernateRoleRepo implements RoleRepo, HibernateBaseRepoWithSessionManagement {
     private final SessionFactory sessionFactory;
     private Session session;
 
@@ -19,18 +20,21 @@ public class HibernateRoleRepo extends BaseHibernateRepoWithSessionManagement im
         this.sessionFactory = sessionFactory;
     }
 
+    @Override
     public void openSession() {
         if (!isSessionActive(session)) {
             this.session = sessionFactory.openSession();
         }
     }
 
+    @Override
     public void closeRepoSession() {
         if (isSessionActive(session)) {
             session.close();
         }
     }
 
+    @Override
     public Session getCurrentSession() {
         openSession();
         return session;

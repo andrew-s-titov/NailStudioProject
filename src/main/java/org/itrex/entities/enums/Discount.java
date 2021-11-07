@@ -1,15 +1,15 @@
 package org.itrex.entities.enums;
 
 public enum Discount {
-    ZERO(1.00),
-    TWO(0.98),
-    THREE(0.97),
-    FIVE(0.95),
-    TEN(0.90);
+    ZERO("0%"),
+    TWO("2%"),
+    THREE("3%"),
+    FIVE("5%"),
+    TEN("10%");
 
-    public final double totalPricePercentValue;
+    public final String percentString;
 
-    Discount(double totalPricePercentValue) {
-        this.totalPricePercentValue = totalPricePercentValue;
+    Discount(String percentString) {
+        this.percentString = percentString;
     }
 }

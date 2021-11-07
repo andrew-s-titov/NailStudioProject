@@ -62,7 +62,7 @@ public class App {
         userRepo.addRoleForUser(user2, client);
 
         System.out.println(": : : : : Users after adding and altering : : : : :");
-        users = userRepo.selectAll();
+        users = userRepo.getAll();
         printEntities(users);
 
         Record record1 = new Record();
@@ -80,14 +80,14 @@ public class App {
 
         System.out.println(": : : : : Records after adding : : : : :");
 
-        records = recordRepo.selectAll();
+        records = recordRepo.getAll();
         printEntities(records);
 
         recordRepo.deleteRecord(record1);
 
         userRepo.deleteUser(user1);
 
-        records = recordRepo.selectAll();
+        records = recordRepo.getAll();
         printEntities(records);
 
         System.out.println(": : : : : Records left: " + records.size() + " : : : : :");

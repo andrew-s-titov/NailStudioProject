@@ -27,7 +27,7 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
     @DisplayName("selectAll with valid data - should have 3 records equal to testdata migration script")
     public void selectAll() {
         // given & when
-        List<User> users = repo.selectAll();
+        List<User> users = repo.getAll();
 
         // then
         Assertions.assertEquals(usersTableInitialTestSize, users.size());
