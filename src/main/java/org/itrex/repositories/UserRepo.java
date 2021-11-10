@@ -23,8 +23,5 @@ public interface UserRepo {
 
     void changeDiscount(User user, Discount discount);
 
-    void addRecordForUser(User user, Record record);
-    void deleteRecordsForUser(User user);
-
     void addRoleForUser(User user, Role role);
 }

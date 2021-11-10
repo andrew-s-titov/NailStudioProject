@@ -1,24 +1,27 @@
 package org.itrex.config;
 
+import static org.itrex.dbProperties.H2Properties.*;
+
+import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
-import org.itrex.migrationService.FlywayService;
-import org.itrex.util.HibernateUtil;
+import org.hibernate.cfg.Configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
+@org.springframework.context.annotation.Configuration
 @ComponentScan({"org.itrex.repositories.impl", "org.itrex.services"})
 public class SpringConfig {
-    @Bean
-    public SessionFactory sessionFactory() {
-        return HibernateUtil.getSessionFactory();
+
+    @Bean(initMethod = "migrate")
+    public Flyway flyway() {
+        return Flyway.configure()
+                .dataSource(DB_URL, DB_USER, DB_PASSWORD)
+                .locations(SCRIPT_LOCATION)
+                .load();
     }
 
     @Bean
-    public FlywayService flywayService() {
-        FlywayService flywayService = new FlywayService();
-        flywayService.migrate();
-        return flywayService;
+    public SessionFactory sessionFactory() {
+        return new Configuration().configure().buildSessionFactory();
     }
 }

@@ -1,11 +1,17 @@
 package org.itrex.entities;
 
+import lombok.*;
 import org.itrex.entities.enums.RoleType;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+@Builder
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "roles", schema = "public")
 public class Role {
@@ -20,26 +26,6 @@ public class Role {
 
     @ManyToMany(mappedBy = "userRoles")
     private Set<User> users = new HashSet<>();
-
-    public long getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(long roleId) {
-        this.roleId = roleId;
-    }
-
-    public RoleType getRoletype() {
-        return roletype;
-    }
-
-    public void setRoletype(RoleType roletype) {
-        this.roletype = roletype;
-    }
-
-    public Set<User> getUsers() {
-        return users;
-    }
 
     @Override
     public String toString() {

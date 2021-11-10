@@ -1,4 +1,4 @@
-package org.itrex.repositories.impl;
+/*package org.itrex.repositories.impl;
 
 import org.itrex.RepositoryTestBaseJDBC;
 import org.itrex.entities.Record;
@@ -12,7 +12,7 @@ import java.sql.*;
 import java.util.List;
 
 public class JdbcRecordRepoTest extends RepositoryTestBaseJDBC {
-/*
+
     private final JdbcRecordRepo repo;
     private final int recordsTableInitialTestSize = 4;
 
@@ -166,5 +166,4 @@ public class JdbcRecordRepoTest extends RepositoryTestBaseJDBC {
         }
     }
 
- */
-}
+}*/

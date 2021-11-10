@@ -1,4 +1,4 @@
-package org.itrex.repositories.impl;
+/*package org.itrex.repositories.impl;
 
 import org.itrex.RepositoryTestBaseJDBC;
 import org.itrex.entities.Role;
@@ -16,7 +16,7 @@ import java.sql.Statement;
 import java.util.List;
 
 public class JdbcUserRepoTest extends RepositoryTestBaseJDBC {
-    /*
+
     private final JdbcUserRepo repo;
     private static final String SELECT_ALL_USERS_QUERY = "SELECT * FROM users";
 
@@ -250,5 +250,4 @@ public class JdbcUserRepoTest extends RepositoryTestBaseJDBC {
             Assertions.fail();
         }
     }
-    */
-}
+}*/

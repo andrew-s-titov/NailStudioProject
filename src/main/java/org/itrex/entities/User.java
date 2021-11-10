@@ -1,5 +1,6 @@
 package org.itrex.entities;
 
+import lombok.*;
 import org.itrex.entities.enums.Discount;
 
 import javax.persistence.*;
@@ -8,6 +9,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "users", schema = "public")
 public class User {
@@ -44,64 +49,14 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> userRoles = new HashSet<>();
 
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(long userId) {
+    @Builder
+    public User(Long userId, byte[] password, String firstName, String lastName, String phone, String email) {
         this.userId = userId;
-    }
-
-    public byte[] getPassword() {
-        return password;
-    }
-
-    public void setPassword(byte[] password) {
         this.password = password;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
         this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
         this.email = email;
-    }
-
-    public Discount getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(Discount discount) {
-        this.discount = discount;
-    }
-
-    public List<Record> getRecords() {
-        return records;
     }
 
     public void addRecord(Record record) {
@@ -113,16 +68,11 @@ public class User {
         records.remove(record);
     }
 
-    public Set<Role> getUserRoles() {
-        return userRoles;
-    }
-
     @Override
     public String toString() {
         return "- - - User #" + userId + ": " +
                 firstName + " " + lastName + ", " +
                 phone + ", " + email +
-                ", discount: " + discount +
-                ", roles: " + userRoles + " - - -";
+                ", discount: " + discount + " - - -";
     }
 }

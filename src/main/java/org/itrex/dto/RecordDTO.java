@@ -1,40 +1,15 @@
 package org.itrex.dto;
 
+import lombok.Builder;
+import lombok.Data;
+
+import org.itrex.entities.enums.RecordTime;
+
+@Data
+@Builder
 public class RecordDTO {
     long recordId;
     String date;
-    String time;
+    RecordTime time;
     long userId;
-
-    public long getRecordId() {
-        return recordId;
-    }
-
-    public void setRecordId(long recordId) {
-        this.recordId = recordId;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
-
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
 }
