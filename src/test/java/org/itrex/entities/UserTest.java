@@ -5,9 +5,14 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.itrex.TestBaseHibernate;
 import org.itrex.entities.enums.RecordTime;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Date;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UserTest extends TestBaseHibernate {
     SessionFactory sessionFactory = getContext().getBean(SessionFactory.class);
@@ -38,28 +43,9 @@ public class UserTest extends TestBaseHibernate {
         transaction.commit();
 
         // then
-        Assertions.assertEquals(3,
+        assertEquals(3,
                 session.createQuery("FROM Record WHERE user_id = 1").getResultList().size());
-        Assertions.assertEquals(3, user.getRecords().size());
-        Assertions.assertEquals(5, session.createQuery("FROM Record").getResultList().size());
-    }
-
-    @Test
-    @DisplayName("removeRecord with valid data - should delete Record from DB")
-    public void removeRecord() {
-        // given
-        User user = session.find(User.class, 1L); // this user has 2 records
-        Record record = user.getRecords().get(0);
-
-        // when
-        Transaction transaction = session.beginTransaction();
-        user.removeRecord(record);
-        transaction.commit();
-
-        // then
-        Assertions.assertEquals(1,
-                session.createQuery("FROM Record WHERE user_id = 1").getResultList().size());
-        Assertions.assertEquals(1, user.getRecords().size());
-        Assertions.assertEquals(3, session.createQuery("FROM Record").getResultList().size());
+        assertEquals(3, user.getRecords().size());
+        assertEquals(5, session.createQuery("FROM Record").getResultList().size());
     }
 }

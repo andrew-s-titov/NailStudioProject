@@ -1,84 +1,153 @@
 package org.itrex.repositories.impl;
 
+import org.hibernate.Session;
 import org.itrex.TestBaseHibernate;
 import org.itrex.entities.Record;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.RecordTime;
-import org.junit.jupiter.api.Assertions;
+import org.itrex.exceptions.DatabaseEntryNotFoundException;
+import org.itrex.repositories.RecordRepo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Date;
 import java.util.List;
 
-public class HibernateRecordRepoTest extends TestBaseHibernate {
-    private final HibernateRecordRepo repo;
-    private final int recordsTableInitialTestSize = 4;
+import static org.junit.jupiter.api.Assertions.*;
 
-    public HibernateRecordRepoTest() {
-        repo = getContext().getBean(HibernateRecordRepo.class);
-    }
+public class HibernateRecordRepoTest extends TestBaseHibernate {
+    private final RecordRepo repo = getContext().getBean(RecordRepo.class);
+    private final int recordsTableInitialTestSize = 4;
+    private Session session;
 
     @Test
-    @DisplayName("selectAll with valid data - should have 4 records equal to testdata migration script")
-    public void selectAll() {
+    @DisplayName("getAll with valid data - should have 4 Records equal to testdata migration script")
+    public void getAll() {
         // given & when
         List<Record> records = repo.getAll();
 
         // then
-        Assertions.assertEquals(recordsTableInitialTestSize, records.size());
-        Assertions.assertEquals(1, records.get(0).getUser().getUserId());
-        Assertions.assertEquals(Date.valueOf("2021-10-18"), records.get(0).getDate());
-        Assertions.assertEquals(RecordTime.NINE, records.get(0).getTime());
-        Assertions.assertEquals(2, records.get(3).getUser().getUserId());
-        Assertions.assertEquals(RecordTime.SEVENTEEN, records.get(3).getTime());
-        repo.closeRepoSession();
+        assertEquals(recordsTableInitialTestSize, records.size());
+        assertEquals(1, records.get(0).getUser().getUserId());
+        assertEquals(Date.valueOf("2021-10-18"), records.get(0).getDate());
+        assertEquals(RecordTime.NINE, records.get(0).getTime());
+        assertEquals(2, records.get(3).getUser().getUserId());
+        assertEquals(RecordTime.SEVENTEEN, records.get(3).getTime());
     }
 
     @Test
-    @DisplayName("addRecord with valid data - records table should contain added Record")
-    public void addRecord() {
-        // given
-        long userId = 1L;
-        User user = repo.getCurrentSession().get(User.class, userId);
-        int recordsCount = user.getRecords().size();
-
-        Record record1 = new Record();
-        record1.setUser(user);
-        record1.setDate(Date.valueOf("2021-10-19"));
-        record1.setTime(RecordTime.NINE);
-
-        // when
-        repo.addRecord(record1);
+    @DisplayName("getRecordById with valid data - should return existing Record")
+    public void getRecordById1() {
+        // given & when
+        Record record1 = repo.getRecordById(1L);
+        Record record2 = repo.getRecordById(3L);
 
         // then
-        Assertions.assertEquals(recordsTableInitialTestSize + 1,
-                repo.getCurrentSession().createQuery("FROM Record", Record.class).getResultList().size());
-        Assertions.assertEquals(recordsCount + 1, repo.getCurrentSession().get(User.class, userId).getRecords().size());
-        repo.closeRepoSession();
+        assertEquals(1, record1.getRecordId());
+        assertEquals(RecordTime.NINE, record1.getTime());
+        assertEquals(Date.valueOf("2021-10-18"), record1.getDate());
+        assertEquals(3, record2.getRecordId());
+        assertEquals(RecordTime.THIRTEEN, record2.getTime());
+        assertEquals(Date.valueOf("2021-10-18"), record2.getDate());
+    }
+
+    @Test
+    @DisplayName("getRecordById with invalid data - should throw DatabaseEntryNotFoundException")
+    public void getRecordById2() {
+        // when & then
+        assertThrows(DatabaseEntryNotFoundException.class, () -> repo.getRecordById(7L));
+        assertThrows(DatabaseEntryNotFoundException.class, () -> repo.getRecordById(180L));
+    }
+
+    @Test
+    @DisplayName("getRecordsForUserByUserId with valid data - should return a list of Records for User")
+    public void getRecordsForUserByUserId1() {
+        // given & when
+        long userId = 1L; // User with this id has 2 records
+        List<Record> records = repo.getRecordsForUserByUserId(userId);
+
+        // then
+        assertEquals(2, records.size());
+    }
+
+    @Test
+    @DisplayName("getRecordsForUserByUserId with invalid data - should retun empty list")
+    public void getRecordsForUserByUserId2() {
+        // given
+        long userId = 7L; // there are no Users with this id
+        List<Record> records = repo.getRecordsForUserByUserId(userId);
+
+        // when & then
+        assertEquals(0, records.size());
+    }
+
+    @Test
+    @DisplayName("addRecordForUser with valid data - records table should contain added Record")
+    public void addRecordForUser() {
+        // given
+        session = getSessionFactory().openSession();
+        long userId = 1L; // this User has 2 records
+        User user = session.find(User.class, userId);
+        int recordsCount = user.getRecords().size();
+        session.close();
+
+        Record record = new Record();
+        record.setDate(Date.valueOf("2021-10-19"));
+        record.setTime(RecordTime.NINE);
+
+        // when
+        repo.addRecordForUser(user, record);
+
+        // then
+        session = getSessionFactory().openSession();
+        assertEquals(recordsTableInitialTestSize + 1,
+                session.createQuery("FROM Record", Record.class).list().size());
+        assertEquals(recordsCount + 1, session.get(User.class, userId).getRecords().size());
+        session.close();
     }
 
     @Test
     @DisplayName("changeRecordTime with valid data - records table should update time for this record")
     public void changeRecordTime() {
         // given
-        Record record = repo.getCurrentSession().get(Record.class, 1L); // time 09:00 'NINE'
+        session = getSessionFactory().openSession();
+        Record record = session.find(Record.class, 1L); // time 09:00 'NINE'
         RecordTime newTime = RecordTime.SEVENTEEN;
         long userId = record.getUser().getUserId();
+        session.close();
 
         // when
-        repo.changeRecordTime(record, RecordTime.SEVENTEEN);
+        repo.changeRecordTime(record, newTime);
+        session = getSessionFactory().openSession();
+        record = session.find(Record.class, 1L);
+        session.close();
 
         // then
-        Assertions.assertEquals(newTime, record.getTime());
-        Assertions.assertEquals(newTime, repo.getCurrentSession().get(Record.class, 1L).getTime());
-        RecordTime time = repo.getCurrentSession().get(User.class, userId).getRecords().stream()
+        assertEquals(newTime, record.getTime());
+        session = getSessionFactory().openSession();
+        RecordTime time = session.find(User.class, userId).getRecords().stream()
                 .filter(r -> r.getRecordId() == 1L)
                 .findAny()
                 .get()
                 .getTime();
-        Assertions.assertEquals(newTime, time);
-        repo.closeRepoSession();
+        assertEquals(newTime, time);
+        session.close();
+    }
+
+    @Test
+    @DisplayName("getFreeTimeForDate with valid data - should return a list of RecordTime")
+    public void getFreeTimeForDate() {
+        // given
+        Date date1 = Date.valueOf("2021-10-18"); // there's 1 free RecordTime for this date
+        Date date2 = Date.valueOf("2021-01-01"); // there are no Records with this date, so every RecordTime for it is free
+
+        // when
+        List<RecordTime> timeList1 = repo.getFreeTimeForDate(date1);
+        List<RecordTime> timeList2 = repo.getFreeTimeForDate(date2);
+
+        // then
+        assertEquals(1, timeList1.size());
+        assertEquals(3, timeList2.size());
     }
 
     @Test
@@ -86,37 +155,19 @@ public class HibernateRecordRepoTest extends TestBaseHibernate {
             "method shouldn't delete user with this record")
     public void deleteRecord() {
         // given
-        Record record = repo.getCurrentSession().get(Record.class, 1L);
-        long userId = record.getUser().getUserId();
-        int recordsCount = repo.getCurrentSession().get(User.class, userId).getRecords().size();
+        session = getSessionFactory().openSession();
+        Record record = session.find(Record.class, 1L);
+        session.close();
 
         // when
         repo.deleteRecord(record);
 
         // then
-        Assertions.assertNull(repo.getCurrentSession().get(Record.class, 1L));
-        Assertions.assertNotNull(repo.getCurrentSession().get(User.class, userId));
-        Assertions.assertEquals(recordsCount - 1, repo.getCurrentSession().get(User.class, userId).getRecords().size());
-        repo.closeRepoSession();
-    }
-
-    @Test
-    @DisplayName("deleteRecordForUser with valid data - records table shouldn't contain records for the user," +
-            "method shouldn't delete user with these records")
-    public void deleteRecordsForUser() {
-        // given
-        long userId = 1L;
-        User user = repo.getCurrentSession().get(User.class, userId); // this user has 2 records
-
-        // when
-        repo.deleteRecordsForUser(user);
-
-        // then
-        Assertions.assertEquals(0, repo.getCurrentSession().createQuery("FROM Record WHERE user_id=:id")
-        .setParameter("id", userId).getResultList().size());
-        Assertions.assertEquals(0, repo.getCurrentSession().get(User.class, userId).getRecords().size());
-        Assertions.assertEquals(0, user.getRecords().size());
-        Assertions.assertNotNull(repo.getCurrentSession().get(User.class, userId));
-        repo.closeRepoSession();
+        session = getSessionFactory().openSession();
+        assertNull(session.find(Record.class, 1L));
+        User user = session.find(User.class, 1L);
+        assertNotNull(user);
+        assertEquals(1, user.getRecords().size());
+        session.close();
     }
 }

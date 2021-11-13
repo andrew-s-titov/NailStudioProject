@@ -77,22 +77,42 @@ public class HibernateUserRepo implements UserRepo {
 
     @Override
     public void changeEmail(User user, String newEmail) {
-        inSession(() -> user.setEmail(newEmail));
+        inSession(() -> {
+            session.update(user);
+            session.beginTransaction();
+            user.setEmail(newEmail);
+            session.getTransaction().commit();
+        });
     }
 
     @Override
     public void changeDiscount(User user, Discount discount) {
-        inSession(() -> user.setDiscount(discount));
+        inSession(() -> {
+            session.update(user);
+            session.beginTransaction();
+            user.setDiscount(discount);
+            session.getTransaction().commit();
+        });
     }
 
     @Override
     public void addRoleForUser(User user, Role role) {
-        inSession(() -> user.getUserRoles().add(role));
+        inSession(() -> {
+            session.beginTransaction();
+            session.update(user);
+            user.getUserRoles().add(role);
+            session.getTransaction().commit();
+        });
     }
 
     private void inSession(Runnable runnable) {
         session = sessionFactory.openSession();
-        runnable.run();
-        session.close();
+        try {
+            runnable.run();
+        } catch (HibernateException e) {
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
     }
 }

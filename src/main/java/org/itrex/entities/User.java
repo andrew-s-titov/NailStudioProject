@@ -64,10 +64,6 @@ public class User {
         record.setUser(this);
     }
 
-    public void removeRecord(Record record) {
-        records.remove(record);
-    }
-
     @Override
     public String toString() {
         return "- - - User #" + userId + ": " +

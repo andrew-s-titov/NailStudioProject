@@ -28,7 +28,7 @@ public class Record {
     private RecordTime time;
 
     @Immutable
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 

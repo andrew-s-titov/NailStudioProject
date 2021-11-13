@@ -1,0 +1,78 @@
+package org.itrex.repositories.impl;
+
+import org.itrex.TestBaseHibernate;
+import org.itrex.entities.Role;
+import org.itrex.entities.enums.RoleType;
+import org.itrex.exceptions.DatabaseEntryNotFoundException;
+import org.itrex.repositories.RoleRepo;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class HibernateRoleRepoTest extends TestBaseHibernate {
+    private final RoleRepo repo = getContext().getBean(RoleRepo.class);
+
+    @Test
+    @DisplayName("getRoles - should return a list of Roles")
+    public void getRoles() {
+        // given & when
+        List<Role> roles = repo.getRoles();
+
+        // then
+        assertEquals(3, roles.size());
+    }
+
+    @Test
+    @DisplayName("getRoleByName with valid data - should return single Role of given type")
+    public void getRoleByName1() {
+        // given
+        String roleName1 = "admin";
+        String roleName2 = "AdmIN";
+
+        // when
+        Role role1 = repo.getRoleByName(roleName1);
+        Role role2 = repo.getRoleByName(roleName2);
+
+        // then
+        assertEquals(RoleType.ADMIN, role1.getRoletype());
+        assertEquals(RoleType.ADMIN, role2.getRoletype());
+        assertEquals(1, role1.getRoleId());
+    }
+
+    @Test
+    @DisplayName("getRoleByName with invalid data - should throw DatabaseEntryNotFoundException")
+    public void getRoleByName2() {
+        // given
+        String roleName = "noRole"; // no such role
+
+        // when & then
+        assertThrows(DatabaseEntryNotFoundException.class, () -> repo.getRoleByName(roleName));
+    }
+
+    @Test
+    @DisplayName("getRoleById1 with valid data - should return a Role with given id")
+    public void getRoleById1() {
+        // given
+        long roleId = 1L;
+
+        // when
+        Role role = repo.getRoleById(roleId);
+
+        // then
+        assertEquals(1, role.getRoleId());
+        assertEquals(RoleType.ADMIN, role.getRoletype());
+    }
+
+    @Test
+    @DisplayName("getRoleById1 with invalid data - should throw DatabaseEntryNotFoundException")
+    public void getRoleById2() {
+        // given
+        long roleId = 150L;
+
+        // when & then
+        assertThrows(DatabaseEntryNotFoundException.class, () -> repo.getRoleById(roleId));
+    }
+}

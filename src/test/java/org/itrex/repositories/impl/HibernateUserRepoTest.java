@@ -1,166 +1,228 @@
 package org.itrex.repositories.impl;
 
+import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.itrex.TestBaseHibernate;
 import org.itrex.entities.Record;
 import org.itrex.entities.Role;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.Discount;
+import org.itrex.exceptions.DatabaseEntryNotFoundException;
+import org.itrex.repositories.UserRepo;
 import org.itrex.util.PasswordEncryption;
-import org.junit.jupiter.api.Assertions;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
-public class HibernateUserRepoTest extends TestBaseHibernate {
-    private final HibernateUserRepo repo;
-    private final int usersTableInitialTestSize = 3;
+import static org.junit.jupiter.api.Assertions.*;
 
-    public HibernateUserRepoTest() {
-        repo = getContext().getBean(HibernateUserRepo.class);
-    }
+public class HibernateUserRepoTest extends TestBaseHibernate {
+    private final UserRepo repo = getContext().getBean(UserRepo.class);
+    private final int usersTableInitialTestSize = 3;
+    private Session session;
 
     @Test
-    @DisplayName("selectAll with valid data - should have 3 records equal to testdata migration script")
-    public void selectAll() {
+    @DisplayName("getAll with valid data - should have 3 Records equal to testdata migration script")
+    public void getAll() {
         // given & when
         List<User> users = repo.getAll();
 
         // then
-        Assertions.assertEquals(usersTableInitialTestSize, users.size());
-        Assertions.assertEquals(1, users.get(0).getUserId());
-        Assertions.assertEquals("Andrew", users.get(0).getFirstName());
-        Assertions.assertEquals("T", users.get(0).getLastName());
-        Assertions.assertEquals("+375293000000", users.get(0).getPhone());
-        Assertions.assertEquals("wow@gmail.com", users.get(0).getEmail());
-        Assertions.assertEquals(3, users.get(2).getUserId());
-        Assertions.assertEquals("+1946484888", users.get(2).getPhone());
-        repo.closeRepoSession();
+        assertEquals(usersTableInitialTestSize, users.size());
+        assertEquals(1, users.get(0).getUserId());
+        assertEquals("Andrew", users.get(0).getFirstName());
+        assertEquals("T", users.get(0).getLastName());
+        assertEquals("+375293000000", users.get(0).getPhone());
+        assertEquals("wow@gmail.com", users.get(0).getEmail());
+        assertEquals(3, users.get(2).getUserId());
+        assertEquals("+1946484888", users.get(2).getPhone());
     }
 
     @Test
-    @DisplayName("addUser with valid data - users table should contain given user")
-    public void addUser1() throws InvalidKeySpecException, NoSuchAlgorithmException {
+    @DisplayName("findUserById with valid data - should return a User with given id")
+    public void findUserById1() {
         // given
-        User user = new User();
-        user.setPassword(PasswordEncryption.getEncryptedPassword("notSoStrongPassword"));
-        user.setFirstName("Freddy");
-        user.setLastName("Krueger");
-        user.setPhone("1900909Fred");
-        user.setEmail("freshmeat@yahoo.com");
+        long userId = 1L;
+
+        // when
+        User user = repo.findUserById(userId);
+
+        // then
+        assertEquals(userId, user.getUserId());
+        assertEquals("+375293000000", user.getPhone());
+    }
+
+    @Test
+    @DisplayName("findUserById with invalid data - should throw DatabaseEntryNotFoundException")
+    public void findUserById2() {
+        // given
+        long userId = 7L; // there are no Users with this id
+
+        // when & then
+        assertThrows(DatabaseEntryNotFoundException.class, () -> repo.findUserById(userId));
+    }
+
+    @Test
+    @DisplayName("findUserByPhone with valid data - should return a User with given phone number")
+    public void findUserByPhone1() {
+        // given
+        String phone = "+1946484888";
+
+        // when
+        User user = repo.findUserByPhone(phone);
+
+        // then
+        assertEquals(phone, user.getPhone());
+        assertEquals("hughjackman@gmail.com", user.getEmail());
+        assertEquals(3, user.getUserId());
+    }
+
+    @Test
+    @DisplayName("findUserByPhone with invalid data - should return null")
+    public void findUserByPhone2() {
+        // given
+        String phone = "+7777777777"; // there are no Users with this phone number
+
+        // when
+        User user = repo.findUserByPhone(phone);
+
+        // when & then
+        assertNull(user);
+    }
+
+    @Test
+    @DisplayName("addUser with valid data - users table should contain given User")
+    public void addUser1() {
+        // given
+        User user = User.builder()
+                .password(PasswordEncryption.getEncryptedPassword("notSoStrongPassword"))
+                .firstName("Freddy")
+                .lastName("Krueger")
+                .phone("1900909Fred")
+                .email("freshmeat@yahoo.com")
+                .build();
 
         // when
         repo.addUser(user);
 
         // then
-        long usersCount = repo.getCurrentSession().createQuery("FROM User", User.class).getResultList().stream()
+        session = getSessionFactory().openSession();
+        long usersCount = session.createQuery("FROM User", User.class).getResultList().stream()
                 .filter(u -> u.getPhone().equals("1900909Fred")).count();
-        Assertions.assertEquals(1, usersCount);
-        repo.closeRepoSession();
+        assertEquals(1, usersCount);
+        session.close();
     }
 
     @Test
     @DisplayName("addUser with invalid data - users table shouldn't contain added users")
-    public void addUser2() throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public void addUser2() {
         // given
-        User user1 = new User();
-        user1.setPassword(PasswordEncryption.getEncryptedPassword("notSoStrongPassword"));
-        user1.setFirstName("Freddy");
-        user1.setLastName("Krueger");
-        // shouldn't exceed 13 сhars
-        user1.setPhone("+375-29-333-33-33");
-        user1.setEmail("freshmeat@yahoo.com");
+        User user1 = User.builder()
+                .password(PasswordEncryption.getEncryptedPassword("notSoStrongPassword"))
+                .firstName("Freddy")
+                .lastName("Krueger")
+                // shouldn't exceed 13 chars
+                .phone("+375-29-333-33-33")
+                .email("freshmeat@yahoo.com")
+                .build();
 
-        User user2 = new User();
-        user2.setPassword(PasswordEncryption.getEncryptedPassword("notSoStrongPassword"));
-        user2.setFirstName("Edward");
-        user2.setLastName("Scissorshands");
-        // should be unique
-        user2.setPhone("+375293000000");
-        user2.setEmail("holdme@yahoo.com");
+        User user2 = User.builder()
+                .password(PasswordEncryption.getEncryptedPassword("notSoStrongPassword"))
+                .firstName("Edward")
+                .lastName("Scissorshands")
+                // should be unique
+                .phone("+375293000000")
+                .email("holdme@yahoo.com")
+                .build();
 
-        // when
         repo.addUser(user1);
         repo.addUser(user2);
 
         // then
-        Assertions.assertEquals(usersTableInitialTestSize,
-                repo.getCurrentSession().createQuery("FROM User", User.class).getResultList().size());
-        repo.closeRepoSession();
+        session = getSessionFactory().openSession();
+        assertEquals(usersTableInitialTestSize,
+                session.createQuery("FROM User", User.class).list().size());
+        session.close();
     }
 
     @Test
-    @DisplayName("changeEmail with valid data - 'e_mail' field should be changed for a user")
+    @DisplayName("deleteUser with valid data - should delete User; users table shouldn't contain User; " +
+            "all Records for User should be deleted")
+    public void deleteUser() {
+        // given
+        session = getSessionFactory().openSession();
+        long userId = 1L;
+        User user = session.find(User.class, userId); // this User has 2 records
+        session.close();
+
+        // when
+        repo.deleteUser(user);
+
+        // then
+        session = getSessionFactory().openSession();
+        assertNull(session.find(User.class, userId));
+
+        Query<Record> query = session.createQuery("FROM Record WHERE user_id = :userId", Record.class);
+        query.setParameter("userId", userId);
+        assertTrue(query.list().isEmpty());
+        session.close();
+    }
+
+    @Test
+    @DisplayName("changeEmail with valid data - 'e_mail' field should be changed for a User")
     public void changeEmail() {
         // given
-        User user = repo.getCurrentSession().find(User.class, 1L);
+        session = getSessionFactory().openSession();
+        User user = session.find(User.class, 1L);
+        session.close();
         String newEmail = "my_new_email@mail.ru";
 
         // when
         repo.changeEmail(user, newEmail);
 
         // then
-        Assertions.assertEquals(newEmail, user.getEmail());
-        Assertions.assertEquals(newEmail, repo.getCurrentSession().get(User.class, 1L).getEmail());
-        repo.closeRepoSession();
+        session = getSessionFactory().openSession();
+        user = session.find(User.class, 1L);
+        assertEquals(newEmail, user.getEmail());
+        session.close();
     }
 
     @Test
     @DisplayName("changeDiscount with valid data - 'discount' field should be changed for a user")
     public void changeDiscount() {
         // given
-        User user = repo.getCurrentSession().find(User.class, 1L);
+        session = getSessionFactory().openSession();
+        User user = session.find(User.class, 1L);
+        session.close();
         Discount newDiscount = Discount.TEN;
 
         // when
         repo.changeDiscount(user, newDiscount);
 
         // then
-        Assertions.assertEquals(newDiscount, user.getDiscount());
-        Assertions.assertEquals(newDiscount, repo.getCurrentSession().get(User.class, 1L).getDiscount());
-        repo.closeRepoSession();
-    }
-
-    @Test
-    @DisplayName("deleteUser with valid data - should delete user; users table shouldn't contain user; " +
-            "all records for user should be deleted")
-    public void deleteUser() {
-        // given
-        Long userId = 1L;
-        User user = repo.getCurrentSession().get(User.class, userId); // this user has 2 records
-
-        // when
-        repo.deleteUser(user);
-
-        // then
-        Assertions.assertNull(repo.getCurrentSession().get(User.class, userId));
-
-        Query<Record> query = repo.getCurrentSession().createQuery("FROM Record WHERE user_id=:userId", Record.class);
-        query.setParameter("userId", userId);
-        Assertions.assertEquals(0, query.getResultList().size());
-        repo.closeRepoSession();
+        session = getSessionFactory().openSession();
+        assertEquals(newDiscount, session.find(User.class, 1L).getDiscount());
+        session.close();
     }
 
     @Test
     @DisplayName("addRoleForUser with valid data - should add 1 row into ManyToMany join table")
     public void addRoleForUser() {
         // given
-        Role client = repo.getCurrentSession().get(Role.class, 3L); // 2 users have this role
-        User user = repo.getCurrentSession().get(User.class, 1L); // this user have 2 roles, doesn't have "client" role
+        session = getSessionFactory().openSession();
+        Role client = session.get(Role.class, 3L); // 2 Users have this role
+        User user = session.get(User.class, 1L); // this User have 2 roles, doesn't have "client" role
+        session.close();
 
         // when
         repo.addRoleForUser(user, client);
 
         // then
-        Assertions.assertTrue(user.getUserRoles().contains(client));
-        Assertions.assertTrue(client.getUsers().contains(user));
-        Assertions.assertEquals(3, repo.getCurrentSession().get(Role.class, 3L).getUsers().size());
-        Assertions.assertEquals(3, repo.getCurrentSession().get(User.class, 1L).getUserRoles().size());
-        Assertions.assertEquals(5, repo.getCurrentSession().createSQLQuery("SELECT * FROM users_roles;")
-                .getResultList().size());
-        repo.closeRepoSession();
+        session = getSessionFactory().openSession();
+        assertEquals(3, session.get(User.class, 1L).getUserRoles().size());
+        assertEquals(5, session.createSQLQuery("SELECT * FROM users_roles").list().size());
+        session.close();
     }
 }

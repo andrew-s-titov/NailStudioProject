@@ -3,9 +3,11 @@ package org.itrex.services.impl;
 import lombok.RequiredArgsConstructor;
 import org.itrex.dto.RecordDTO;
 import org.itrex.entities.Record;
+import org.itrex.entities.User;
 import org.itrex.entities.enums.RecordTime;
 import org.itrex.exceptions.BookingUnavailableException;
 import org.itrex.repositories.RecordRepo;
+import org.itrex.repositories.UserRepo;
 import org.itrex.services.RecordService;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 @Service
 public class RecordServiceImpl implements RecordService {
     private final RecordRepo recordRepo;
+    private final UserRepo userRepo;
 
     @Override
     public List<RecordDTO> getAll() {
@@ -36,6 +39,22 @@ public class RecordServiceImpl implements RecordService {
     @Override
     public RecordDTO getRecordById(Serializable id) {
         return entityToDTO(recordRepo.getRecordById(id));
+    }
+
+    @Override
+    public String addRecordForUser(Serializable userId, RecordDTO recordDTO) {
+        User user = userRepo.findUserById(userId);
+        RecordTime time = recordDTO.getTime();
+        Date date = Date.valueOf(recordDTO.getDate());
+        try {
+            checkTimeAvailability(date, time);
+            Record newRecord = fromDTO(recordDTO);
+            recordRepo.addRecordForUser(user, newRecord);
+            return "Booking successful";
+        } catch (BookingUnavailableException ex) {
+            ex.printStackTrace();
+            return ex.getMessage();
+        }
     }
 
     @Override
@@ -59,7 +78,7 @@ public class RecordServiceImpl implements RecordService {
     }
 
     private void checkTimeAvailability(Date date, RecordTime newTime) throws BookingUnavailableException {
-        if (recordRepo.getFreeTimeForDate(date).contains(newTime)) {
+        if (!recordRepo.getFreeTimeForDate(date).contains(newTime)) {
             throw new BookingUnavailableException();
         }
     }
@@ -70,6 +89,13 @@ public class RecordServiceImpl implements RecordService {
                 .date(recordEntity.getDate().toString())
                 .time(recordEntity.getTime())
                 .userId(recordEntity.getUser().getUserId())
+                .build();
+    }
+
+    private Record fromDTO(RecordDTO recordDTO) {
+        return Record.builder()
+                .date(Date.valueOf(recordDTO.getDate()))
+                .time(recordDTO.getTime())
                 .build();
     }
 }

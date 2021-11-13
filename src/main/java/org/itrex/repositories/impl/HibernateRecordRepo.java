@@ -1,7 +1,6 @@
 package org.itrex.repositories.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.itrex.entities.Record;
@@ -13,8 +12,9 @@ import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Repository
@@ -43,25 +43,6 @@ public class HibernateRecordRepo implements RecordRepo {
     }
 
     @Override
-    public void changeRecordTime(Record record, RecordTime newTime) {
-        inSession(() -> record.setTime(newTime));
-    }
-
-    @Override
-    public void deleteRecord(Record record) {
-        inSession(() -> {
-            session.beginTransaction();
-            try {
-                record.getUser().removeRecord(record);
-                session.getTransaction().commit();
-            } catch (HibernateException ex) {
-                ex.printStackTrace();
-                session.getTransaction().rollback();
-            }
-        });
-    }
-
-    @Override
     public List<Record> getRecordsForUserByUserId(Serializable userId) {
         session = sessionFactory.openSession();
         List<Record> records = session.createQuery("FROM Record WHERE user_id = :id", Record.class)
@@ -72,23 +53,46 @@ public class HibernateRecordRepo implements RecordRepo {
     }
 
     @Override
-    public void addRecordForUser(User user, Record record) {
+    public void changeRecordTime(Record record, RecordTime newTime) {
         inSession(() -> {
-            user.addRecord(record);
-            session.save(record);
+            session.beginTransaction();
+            session.update(record);
+            record.setTime(newTime);
+            session.getTransaction().commit();
         });
     }
 
+    @Override
+    public void deleteRecord(Record record) {
+        inSession(() -> {
+            session.beginTransaction();
+            session.delete(record);
+            session.getTransaction().commit();
+        });
+    }
+
+    @Override
+    public void addRecordForUser(User user, Record record) {
+        inSession(() -> {
+            session.beginTransaction();
+            session.update(user);
+            user.addRecord(record);
+            session.getTransaction().commit();
+        });
+    }
 
     public List<RecordTime> getFreeTimeForDate(Date date) {
         session = sessionFactory.openSession();
-        List<RecordTime> availableTime = session.createQuery("FROM Record WHERE date = :date", Record.class)
+        final List<RecordTime> availableTime = new ArrayList<>(Arrays.asList(RecordTime.values()));
+        List<Record> recordsWithGivenDate = session.createQuery("FROM Record WHERE date = :date", Record.class)
                 .setParameter("date", date)
-                .list()
-                .stream()
-                .map(Record::getTime)
-                .collect(Collectors.toList());
+                .list();
         session.close();
+        if (!recordsWithGivenDate.isEmpty()) {
+            recordsWithGivenDate.stream()
+                    .map(Record::getTime)
+                    .forEach(availableTime::remove);
+        }
         return availableTime;
     }
 

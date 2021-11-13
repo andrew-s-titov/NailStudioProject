@@ -49,12 +49,7 @@ public class App {
         List<User> users = userRepo.getAll();
         users.forEach(System.out::println);
 
-        User t = User.builder()
-                .firstName("T")
-                .lastName("F")
-                .build();
-        System.out.println(t);
-//
+
 //        Record record1 = new Record();
 //        record1.setUser(user1);
 //        record1.setDate(Date.valueOf("2021-10-18"));
@@ -84,6 +79,5 @@ public class App {
 
 //         * * * close connection * * *
         sessionFactory.close();
-
     }
 }

@@ -4,13 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.itrex.entities.Role;
+import org.itrex.entities.enums.RoleType;
 import org.itrex.exceptions.DatabaseEntryNotFoundException;
 import org.itrex.repositories.RoleRepo;
 import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Repository
@@ -28,19 +32,17 @@ public class HibernateRoleRepo implements RoleRepo {
 
     @Override
     public Role getRoleByName(String name) {
-        Optional<Role> role;
-        session = sessionFactory.openSession();
-        role = session.createQuery("FROM Role WHERE role_name = :name", Role.class)
-                .setParameter("name", name.toUpperCase())
-                .list()
-                .stream()
-                .findAny();
-        session.close();
-        if (role.isEmpty()) {
+        List<String> roleNames = Arrays.stream(RoleType.values())
+                .map(RoleType::name)
+                .collect(Collectors.toList());
+        if (!roleNames.contains(name.toUpperCase())) {
             String message = String.format("Role \"%s\" wasn't found", name);
             throw new DatabaseEntryNotFoundException(message);
         }
-        return role.orElse(null);
+        session = sessionFactory.openSession();
+        return session.createQuery("FROM Role WHERE role_name = :name", Role.class)
+                .setParameter("name", name.toUpperCase())
+                .getSingleResult();
     }
 
     @Override
