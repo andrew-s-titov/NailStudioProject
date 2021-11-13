@@ -28,11 +28,9 @@ public class HibernateRoleRepoTest extends TestBaseHibernate {
     @Test
     @DisplayName("getRoleByName with valid data - should return single Role of given type")
     public void getRoleByName1() {
-        // given
+        // given & when
         String roleName1 = "admin";
         String roleName2 = "AdmIN";
-
-        // when
         Role role1 = repo.getRoleByName(roleName1);
         Role role2 = repo.getRoleByName(roleName2);
 
@@ -53,7 +51,7 @@ public class HibernateRoleRepoTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("getRoleById1 with valid data - should return a Role with given id")
+    @DisplayName("getRoleById with valid data - should return a Role with given id")
     public void getRoleById1() {
         // given
         long roleId = 1L;
@@ -67,7 +65,7 @@ public class HibernateRoleRepoTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("getRoleById1 with invalid data - should throw DatabaseEntryNotFoundException")
+    @DisplayName("getRoleById with invalid data - should throw DatabaseEntryNotFoundException")
     public void getRoleById2() {
         // given
         long roleId = 150L;

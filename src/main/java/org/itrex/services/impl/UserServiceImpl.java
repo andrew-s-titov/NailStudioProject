@@ -6,9 +6,11 @@ import org.itrex.entities.Record;
 import org.itrex.entities.Role;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.Discount;
+import org.itrex.entities.enums.RoleType;
 import org.itrex.exceptions.DeletingUserWithActiveRecordsException;
 import org.itrex.exceptions.UserExistsException;
 import org.itrex.repositories.RecordRepo;
+import org.itrex.repositories.RoleRepo;
 import org.itrex.repositories.UserRepo;
 import org.itrex.services.UserService;
 import org.itrex.util.PasswordEncryption;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final RecordRepo recordRepo;
+    private final RoleRepo roleRepo;
 
     @Override
     public UserDTO findUserById(Serializable id) {
@@ -35,7 +38,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO findUserByPhone(String phone) {
         User userEntity = userRepo.findUserByPhone(phone);
-        return entityToDTO(userEntity);
+        return userEntity == null ? null : entityToDTO(userEntity);
     }
 
     @Override
@@ -86,8 +89,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addRoleForUser(Serializable userId, Role role) {
+    public void addRoleForUser(Serializable userId, String roleName) {
         User user = userRepo.findUserById(userId);
+        Role role = roleRepo.getRoleByName(roleName);
         userRepo.addRoleForUser(user, role);
     }
 

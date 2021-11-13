@@ -21,7 +21,7 @@ public class HibernateRecordRepoTest extends TestBaseHibernate {
     private Session session;
 
     @Test
-    @DisplayName("getAll with valid data - should have 4 Records equal to testdata migration script")
+    @DisplayName("getAll - should return 4 Records equal to testdata migration script")
     public void getAll() {
         // given & when
         List<Record> records = repo.getAll();
@@ -54,9 +54,13 @@ public class HibernateRecordRepoTest extends TestBaseHibernate {
     @Test
     @DisplayName("getRecordById with invalid data - should throw DatabaseEntryNotFoundException")
     public void getRecordById2() {
+        // given
+        long recordId1 = 7L;
+        long recordId2 = 180L;
+
         // when & then
-        assertThrows(DatabaseEntryNotFoundException.class, () -> repo.getRecordById(7L));
-        assertThrows(DatabaseEntryNotFoundException.class, () -> repo.getRecordById(180L));
+        assertThrows(DatabaseEntryNotFoundException.class, () -> repo.getRecordById(recordId1));
+        assertThrows(DatabaseEntryNotFoundException.class, () -> repo.getRecordById(recordId2));
     }
 
     @Test
@@ -71,7 +75,7 @@ public class HibernateRecordRepoTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("getRecordsForUserByUserId with invalid data - should retun empty list")
+    @DisplayName("getRecordsForUserByUserId with invalid data - should return empty list")
     public void getRecordsForUserByUserId2() {
         // given
         long userId = 7L; // there are no Users with this id
@@ -91,9 +95,10 @@ public class HibernateRecordRepoTest extends TestBaseHibernate {
         int recordsCount = user.getRecords().size();
         session.close();
 
-        Record record = new Record();
-        record.setDate(Date.valueOf("2021-10-19"));
-        record.setTime(RecordTime.NINE);
+        Record record = Record.builder()
+                .date(Date.valueOf("2021-10-19"))
+                .time(RecordTime.NINE)
+                .build();
 
         // when
         repo.addRecordForUser(user, record);

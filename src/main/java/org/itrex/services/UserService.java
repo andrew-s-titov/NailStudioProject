@@ -22,5 +22,5 @@ public interface UserService {
 
     void changeDiscount(Serializable userId, Discount discount);
 
-    void addRoleForUser(Serializable userId, Role role);
+    void addRoleForUser(Serializable userId, String roleName);
 }

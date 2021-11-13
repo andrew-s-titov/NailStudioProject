@@ -1,6 +1,5 @@
 package org.itrex.repositories;
 
-import org.itrex.entities.Record;
 import org.itrex.entities.Role;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.Discount;

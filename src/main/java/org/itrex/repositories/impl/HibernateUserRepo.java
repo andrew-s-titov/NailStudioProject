@@ -107,12 +107,7 @@ public class HibernateUserRepo implements UserRepo {
 
     private void inSession(Runnable runnable) {
         session = sessionFactory.openSession();
-        try {
-            runnable.run();
-        } catch (HibernateException e) {
-            e.printStackTrace();
-        } finally {
-            session.close();
-        }
+        runnable.run();
+        session.close();
     }
 }
