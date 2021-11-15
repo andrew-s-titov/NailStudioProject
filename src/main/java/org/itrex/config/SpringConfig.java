@@ -7,9 +7,11 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 @org.springframework.context.annotation.Configuration
-@ComponentScan({"org.itrex.repositories.impl", "org.itrex.services"})
+@EnableAspectJAutoProxy
+@ComponentScan({"org.itrex"})
 public class SpringConfig {
 
     @Bean(initMethod = "migrate")

@@ -12,16 +12,15 @@ import org.itrex.repositories.UserRepo;
 import org.itrex.services.RecordService;
 import org.itrex.services.RoleService;
 import org.itrex.services.UserService;
+import org.itrex.util.PasswordEncryption;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
 public class App {
 
-    public static void main(String[] args) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public static void main(String[] args) {
         ApplicationContext context = new AnnotationConfigApplicationContext(SpringConfig.class);
         context.getBean(Flyway.class);
         SessionFactory sessionFactory = context.getBean(SessionFactory.class);
@@ -34,21 +33,38 @@ public class App {
         RecordService recordService = context.getBean(RecordService.class);
         RoleService roleService = context.getBean(RoleService.class);
 
-        UserDTO user = UserDTO.builder()
+        UserDTO userDTO1 = UserDTO.builder()
                 .firstName("Boris")
                 .lastName("Blade")
                 .phone("+375295000000")
                 .email("bbritva@mail.ru")
                 .password("password2")
                 .build();
-        System.out.println(user);
 
-        userService.addUser(user);
+        UserDTO userDTO2 = UserDTO.builder()
+                .firstName("Freddy")
+                .lastName("Krueger")
+                .phone("+375333333333")
+                .email("freshmeat@yahoo.com")
+                .password("password3")
+                .build();
+
+        userService.addUser(userDTO1);
+        userService.addUser(userDTO2);
 
         System.out.println(": : : : : Users after adding and altering : : : : :");
         List<User> users = userRepo.getAll();
         users.forEach(System.out::println);
 
+        User user = User.builder()
+                .firstName("A")
+                .lastName("B")
+                .phone("+37529299999999") // value too long for column
+                .email("ccccccc@mail.ru")
+                .password(PasswordEncryption.getEncryptedPassword("somePassword"))
+                .build();
+
+        userRepo.addUser(user);
 
 //        Record record1 = new Record();
 //        record1.setUser(user1);

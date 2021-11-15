@@ -10,9 +10,9 @@ import java.util.List;
 public interface UserRepo {
     List<User> getAll();
 
-    User findUserById(Serializable id);
+    User getUserById(Serializable id);
 
-    User findUserByPhone(String phone);
+    User getUserByPhone(String phone);
 
     void addUser(User user);
 

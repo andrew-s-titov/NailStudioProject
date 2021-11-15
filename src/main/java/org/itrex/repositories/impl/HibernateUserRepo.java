@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.itrex.entities.Record;
 import org.itrex.entities.Role;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.Discount;
@@ -23,7 +22,7 @@ public class HibernateUserRepo implements UserRepo {
     private Session session;
 
     @Override
-    public User findUserById(Serializable id) {
+    public User getUserById(Serializable id) {
         User user;
         session = sessionFactory.openSession();
         user = session.get(User.class, id);
@@ -36,7 +35,7 @@ public class HibernateUserRepo implements UserRepo {
     }
 
     @Override
-    public User findUserByPhone(String phone) {
+    public User getUserByPhone(String phone) {
         Optional<User> user;
         session = sessionFactory.openSession();
         user = session.createQuery("FROM User WHERE phone = :phone", User.class)

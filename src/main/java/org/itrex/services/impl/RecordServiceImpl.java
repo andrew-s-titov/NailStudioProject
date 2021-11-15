@@ -43,7 +43,7 @@ public class RecordServiceImpl implements RecordService {
 
     @Override
     public String addRecordForUser(Serializable userId, RecordDTO recordDTO) {
-        User user = userRepo.findUserById(userId);
+        User user = userRepo.getUserById(userId);
         RecordTime time = recordDTO.getTime();
         Date date = Date.valueOf(recordDTO.getDate());
         try {

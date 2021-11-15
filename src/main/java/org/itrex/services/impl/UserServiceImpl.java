@@ -6,7 +6,6 @@ import org.itrex.entities.Record;
 import org.itrex.entities.Role;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.Discount;
-import org.itrex.entities.enums.RoleType;
 import org.itrex.exceptions.DeletingUserWithActiveRecordsException;
 import org.itrex.exceptions.UserExistsException;
 import org.itrex.repositories.RecordRepo;
@@ -31,13 +30,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO findUserById(Serializable id) {
-        User userEntity = userRepo.findUserById(id);
+        User userEntity = userRepo.getUserById(id);
         return entityToDTO(userEntity);
     }
 
     @Override
     public UserDTO findUserByPhone(String phone) {
-        User userEntity = userRepo.findUserByPhone(phone);
+        User userEntity = userRepo.getUserByPhone(phone);
         return userEntity == null ? null : entityToDTO(userEntity);
     }
 
@@ -64,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String deleteUser(Serializable id) {
-        User userEntity = userRepo.findUserById(id);
+        User userEntity = userRepo.getUserById(id);
         List<Record> records = recordRepo.getRecordsForUserByUserId(id);
         try {
             checkActiveRecords(records);
@@ -78,25 +77,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changeEmail(Serializable userId, String newEmail) {
-        User user = userRepo.findUserById(userId);
+        User user = userRepo.getUserById(userId);
         userRepo.changeEmail(user, newEmail);
     }
 
     @Override
     public void changeDiscount(Serializable userId, Discount discount) {
-        User user = userRepo.findUserById(userId);
+        User user = userRepo.getUserById(userId);
         userRepo.changeDiscount(user, discount);
     }
 
     @Override
     public void addRoleForUser(Serializable userId, String roleName) {
-        User user = userRepo.findUserById(userId);
+        User user = userRepo.getUserById(userId);
         Role role = roleRepo.getRoleByName(roleName);
         userRepo.addRoleForUser(user, role);
     }
 
     private void checkExistingUser(String phone) throws UserExistsException {
-        if (userRepo.findUserByPhone(phone) != null) {
+        if (userRepo.getUserByPhone(phone) != null) {
             throw new UserExistsException();
         }
     }

@@ -42,13 +42,13 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("findUserById with valid data - should return a User with given id")
-    public void findUserById1() {
+    @DisplayName("getUserById with valid data - should return a User with given id")
+    public void getUserById1() {
         // given
         long userId = 1L;
 
         // when
-        User user = repo.findUserById(userId);
+        User user = repo.getUserById(userId);
 
         // then
         assertEquals(userId, user.getUserId());
@@ -56,23 +56,23 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("findUserById with invalid data - should throw DatabaseEntryNotFoundException")
-    public void findUserById2() {
+    @DisplayName("getUserById with invalid data - should throw DatabaseEntryNotFoundException")
+    public void getUserById2() {
         // given
         long userId = 7L; // there are no Users with this id
 
         // when & then
-        assertThrows(DatabaseEntryNotFoundException.class, () -> repo.findUserById(userId));
+        assertThrows(DatabaseEntryNotFoundException.class, () -> repo.getUserById(userId));
     }
 
     @Test
-    @DisplayName("findUserByPhone with valid data - should return a User with given phone number")
-    public void findUserByPhone1() {
+    @DisplayName("getUserByPhone with valid data - should return a User with given phone number")
+    public void getUserByPhone1() {
         // given
         String phone = "+1946484888";
 
         // when
-        User user = repo.findUserByPhone(phone);
+        User user = repo.getUserByPhone(phone);
 
         // then
         assertEquals(phone, user.getPhone());
@@ -81,13 +81,13 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("findUserByPhone with invalid data - should return null")
-    public void findUserByPhone2() {
+    @DisplayName("getUserByPhone with invalid data - should return null")
+    public void getUserByPhone2() {
         // given
         String phone = "+7777777777"; // there are no Users with this phone number
 
         // when
-        User user = repo.findUserByPhone(phone);
+        User user = repo.getUserByPhone(phone);
 
         // when & then
         assertNull(user);

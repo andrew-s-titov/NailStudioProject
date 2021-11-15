@@ -10,7 +10,6 @@ import org.itrex.repositories.RoleRepo;
 import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;

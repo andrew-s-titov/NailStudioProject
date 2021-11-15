@@ -1,5 +1,7 @@
 package org.itrex.util;
 
+import lombok.extern.slf4j.Slf4j;
+
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.nio.charset.StandardCharsets;
@@ -8,6 +10,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
 
+@Slf4j
 public class PasswordEncryption {
     private static final byte[] SALT = "notPepper".getBytes(StandardCharsets.UTF_8);
 
@@ -23,8 +26,8 @@ public class PasswordEncryption {
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algorithm);
             encryptedPassword = secretKeyFactory.generateSecret(keySpec).getEncoded();
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            e.printStackTrace();
-            // TODO: logging
+            log.warn(e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()) +
+                    "\nSECURITY ALERT: passed password was written to DB as a byte array without encryption");
         }
         return encryptedPassword;
     }
