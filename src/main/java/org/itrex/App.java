@@ -4,6 +4,7 @@ import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.itrex.config.SpringConfig;
 import org.itrex.dto.UserDTO;
+import org.itrex.entities.Record;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.Discount;
 import org.itrex.repositories.RecordRepo;
@@ -44,7 +45,7 @@ public class App {
         UserDTO userDTO2 = UserDTO.builder()
                 .firstName("Freddy")
                 .lastName("Krueger")
-                .phone("+375333333333")
+                .phone("+375331001010")
                 .email("freshmeat@yahoo.com")
                 .password("password3")
                 .build();
@@ -55,6 +56,8 @@ public class App {
         System.out.println(": : : : : Users after adding and altering : : : : :");
         List<User> users = userRepo.getAll();
         users.forEach(System.out::println);
+
+        recordRepo.getRecordById(5L); // no such record
 
         User user = User.builder()
                 .firstName("A")

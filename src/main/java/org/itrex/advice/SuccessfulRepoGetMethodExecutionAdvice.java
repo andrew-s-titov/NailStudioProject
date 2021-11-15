@@ -21,11 +21,8 @@ public class SuccessfulRepoGetMethodExecutionAdvice {
     @AfterReturning(value = "repositoryGetMethods()", returning = "entities")
     public void checkRepoGetMethodExecution(JoinPoint joinPoint, Object entities) throws Throwable {
         String methodSignature = joinPoint.getSignature().toString();
-        String stringBuilder = "\n* * * * *\nMethod \"" +
-                methodSignature +
-                "\" executed successfully. Result:\n" +
-                entities.toString() +
-                "\n* * * * *\n";
-        System.out.println(stringBuilder);
+        String result = String.format("\n* * * *\nMethod \"%s\" executed successfully.\nResult: \n%s\n* * * *\n",
+                methodSignature, entities == null ? "null" : entities.toString());
+        System.out.println(result);
     }
 }

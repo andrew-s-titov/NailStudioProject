@@ -18,11 +18,7 @@ public class ExceptionLoggingAdvice {
             result = joinPoint.proceed();
         } catch (Throwable throwable) {
             String method = joinPoint.getSignature().toString();
-            String logInfo = "Failed to execute method \"" +
-                    method +
-                    "\". Exception: " +
-                    throwable.getMessage();
-            log.error(logInfo);
+            log.error("\n* * *\nFailed to execute method \"{}\".\nException: {}\n* * *", method, throwable.getClass());
             throwable.printStackTrace();
         }
         return result;
