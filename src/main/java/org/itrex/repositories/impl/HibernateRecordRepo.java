@@ -1,6 +1,7 @@
 package org.itrex.repositories.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.itrex.entities.Record;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @Repository
 public class HibernateRecordRepo implements RecordRepo {
@@ -36,7 +38,8 @@ public class HibernateRecordRepo implements RecordRepo {
         Record record = session.get(Record.class, id);
         session.close();
         if (record == null) {
-            String message = String.format("Record with id %s wasn't found", id);
+            String message = String.format("Record with id %s wasn't found.", id);
+            log.debug(message + "DatabaseEntryNotFoundException was thrown while executing getRecordById method.");
             throw new DatabaseEntryNotFoundException(message);
         }
         return record;

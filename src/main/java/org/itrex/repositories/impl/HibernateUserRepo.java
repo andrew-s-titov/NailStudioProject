@@ -1,6 +1,7 @@
 package org.itrex.repositories.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -12,9 +13,11 @@ import org.itrex.repositories.UserRepo;
 import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Repository
 public class HibernateUserRepo implements UserRepo {
@@ -29,6 +32,7 @@ public class HibernateUserRepo implements UserRepo {
         session.close();
         if (user == null) {
             String message = String.format("User with id %s wasn't found", id);
+            log.debug(message + "DatabaseEntryNotFoundException was thrown while executing getUserById method.");
             throw new DatabaseEntryNotFoundException(message);
         }
         return user;
@@ -68,7 +72,7 @@ public class HibernateUserRepo implements UserRepo {
                 session.delete(user);
                 session.getTransaction().commit();
             } catch (HibernateException ex) {
-                ex.printStackTrace();
+                log.debug(Arrays.toString(ex.getStackTrace()));
                 session.getTransaction().rollback();
             }
         });

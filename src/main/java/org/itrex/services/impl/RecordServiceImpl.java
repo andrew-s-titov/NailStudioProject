@@ -1,6 +1,7 @@
 package org.itrex.services.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.itrex.dto.RecordDTO;
 import org.itrex.entities.Record;
 import org.itrex.entities.User;
@@ -16,6 +17,7 @@ import java.sql.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class RecordServiceImpl implements RecordService {
@@ -52,7 +54,7 @@ public class RecordServiceImpl implements RecordService {
             recordRepo.addRecordForUser(user, newRecord);
             return "Booking successful";
         } catch (BookingUnavailableException ex) {
-            ex.printStackTrace();
+            log.info("Failed to add record for User id " + userId + ": " + ex.getClass().getName() + "was thrown");
             return ex.getMessage();
         }
     }
@@ -66,7 +68,7 @@ public class RecordServiceImpl implements RecordService {
             recordRepo.changeRecordTime(recordEntity, newTime);
             return "Booking successful";
         } catch (BookingUnavailableException ex) {
-            ex.printStackTrace();
+            log.info("Failed to change time for Record id " + recordId + ": " + ex.getClass().getName() + "was thrown");
             return ex.getMessage();
         }
     }

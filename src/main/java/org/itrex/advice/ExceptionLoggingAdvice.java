@@ -20,6 +20,7 @@ public class ExceptionLoggingAdvice {
             String method = joinPoint.getSignature().toString();
             log.error("\n* * *\nFailed to execute method \"{}\".\nException: {}\n* * *", method, throwable.getClass());
             throwable.printStackTrace();
+            throw throwable; // to avoid test failing
         }
         return result;
     }

@@ -1,6 +1,7 @@
 package org.itrex.repositories.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.itrex.entities.Role;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Repository
 public class HibernateRoleRepo implements RoleRepo {
@@ -36,6 +38,7 @@ public class HibernateRoleRepo implements RoleRepo {
                 .collect(Collectors.toList());
         if (!roleNames.contains(name.toUpperCase())) {
             String message = String.format("Role \"%s\" wasn't found", name);
+            log.debug(message + "DatabaseEntryNotFoundException was thrown while executing getRoleByName method.");
             throw new DatabaseEntryNotFoundException(message);
         }
         session = sessionFactory.openSession();
@@ -56,6 +59,7 @@ public class HibernateRoleRepo implements RoleRepo {
         session.close();
         if (role.isEmpty()) {
             String message = String.format("Role with id %s wasn't found", id);
+            log.debug(message + "DatabaseEntryNotFoundException was thrown while executing getRoleById method.");
             throw new DatabaseEntryNotFoundException(message);
         }
         return role.orElse(null);

@@ -1,6 +1,7 @@
 package org.itrex.services.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.itrex.dto.UserDTO;
 import org.itrex.entities.Record;
 import org.itrex.entities.Role;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
@@ -56,7 +58,7 @@ public class UserServiceImpl implements UserService {
             userRepo.addUser(userEntity);
             return "Registration successful";
         } catch (UserExistsException ex) {
-            ex.printStackTrace();
+            log.info("Attempt to register User with existing phone number " + phone);
             return ex.getMessage();
         }
     }
@@ -70,7 +72,7 @@ public class UserServiceImpl implements UserService {
             userRepo.deleteUser(userEntity);
             return "User has been removed";
         } catch (DeletingUserWithActiveRecordsException ex) {
-            ex.printStackTrace();
+            log.info("Attempt to remove User with active records. User id: " + id);
             return ex.getMessage();
         }
     }

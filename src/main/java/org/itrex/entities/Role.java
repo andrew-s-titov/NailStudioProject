@@ -7,11 +7,9 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-@Builder
 @Setter
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "roles", schema = "public")
 public class Role {
@@ -26,6 +24,12 @@ public class Role {
 
     @ManyToMany(mappedBy = "userRoles")
     private Set<User> users = new HashSet<>();
+
+    @Builder
+    public Role(long roleId, RoleType roleType) {
+        this.roleId = roleId;
+        this.roletype = roleType;
+    }
 
     @Override
     public String toString() {

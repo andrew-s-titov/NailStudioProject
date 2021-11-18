@@ -6,11 +6,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.itrex.dbProperties.H2Properties.*;
-
 public class RepositoryTestBaseJDBC {
     private final Flyway flyway;
     private final JdbcConnectionPool connectionPool;
+    public final String DB_URL = "jdbc:h2:mem:PUBLIC;DB_CLOSE_DELAY=-1";
+    public final String DB_USER = "admin";
+    public final String DB_PASSWORD = "1234";
 
     public RepositoryTestBaseJDBC(@Autowired Flyway flyway) {
         this.flyway = flyway;

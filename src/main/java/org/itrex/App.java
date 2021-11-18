@@ -57,18 +57,6 @@ public class App {
         List<User> users = userRepo.getAll();
         users.forEach(System.out::println);
 
-        recordRepo.getRecordById(5L); // no such record
-
-        User user = User.builder()
-                .firstName("A")
-                .lastName("B")
-                .phone("+37529299999999") // value too long for column
-                .email("ccccccc@mail.ru")
-                .password(PasswordEncryption.getEncryptedPassword("somePassword"))
-                .build();
-
-        userRepo.addUser(user);
-
 //        Record record1 = new Record();
 //        record1.setUser(user1);
 //        record1.setDate(Date.valueOf("2021-10-18"));
