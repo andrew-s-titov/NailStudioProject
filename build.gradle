@@ -41,8 +41,7 @@ dependencies {
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
 
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.32'
-    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.32'
-
+    implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.32'
 }
 
 test {
@@ -50,9 +49,9 @@ test {
 }
 
 /*
-an ability to set a profile
+an ability to set a build profile
 usage:
-    gradle build -Pprofile=stable
+    gradle build -Pprofile=prod
     gradlew build -Pprofile=dev
  */
 build {

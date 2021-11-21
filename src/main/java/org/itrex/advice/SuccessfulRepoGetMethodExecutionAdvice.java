@@ -1,11 +1,13 @@
 package org.itrex.advice;
 
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Aspect
 @Component
 public class SuccessfulRepoGetMethodExecutionAdvice {
@@ -24,5 +26,6 @@ public class SuccessfulRepoGetMethodExecutionAdvice {
         String result = String.format("\n* * * *\nMethod \"%s\" executed successfully.\nResult: \n%s\n* * * *\n",
                 methodSignature, entities == null ? "null" : entities.toString());
         System.out.println(result);
+        log.info(result);
     }
 }
