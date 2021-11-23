@@ -69,6 +69,7 @@ public class HibernateRecordRepo implements RecordRepo {
     public void deleteRecord(Record record) {
         inSession(() -> {
             session.beginTransaction();
+            session.update(record);
             session.delete(record);
             session.getTransaction().commit();
         });

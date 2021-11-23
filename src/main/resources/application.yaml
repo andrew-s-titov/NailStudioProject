@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:PUBLIC;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: admin
+    password: 1234
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+  flyway:
+    locations: db/migration
+  profiles:
+    active: dev

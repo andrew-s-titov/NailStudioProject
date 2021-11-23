@@ -14,13 +14,15 @@ import org.itrex.util.PasswordEncryption;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HibernateUserRepoTest extends TestBaseHibernate {
-    private final UserRepo repo = getContext().getBean(UserRepo.class);
+    @Autowired
+    private UserRepo repo;
     private final int usersTableInitialTestSize = 3;
     private Session session;
 
@@ -130,7 +132,7 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
                 .build();
 
         // when & then
-        assertThrows(HibernateException.class, () -> repo.addUser(user));
+        assertThrows(Exception.class, () -> repo.addUser(user));
     }
 
     @Test

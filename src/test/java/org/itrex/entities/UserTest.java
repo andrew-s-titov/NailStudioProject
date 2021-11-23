@@ -15,12 +15,11 @@ import java.sql.Date;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UserTest extends TestBaseHibernate {
-    SessionFactory sessionFactory = getContext().getBean(SessionFactory.class);
     private Session session;
 
     @BeforeEach
     public void openSession() {
-        session = sessionFactory.openSession();
+        session = getSessionFactory().openSession();
     }
 
     @AfterEach

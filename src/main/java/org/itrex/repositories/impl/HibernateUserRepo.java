@@ -69,6 +69,7 @@ public class HibernateUserRepo implements UserRepo {
         inSession(() -> {
             session.beginTransaction();
             try {
+                session.update(user);
                 session.delete(user);
                 session.getTransaction().commit();
             } catch (HibernateException ex) {

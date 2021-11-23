@@ -11,13 +11,15 @@ import org.itrex.exceptions.DatabaseEntryNotFoundException;
 import org.itrex.services.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceImplTest extends TestBaseHibernate {
-    private final UserService service = getContext().getBean(UserService.class);
+    @Autowired
+    private UserService service;
     private final int usersTableInitialTestSize = 3;
     private Session session;
 

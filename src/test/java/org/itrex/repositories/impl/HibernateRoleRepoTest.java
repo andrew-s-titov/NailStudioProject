@@ -7,13 +7,15 @@ import org.itrex.exceptions.DatabaseEntryNotFoundException;
 import org.itrex.repositories.RoleRepo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HibernateRoleRepoTest extends TestBaseHibernate {
-    private final RoleRepo repo = getContext().getBean(RoleRepo.class);
+    @Autowired
+    private RoleRepo repo;
 
     @Test
     @DisplayName("getRoles - should return a list of Roles")

@@ -1,8 +1,7 @@
 package org.itrex;
 
+import lombok.RequiredArgsConstructor;
 import org.flywaydb.core.Flyway;
-import org.hibernate.SessionFactory;
-import org.itrex.config.SpringConfig;
 import org.itrex.dto.UserDTO;
 import org.itrex.entities.Record;
 import org.itrex.entities.User;
@@ -14,17 +13,25 @@ import org.itrex.services.RecordService;
 import org.itrex.services.RoleService;
 import org.itrex.services.UserService;
 import org.itrex.util.PasswordEncryption;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.List;
 
-public class App {
+@RequiredArgsConstructor
+@SpringBootApplication
+public class App implements CommandLineRunner {
+
+    private final ApplicationContext context;
 
     public static void main(String[] args) {
-        ApplicationContext context = new AnnotationConfigApplicationContext(SpringConfig.class);
-        context.getBean(Flyway.class);
-        SessionFactory sessionFactory = context.getBean(SessionFactory.class);
+        SpringApplication.run(App.class, args);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
 
         UserRepo userRepo = context.getBean(UserRepo.class);
         RoleRepo roleRepo = context.getBean(RoleRepo.class);
@@ -83,8 +90,5 @@ public class App {
 //        records.forEach(System.out::println);
 //
 //        System.out.println(": : : : : Records left: " + records.size() + " : : : : :");
-
-//         * * * close connection * * *
-        sessionFactory.close();
     }
 }

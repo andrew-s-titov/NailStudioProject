@@ -9,6 +9,7 @@ import org.itrex.exceptions.DatabaseEntryNotFoundException;
 import org.itrex.repositories.RecordRepo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Date;
 import java.util.List;
@@ -16,7 +17,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HibernateRecordRepoTest extends TestBaseHibernate {
-    private final RecordRepo repo = getContext().getBean(RecordRepo.class);
+    @Autowired
+    private RecordRepo repo;
     private final int recordsTableInitialTestSize = 4;
     private Session session;
 

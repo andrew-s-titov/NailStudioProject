@@ -25,7 +25,6 @@ public class SuccessfulRepoGetMethodExecutionAdvice {
         String methodSignature = joinPoint.getSignature().toString();
         String result = String.format("\n* * * *\nMethod \"%s\" executed successfully.\nResult: \n%s\n* * * *\n",
                 methodSignature, entities == null ? "null" : entities.toString());
-        System.out.println(result);
         log.info(result);
     }
 }

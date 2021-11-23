@@ -7,6 +7,7 @@ import org.itrex.exceptions.DatabaseEntryNotFoundException;
 import org.itrex.services.RoleService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -14,7 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class RoleServiceImplTest extends TestBaseHibernate {
-    private final RoleService service = getContext().getBean(RoleService.class);
+    @Autowired
+    private RoleService service;
 
     @Test
     @DisplayName("getRoles - should return a list of RoleDTO")

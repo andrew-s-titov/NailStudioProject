@@ -10,13 +10,15 @@ import org.itrex.exceptions.DatabaseEntryNotFoundException;
 import org.itrex.services.RecordService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class RecordServiceImplTest extends TestBaseHibernate {
-    private final RecordService service = getContext().getBean(RecordService.class);
+    @Autowired
+    private RecordService service;
     private final int recordsTableInitialTestSize = 4;
     private Session session;
 
