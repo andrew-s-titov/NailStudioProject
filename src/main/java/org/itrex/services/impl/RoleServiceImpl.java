@@ -7,7 +7,6 @@ import org.itrex.repositories.RoleRepo;
 import org.itrex.services.RoleService;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,13 +23,13 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public RoleDTO getRoleByName(String name) {
-        return entityToDTO(roleRepo.getRoleByName(name));
+    public RoleDTO getRoleByName(String roleName) {
+        return entityToDTO(roleRepo.getRoleByName(roleName));
     }
 
     @Override
-    public RoleDTO getRoleById(Serializable id) {
-        return entityToDTO(roleRepo.getRoleById(id));
+    public RoleDTO getRoleById(Integer roleId) {
+        return entityToDTO(roleRepo.getRoleById(roleId));
     }
 
     private RoleDTO entityToDTO(Role roleEntity) {

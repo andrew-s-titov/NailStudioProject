@@ -3,7 +3,7 @@ package org.itrex.services.impl;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.itrex.TestBaseHibernate;
-import org.itrex.dto.UserDTO;
+import org.itrex.dto.UserCreateDTO;
 import org.itrex.entities.Record;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.Discount;
@@ -24,10 +24,10 @@ public class UserServiceImplTest extends TestBaseHibernate {
     private Session session;
 
     @Test
-    @DisplayName("getAll - should return 3 UserDTO equal to testdata migration script")
+    @DisplayName("getAll - should return 3 UserCreateDTO equal to testdata migration script")
     public void getAll() {
         // given & when
-        List<UserDTO> users = service.getAll();
+        List<UserCreateDTO> users = service.getAll();
 
         // then
         assertEquals(usersTableInitialTestSize, users.size());
@@ -41,13 +41,13 @@ public class UserServiceImplTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("findUserById with valid data - should return a UserDTO with given id")
+    @DisplayName("findUserById with valid data - should return a UserCreateDTO with given id")
     public void findUserById1() {
         // given
         long userId = 1L;
 
         // when
-        UserDTO user = service.findUserById(userId);
+        UserCreateDTO user = service.getUserById(userId);
 
         // then
         assertEquals(userId, user.getUserId());
@@ -61,7 +61,7 @@ public class UserServiceImplTest extends TestBaseHibernate {
         long userId = 7L; // there are no Users with this id
 
         // when & then
-        assertThrows(DatabaseEntryNotFoundException.class, () -> service.findUserById(userId));
+        assertThrows(DatabaseEntryNotFoundException.class, () -> service.getUserById(userId));
     }
 
     @Test
@@ -71,7 +71,7 @@ public class UserServiceImplTest extends TestBaseHibernate {
         String phone = "+1946484888";
 
         // when
-        UserDTO user = service.findUserByPhone(phone);
+        UserCreateDTO user = service.getUserByPhone(phone);
 
         // then
         assertEquals(phone, user.getPhone());
@@ -86,7 +86,7 @@ public class UserServiceImplTest extends TestBaseHibernate {
         String phone = "+7777777777"; // there are no Users with this phone number
 
         // when
-        UserDTO user = service.findUserByPhone(phone);
+        UserCreateDTO user = service.getUserByPhone(phone);
 
         // when & then
         assertNull(user);
@@ -96,7 +96,7 @@ public class UserServiceImplTest extends TestBaseHibernate {
     @DisplayName("addUser with valid data - users table should contain given User")
     public void addUser1() {
         // given
-        UserDTO user = UserDTO.builder()
+        UserCreateDTO user = UserCreateDTO.builder()
                 .password("notSoStrongPassword")
                 .firstName("Freddy")
                 .lastName("Krueger")
@@ -105,7 +105,7 @@ public class UserServiceImplTest extends TestBaseHibernate {
                 .build();
 
         // when
-        service.addUser(user);
+        service.createUser(user);
 
         // then
         session = getSessionFactory().openSession();
@@ -124,7 +124,7 @@ public class UserServiceImplTest extends TestBaseHibernate {
     @DisplayName("addUser with invalid data - users table shouldn't added users")
     public void addUser2() {
         // given
-        UserDTO user2 = UserDTO.builder()
+        UserCreateDTO user2 = UserCreateDTO.builder()
                 .password("notSoStrongPassword")
                 .firstName("Edward")
                 .lastName("Scissorshands")
@@ -134,7 +134,7 @@ public class UserServiceImplTest extends TestBaseHibernate {
                 .build();
 
         // when
-        String message = service.addUser(user2);
+        String message = service.createUser(user2);
 
         // then
         assertEquals("User with the same phone number already exists!", message);
@@ -173,7 +173,7 @@ public class UserServiceImplTest extends TestBaseHibernate {
         String newEmail = "my_new_email@mail.ru";
 
         // when
-        service.changeEmail(userId, newEmail);
+        service.updateUserInfo(userId, newEmail);
 
         // then
         session = getSessionFactory().openSession();

@@ -39,7 +39,7 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private Discount discount = Discount.ZERO;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Record> records = new ArrayList<>();
 
     @ManyToMany
@@ -60,7 +60,7 @@ public class User {
 
     public void addRecord(Record record) {
         records.add(record);
-        record.setUser(this);
+        record.setClient(this);
     }
 
     @Override

@@ -1,18 +1,14 @@
 package org.itrex;
 
 import lombok.RequiredArgsConstructor;
-import org.flywaydb.core.Flyway;
-import org.itrex.dto.UserDTO;
-import org.itrex.entities.Record;
+import org.itrex.dto.UserCreateDTO;
 import org.itrex.entities.User;
-import org.itrex.entities.enums.Discount;
 import org.itrex.repositories.RecordRepo;
 import org.itrex.repositories.RoleRepo;
 import org.itrex.repositories.UserRepo;
 import org.itrex.services.RecordService;
 import org.itrex.services.RoleService;
 import org.itrex.services.UserService;
-import org.itrex.util.PasswordEncryption;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -41,7 +37,7 @@ public class App implements CommandLineRunner {
         RecordService recordService = context.getBean(RecordService.class);
         RoleService roleService = context.getBean(RoleService.class);
 
-        UserDTO userDTO1 = UserDTO.builder()
+        UserCreateDTO userCreateDTO1 = UserCreateDTO.builder()
                 .firstName("Boris")
                 .lastName("Blade")
                 .phone("+375295000000")
@@ -49,7 +45,7 @@ public class App implements CommandLineRunner {
                 .password("password2")
                 .build();
 
-        UserDTO userDTO2 = UserDTO.builder()
+        UserCreateDTO userCreateDTO2 = UserCreateDTO.builder()
                 .firstName("Freddy")
                 .lastName("Krueger")
                 .phone("+375331001010")
@@ -57,8 +53,8 @@ public class App implements CommandLineRunner {
                 .password("password3")
                 .build();
 
-        userService.addUser(userDTO1);
-        userService.addUser(userDTO2);
+        userService.createUser(userCreateDTO1);
+        userService.createUser(userCreateDTO2);
 
         System.out.println(": : : : : Users after adding and altering : : : : :");
         List<User> users = userRepo.getAll();

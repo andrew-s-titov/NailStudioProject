@@ -1,21 +1,22 @@
 package org.itrex.services;
 
-import org.itrex.dto.RecordDTO;
-import org.itrex.entities.enums.RecordTime;
+import org.itrex.dto.RecordCreateDTO;
+import org.itrex.dto.RecordForAdminDTO;
+import org.itrex.dto.RecordForStaffToDoDTO;
+import org.itrex.dto.RecordOfClientDTO;
+import org.itrex.exceptions.BookingUnavailableException;
 
-import java.io.Serializable;
 import java.util.List;
 
 public interface RecordService {
-    List<RecordDTO> getAll();
+    // TODO: remove
+    List<RecordForAdminDTO> getAll();
 
-    RecordDTO getRecordById(Serializable id);
+    List<RecordOfClientDTO> getRecordsForUser(Long clientId);
 
-    List<RecordDTO> getRecordsForUserByUserId(Serializable id);
+    List<RecordForStaffToDoDTO> getRecordsForStaffToDo(Long staffId);
 
-    String addRecordForUser(Serializable userId, RecordDTO record);
+    Long createRecordForClient(RecordCreateDTO recordCreateDTO) throws BookingUnavailableException;
 
-    String changeRecordTime(Serializable recordId, RecordTime newTime);
-
-    void deleteRecord(Serializable recordId);
+    void deleteRecord(Long recordId);
 }

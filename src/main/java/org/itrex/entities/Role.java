@@ -16,7 +16,7 @@ public class Role {
 
     @Id
     @Column(name = "role_id")
-    private long roleId;
+    private Integer roleId;
 
     @Column(name = "role_name", nullable = false)
     @Enumerated(value = EnumType.STRING)
@@ -26,7 +26,7 @@ public class Role {
     private Set<User> users = new HashSet<>();
 
     @Builder
-    public Role(long roleId, RoleType roleType) {
+    public Role(Integer roleId, RoleType roleType) {
         this.roleId = roleId;
         this.roletype = roleType;
     }

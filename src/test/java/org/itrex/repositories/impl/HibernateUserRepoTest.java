@@ -1,6 +1,5 @@
 package org.itrex.repositories.impl;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.itrex.TestBaseHibernate;
@@ -108,7 +107,7 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
                 .build();
 
         // when
-        repo.addUser(user);
+        repo.createUser(user);
 
         // then
         session = getSessionFactory().openSession();
@@ -132,7 +131,7 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
                 .build();
 
         // when & then
-        assertThrows(Exception.class, () -> repo.addUser(user));
+        assertThrows(Exception.class, () -> repo.createUser(user));
     }
 
     @Test
@@ -167,7 +166,7 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
         String newEmail = "my_new_email@mail.ru";
 
         // when
-        repo.changeEmail(user, newEmail);
+        repo.updateUserInfo(user, newEmail);
 
         // then
         session = getSessionFactory().openSession();

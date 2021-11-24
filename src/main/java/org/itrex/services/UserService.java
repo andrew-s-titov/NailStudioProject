@@ -1,26 +1,30 @@
 package org.itrex.services;
 
-import org.itrex.dto.UserDTO;
-import org.itrex.entities.Role;
+import org.itrex.dto.UserCreateDTO;
+import org.itrex.dto.UserResponseDTO;
+import org.itrex.dto.UserUpdateDTO;
 import org.itrex.entities.enums.Discount;
+import org.itrex.exceptions.DeletingUserWithActiveRecordsException;
+import org.itrex.exceptions.UserExistsException;
 
-import java.io.Serializable;
 import java.util.List;
 
 public interface UserService {
-    UserDTO findUserById(Serializable id);
+    UserResponseDTO getUserById(Long userId);
 
-    UserDTO findUserByPhone(String phone);
+    UserResponseDTO getUserByPhone(String phone);
 
-    List<UserDTO> getAll();
+    List<UserResponseDTO> getAll();
 
-    String addUser(UserDTO user);
+    Long createUser(UserCreateDTO userCreateDTO) throws UserExistsException;
 
-    String deleteUser(Serializable id);
+    void deleteUser(Long userId) throws DeletingUserWithActiveRecordsException;
 
-    void changeEmail(Serializable userId, String newEmail);
+    // TODO: update user
+    void updateUserInfo(UserUpdateDTO userUpdateDTO);
 
-    void changeDiscount(Serializable userId, Discount discount);
+    void changeDiscount(Long clientId, Discount discount);
 
-    void addRoleForUser(Serializable userId, String roleName);
+    // TODO: decide whether to leave or not
+    void addRoleForUser(Long userId, String roleName);
 }

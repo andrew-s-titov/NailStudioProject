@@ -10,5 +10,5 @@ public interface RoleService {
 
     RoleDTO getRoleByName(String name);
 
-    RoleDTO getRoleById(Serializable id);
+    RoleDTO getRoleById(Integer id);
 }

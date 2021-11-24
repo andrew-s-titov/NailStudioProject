@@ -42,9 +42,11 @@ public class HibernateRoleRepo implements RoleRepo {
             throw new DatabaseEntryNotFoundException(message);
         }
         session = sessionFactory.openSession();
-        return session.createQuery("FROM Role WHERE role_name = :name", Role.class)
+        Role role = session.createQuery("FROM Role WHERE role_name = :name", Role.class)
                 .setParameter("name", name.toUpperCase())
                 .getSingleResult();
+        session.close();
+        return role;
     }
 
     @Override
@@ -62,6 +64,6 @@ public class HibernateRoleRepo implements RoleRepo {
             log.debug(message + "DatabaseEntryNotFoundException was thrown while executing getRoleById method.");
             throw new DatabaseEntryNotFoundException(message);
         }
-        return role.orElse(null);
+        return role.get();
     }
 }

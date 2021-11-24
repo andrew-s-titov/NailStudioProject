@@ -2,7 +2,9 @@ package org.itrex.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.itrex.dto.UserDTO;
+import org.itrex.dto.UserCreateDTO;
+import org.itrex.dto.UserResponseDTO;
+import org.itrex.dto.UserUpdateDTO;
 import org.itrex.entities.Record;
 import org.itrex.entities.Role;
 import org.itrex.entities.User;
@@ -16,7 +18,6 @@ import org.itrex.services.UserService;
 import org.itrex.util.PasswordEncryption;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
@@ -31,66 +32,58 @@ public class UserServiceImpl implements UserService {
     private final RoleRepo roleRepo;
 
     @Override
-    public UserDTO findUserById(Serializable id) {
-        User userEntity = userRepo.getUserById(id);
-        return entityToDTO(userEntity);
+    public UserResponseDTO getUserById(Long userId) {
+        User userEntity = userRepo.getUserById(userId);
+        return toUserResponseDTO(userEntity);
     }
 
     @Override
-    public UserDTO findUserByPhone(String phone) {
+    public UserResponseDTO getUserByPhone(String phone) {
         User userEntity = userRepo.getUserByPhone(phone);
-        return userEntity == null ? null : entityToDTO(userEntity);
+        return userEntity == null ? null : toUserResponseDTO(userEntity);
     }
 
     @Override
-    public List<UserDTO> getAll() {
+    public List<UserResponseDTO> getAll() {
         return userRepo.getAll().stream()
-                .map(this::entityToDTO)
+                .map(this::toUserResponseDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public String addUser(UserDTO user) {
+    public Long createUser(UserCreateDTO user) throws UserExistsException {
         String phone = user.getPhone();
-        try {
-            checkExistingUser(phone);
-            User userEntity = fromDTO(user);
-            userRepo.addUser(userEntity);
-            return "Registration successful";
-        } catch (UserExistsException ex) {
-            log.info("Attempt to register User with existing phone number " + phone);
-            return ex.getMessage();
-        }
+        checkExistingUser(phone);
+        User newUser = fromUserCreateDTO(user);
+        return userRepo.createUser(newUser);
     }
 
     @Override
-    public String deleteUser(Serializable id) {
-        User userEntity = userRepo.getUserById(id);
-        List<Record> records = recordRepo.getRecordsForUserByUserId(id);
-        try {
-            checkActiveRecords(records);
-            userRepo.deleteUser(userEntity);
-            return "User has been removed";
-        } catch (DeletingUserWithActiveRecordsException ex) {
-            log.info("Attempt to remove User with active records. User id: " + id);
-            return ex.getMessage();
-        }
+    public void deleteUser(Long userId) throws DeletingUserWithActiveRecordsException {
+        User userEntity = userRepo.getUserById(userId);
+        List<Record> records = recordRepo.getRecordsForUser(userId);
+        checkActiveRecords(records);
+        userRepo.deleteUser(userEntity);
     }
 
     @Override
-    public void changeEmail(Serializable userId, String newEmail) {
-        User user = userRepo.getUserById(userId);
-        userRepo.changeEmail(user, newEmail);
+    public void updateUserInfo(UserUpdateDTO userUpdateDTO) {
+        User user = userRepo.getUserById(userUpdateDTO.getUserId());
+        user.setFirstName(userUpdateDTO.getFirstName());
+        user.setLastName(userUpdateDTO.getLastName());
+        user.setEmail(userUpdateDTO.getEmail());
+        userRepo.updateUserInfo(user);
     }
 
     @Override
-    public void changeDiscount(Serializable userId, Discount discount) {
-        User user = userRepo.getUserById(userId);
-        userRepo.changeDiscount(user, discount);
+    public void changeDiscount(Long clientId, Discount discount) {
+        User user = userRepo.getUserById(clientId);
+        user.setDiscount(discount);
+        userRepo.updateUserInfo(user);
     }
 
     @Override
-    public void addRoleForUser(Serializable userId, String roleName) {
+    public void addRoleForUser(Long userId, String roleName) {
         User user = userRepo.getUserById(userId);
         Role role = roleRepo.getRoleByName(roleName);
         userRepo.addRoleForUser(user, role);
@@ -114,8 +107,8 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private UserDTO entityToDTO(User userEntity) {
-        return UserDTO.builder()
+    private UserResponseDTO toUserResponseDTO(User userEntity) {
+        return UserResponseDTO.builder()
                 .userId(userEntity.getUserId())
                 .firstName(userEntity.getFirstName())
                 .lastName(userEntity.getLastName())
@@ -125,7 +118,7 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    private User fromDTO(UserDTO dto) {
+    private User fromUserCreateDTO(UserCreateDTO dto) {
         return User.builder()
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())

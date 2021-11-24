@@ -2,7 +2,11 @@ package org.itrex.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.itrex.dto.RecordDTO;
+import org.itrex.converters.RecordDTOConverter;
+import org.itrex.dto.RecordCreateDTO;
+import org.itrex.dto.RecordForAdminDTO;
+import org.itrex.dto.RecordForStaffToDoDTO;
+import org.itrex.dto.RecordOfClientDTO;
 import org.itrex.entities.Record;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.RecordTime;
@@ -12,7 +16,6 @@ import org.itrex.repositories.UserRepo;
 import org.itrex.services.RecordService;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.sql.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,58 +26,49 @@ import java.util.stream.Collectors;
 public class RecordServiceImpl implements RecordService {
     private final RecordRepo recordRepo;
     private final UserRepo userRepo;
+    private final RecordDTOConverter converter;
 
     @Override
-    public List<RecordDTO> getAll() {
+    public List<RecordForAdminDTO> getAll() {
         return recordRepo.getAll().stream()
-                .map(this::entityToDTO)
+                .map(converter::toRecordForAdminDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<RecordDTO> getRecordsForUserByUserId(Serializable id) {
-        return recordRepo.getRecordsForUserByUserId(id).stream()
-                .map(this::entityToDTO)
+    public List<RecordOfClientDTO> getRecordsForUser(Long clientId) {
+        return recordRepo.getRecordsForUser(clientId).stream()
+                .map(converter::toRecordOfClientDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public RecordDTO getRecordById(Serializable id) {
-        return entityToDTO(recordRepo.getRecordById(id));
+    public List<RecordForStaffToDoDTO> getRecordsForStaffToDo(Long staffId) {
+        return recordRepo.getRecordsForUser(staffId).stream()
+                .map(converter::toRecordForStaffToDoDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public String addRecordForUser(Serializable userId, RecordDTO recordDTO) {
-        User user = userRepo.getUserById(userId);
-        RecordTime time = recordDTO.getTime();
-        Date date = Date.valueOf(recordDTO.getDate());
-        try {
-            checkTimeAvailability(date, time);
-            Record newRecord = fromDTO(recordDTO);
-            recordRepo.addRecordForUser(user, newRecord);
-            return "Booking successful";
-        } catch (BookingUnavailableException ex) {
-            log.info("Failed to add record for User id " + userId + ": " + ex.getClass().getName() + "was thrown");
-            return ex.getMessage();
-        }
+    public Long createRecordForClient(RecordCreateDTO recordCreateDTO) throws BookingUnavailableException {
+        User client = userRepo.getUserById(recordCreateDTO.getUserId());
+        User staff = userRepo.getUserById(recordCreateDTO.getStaffId());
+        RecordTime time = recordCreateDTO.getTime();
+        Date date = Date.valueOf(recordCreateDTO.getDate());
+        // TODO: add logic - check depending on staff free slots
+        checkTimeAvailability(date, time);
+        Record newRecord = converter.fromRecordCreateDTO(recordCreateDTO);
+        // TODO: check implicit setClient (createRecordForClient calls User.addRecord)
+        newRecord.setClient(client);
+        newRecord.setStaff(staff);
+        // TODO: check createRecord logic
+        recordRepo.createRecordForClient(client, newRecord);
+        // TODO: change return
+        return 0L;
     }
 
     @Override
-    public String changeRecordTime(Serializable recordId, RecordTime newTime) {
-        Record recordEntity = recordRepo.getRecordById(recordId);
-        Date date = recordEntity.getDate();
-        try {
-            checkTimeAvailability(date, newTime);
-            recordRepo.changeRecordTime(recordEntity, newTime);
-            return "Booking successful";
-        } catch (BookingUnavailableException ex) {
-            log.info("Failed to change time for Record id " + recordId + ": " + ex.getClass().getName() + "was thrown");
-            return ex.getMessage();
-        }
-    }
-
-    @Override
-    public void deleteRecord(Serializable recordId) {
+    public void deleteRecord(Long recordId) {
         Record recordEntity = recordRepo.getRecordById(recordId);
         recordRepo.deleteRecord(recordEntity);
     }
@@ -83,21 +77,5 @@ public class RecordServiceImpl implements RecordService {
         if (!recordRepo.getFreeTimeForDate(date).contains(newTime)) {
             throw new BookingUnavailableException();
         }
-    }
-
-    private RecordDTO entityToDTO(Record recordEntity) {
-        return RecordDTO.builder()
-                .recordId(recordEntity.getRecordId())
-                .date(recordEntity.getDate().toString())
-                .time(recordEntity.getTime())
-                .userId(recordEntity.getUser().getUserId())
-                .build();
-    }
-
-    private Record fromDTO(RecordDTO recordDTO) {
-        return Record.builder()
-                .date(Date.valueOf(recordDTO.getDate()))
-                .time(recordDTO.getTime())
-                .build();
     }
 }

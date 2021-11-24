@@ -28,15 +28,20 @@ public class Record {
     private RecordTime time;
 
     @Immutable
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "client_id")
+    private User client;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "staff_id")
+    private User staff;
 
     @Override
     public String toString() {
         return "* * * Record #" +
                 recordId + ": " +
-                "user ID #" + user.getUserId() + ", " +
+                "user ID #" + client.getUserId() + ", " +
+                "staff ID #" + staff.getUserId() + ", " +
                 date + ", " +
                 time.digitsText + " * * *";
     }

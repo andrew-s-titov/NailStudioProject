@@ -7,7 +7,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.itrex.entities.Role;
 import org.itrex.entities.User;
-import org.itrex.entities.enums.Discount;
 import org.itrex.exceptions.DatabaseEntryNotFoundException;
 import org.itrex.repositories.UserRepo;
 import org.springframework.stereotype.Repository;
@@ -60,8 +59,9 @@ public class HibernateUserRepo implements UserRepo {
     }
 
     @Override
-    public void addUser(User user) {
-        inSession(() -> session.save(user));
+    public Long createUser(User user) {
+        session = sessionFactory.openSession();
+        return (Long) session.save(user);
     }
 
     @Override
@@ -80,23 +80,8 @@ public class HibernateUserRepo implements UserRepo {
     }
 
     @Override
-    public void changeEmail(User user, String newEmail) {
-        inSession(() -> {
-            session.update(user);
-            session.beginTransaction();
-            user.setEmail(newEmail);
-            session.getTransaction().commit();
-        });
-    }
-
-    @Override
-    public void changeDiscount(User user, Discount discount) {
-        inSession(() -> {
-            session.update(user);
-            session.beginTransaction();
-            user.setDiscount(discount);
-            session.getTransaction().commit();
-        });
+    public void updateUserInfo(User user) {
+        inSession(() -> session.update(user));
     }
 
     @Override

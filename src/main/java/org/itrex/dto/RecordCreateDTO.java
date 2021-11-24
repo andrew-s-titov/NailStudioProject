@@ -7,9 +7,9 @@ import org.itrex.entities.enums.RecordTime;
 
 @Data
 @Builder
-public class RecordDTO {
-    long recordId;
+public class RecordCreateDTO {
     String date;
     RecordTime time;
-    long userId;
+    Long userId;
+    Long staffId;
 }

@@ -2,7 +2,7 @@ package org.itrex.services.impl;
 
 import org.hibernate.Session;
 import org.itrex.TestBaseHibernate;
-import org.itrex.dto.RecordDTO;
+import org.itrex.dto.RecordCreateDTO;
 import org.itrex.entities.Record;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.RecordTime;
@@ -26,7 +26,7 @@ public class RecordServiceImplTest extends TestBaseHibernate {
     @DisplayName("getAll - should return 4 Records equal to testdata migration script")
     public void getAll() {
         // given & when
-        List<RecordDTO> records = service.getAll();
+        List<RecordCreateDTO> records = service.getAll();
 
         // then
         assertEquals(recordsTableInitialTestSize, records.size());
@@ -41,16 +41,16 @@ public class RecordServiceImplTest extends TestBaseHibernate {
     @DisplayName("getRecordById with valid data - should return existing Record")
     public void getRecordById1() {
         // given & when
-        RecordDTO recordDTO1 = service.getRecordById(1L);
-        RecordDTO recordDTO2 = service.getRecordById(3L);
+        RecordCreateDTO recordCreateDTO1 = service.getRecordById(1L);
+        RecordCreateDTO recordCreateDTO2 = service.getRecordById(3L);
 
         // then
-        assertEquals(1, recordDTO1.getRecordId());
-        assertEquals(RecordTime.NINE, recordDTO1.getTime());
-        assertEquals("2021-10-18", recordDTO1.getDate());
-        assertEquals(3, recordDTO2.getRecordId());
-        assertEquals(RecordTime.THIRTEEN, recordDTO2.getTime());
-        assertEquals("2021-10-18", recordDTO2.getDate());
+        assertEquals(1, recordCreateDTO1.getRecordId());
+        assertEquals(RecordTime.NINE, recordCreateDTO1.getTime());
+        assertEquals("2021-10-18", recordCreateDTO1.getDate());
+        assertEquals(3, recordCreateDTO2.getRecordId());
+        assertEquals(RecordTime.THIRTEEN, recordCreateDTO2.getTime());
+        assertEquals("2021-10-18", recordCreateDTO2.getDate());
     }
 
     @Test
@@ -70,7 +70,7 @@ public class RecordServiceImplTest extends TestBaseHibernate {
     public void getRecordsForUserByUserId1() {
         // given & when
         long userId = 1L; // User with this id has 2 records
-        List<RecordDTO> records = service.getRecordsForUserByUserId(userId);
+        List<RecordCreateDTO> records = service.getRecordsForUser(userId);
 
         // then
         assertEquals(2, records.size());
@@ -82,7 +82,7 @@ public class RecordServiceImplTest extends TestBaseHibernate {
     public void getRecordsForUserByUserId2() {
         // given
         long userId = 7L; // there are no Users with this id
-        List<RecordDTO> records = service.getRecordsForUserByUserId(userId);
+        List<RecordCreateDTO> records = service.getRecordsForUser(userId);
 
         // when & then
         assertEquals(0, records.size());
@@ -94,13 +94,13 @@ public class RecordServiceImplTest extends TestBaseHibernate {
         // given
         long userId = 1L;
         long numberOfRecordsForUser = 2L;
-        RecordDTO record = RecordDTO.builder()
+        RecordCreateDTO record = RecordCreateDTO.builder()
                 .date("2021-10-19")
                 .time(RecordTime.NINE)
                 .build();
 
         // when
-        service.addRecordForUser(userId, record);
+        service.createRecordForClient(userId, record);
 
         // then
         session = getSessionFactory().openSession();
@@ -115,13 +115,13 @@ public class RecordServiceImplTest extends TestBaseHibernate {
     public void addRecordForUser2() {
         // given
         long userId = 1L;
-        RecordDTO record = RecordDTO.builder()
+        RecordCreateDTO record = RecordCreateDTO.builder()
                 .date("2021-10-18")
                 .time(RecordTime.NINE) // this time has been already booked for given date
                 .build();
 
         // when & then
-        assertEquals("This time has already been booked!", service.addRecordForUser(userId, record));
+        assertEquals("This time has already been booked!", service.createRecordForClient(userId, record));
         session = getSessionFactory().openSession();
         assertEquals(recordsTableInitialTestSize,
                 session.createQuery("FROM Record", Record.class).list().size());

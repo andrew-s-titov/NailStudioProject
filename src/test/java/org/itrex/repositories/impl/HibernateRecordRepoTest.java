@@ -70,7 +70,7 @@ public class HibernateRecordRepoTest extends TestBaseHibernate {
     public void getRecordsForUserByUserId1() {
         // given & when
         long userId = 1L; // User with this id has 2 records
-        List<Record> records = repo.getRecordsForUserByUserId(userId);
+        List<Record> records = repo.getRecordsForUser(userId);
 
         // then
         assertEquals(2, records.size());
@@ -81,7 +81,7 @@ public class HibernateRecordRepoTest extends TestBaseHibernate {
     public void getRecordsForUserByUserId2() {
         // given
         long userId = 7L; // there are no Users with this id
-        List<Record> records = repo.getRecordsForUserByUserId(userId);
+        List<Record> records = repo.getRecordsForUser(userId);
 
         // when & then
         assertEquals(0, records.size());
@@ -103,7 +103,7 @@ public class HibernateRecordRepoTest extends TestBaseHibernate {
                 .build();
 
         // when
-        repo.addRecordForUser(user, record);
+        repo.createRecordForClient(user, record);
 
         // then
         session = getSessionFactory().openSession();

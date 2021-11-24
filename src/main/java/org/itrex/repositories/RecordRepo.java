@@ -13,11 +13,9 @@ public interface RecordRepo {
 
     Record getRecordById(Serializable id);
 
-    List<Record> getRecordsForUserByUserId(Serializable userId);
+    List<Record> getRecordsForUser(Serializable userId);
 
-    void addRecordForUser(User user, Record record);
-
-    void changeRecordTime(Record record, RecordTime newTime);
+    void createRecordForClient(User client, Record record);
 
     List<RecordTime> getFreeTimeForDate(Date date);
 

@@ -46,23 +46,13 @@ public class HibernateRecordRepo implements RecordRepo {
     }
 
     @Override
-    public List<Record> getRecordsForUserByUserId(Serializable userId) {
+    public List<Record> getRecordsForUser(Serializable userId) {
         session = sessionFactory.openSession();
         List<Record> records = session.createQuery("FROM Record WHERE user_id = :id", Record.class)
                 .setParameter("id", userId)
                 .list();
         session.close();
         return records;
-    }
-
-    @Override
-    public void changeRecordTime(Record record, RecordTime newTime) {
-        inSession(() -> {
-            session.beginTransaction();
-            session.update(record);
-            record.setTime(newTime);
-            session.getTransaction().commit();
-        });
     }
 
     @Override
@@ -76,7 +66,7 @@ public class HibernateRecordRepo implements RecordRepo {
     }
 
     @Override
-    public void addRecordForUser(User user, Record record) {
+    public void createRecordForClient(User user, Record record) {
         inSession(() -> {
             session.beginTransaction();
             session.update(user);
@@ -101,8 +91,11 @@ public class HibernateRecordRepo implements RecordRepo {
     }
 
     private void inSession(Runnable runnable) {
-        session = sessionFactory.openSession();
-        runnable.run();
-        session.close();
+        try {
+            session = sessionFactory.openSession();
+            runnable.run();
+        } finally {
+            session.close(); // without finally there's a connection leak if method exits with an exception
+        }
     }
 }
