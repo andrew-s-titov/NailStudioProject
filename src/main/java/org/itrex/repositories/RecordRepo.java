@@ -1,23 +1,18 @@
 package org.itrex.repositories;
 
 import org.itrex.entities.Record;
-import org.itrex.entities.User;
-import org.itrex.entities.enums.RecordTime;
-
-import java.io.Serializable;
-import java.sql.Date;
 import java.util.List;
 
 public interface RecordRepo {
     List<Record> getAll();
 
-    Record getRecordById(Serializable id);
+    Record getRecordById(Long id);
 
-    List<Record> getRecordsForUser(Serializable userId);
+    List<Record> getRecordsForClient(Long clientId);
 
-    void createRecordForClient(User client, Record record);
+    List<Record> getRecordsForStaffToDo(Long staffId);
 
-    List<RecordTime> getFreeTimeForDate(Date date);
+    Record createRecord(Record record);
 
     void deleteRecord(Record record);
 }

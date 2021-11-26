@@ -5,11 +5,13 @@ import lombok.Data;
 import org.itrex.entities.enums.Discount;
 import org.itrex.entities.enums.RecordTime;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 public class RecordForStaffToDoDTO {
     Long recordId;
-    String date;
+    LocalDate date;
     RecordTime time;
     String clientFirstName;
     String clientLastName;

@@ -1,12 +1,10 @@
 package org.itrex.repositories.impl;
 
 import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.itrex.TestBaseHibernate;
 import org.itrex.entities.Record;
 import org.itrex.entities.Role;
 import org.itrex.entities.User;
-import org.itrex.entities.enums.Discount;
 import org.itrex.exceptions.DatabaseEntryNotFoundException;
 import org.itrex.repositories.UserRepo;
 import org.itrex.util.PasswordEncryption;
@@ -22,11 +20,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class HibernateUserRepoTest extends TestBaseHibernate {
     @Autowired
     private UserRepo repo;
-    private final int usersTableInitialTestSize = 3;
+    private final int usersTableInitialTestSize = 4;
     private Session session;
 
     @Test
-    @DisplayName("getAll - should return 3 Users equal to testdata migration script")
+    @DisplayName("getAll - should return all Users equal to testdata migration script")
     public void getAll() {
         // given & when
         List<User> users = repo.getAll();
@@ -46,7 +44,7 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
     @DisplayName("getUserById with valid data - should return a User with given id")
     public void getUserById1() {
         // given
-        long userId = 1L;
+        Long userId = 1L;
 
         // when
         User user = repo.getUserById(userId);
@@ -60,7 +58,7 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
     @DisplayName("getUserById with invalid data - should throw DatabaseEntryNotFoundException")
     public void getUserById2() {
         // given
-        long userId = 7L; // there are no Users with this id
+        Long userId = 7L; // there are no Users with this id
 
         // when & then
         assertThrows(DatabaseEntryNotFoundException.class, () -> repo.getUserById(userId));
@@ -90,13 +88,13 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
         // when
         User user = repo.getUserByPhone(phone);
 
-        // when & then
+        // then
         assertNull(user);
     }
 
     @Test
-    @DisplayName("addUser with valid data - users table should contain given User")
-    public void addUser1() {
+    @DisplayName("createUser with valid data - users table should contain given User")
+    public void createUser1() {
         // given
         User user = User.builder()
                 .password(PasswordEncryption.getEncryptedPassword("notSoStrongPassword"))
@@ -107,19 +105,21 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
                 .build();
 
         // when
-        repo.createUser(user);
+        User returnedUser = repo.createUser(user);
 
         // then
         session = getSessionFactory().openSession();
-        long usersCount = session.createQuery("FROM User", User.class).list().stream()
-                .filter(u -> u.getPhone().equals("1900909Fred")).count();
-        assertEquals(1, usersCount);
+        List<User> users = session.createQuery("FROM User", User.class).list();
+        assertEquals(usersTableInitialTestSize + 1, users.size());
+        assertEquals(1, users.stream()
+                .filter(u -> u.getPhone().equals("1900909Fred")).count());
+        assertEquals("1900909Fred", returnedUser.getPhone());
         session.close();
     }
 
     @Test
-    @DisplayName("addUser with invalid data - should throw HibernateException")
-    public void addUser2() {
+    @DisplayName("createUser with invalid data - should throw an Exception")
+    public void createUser2() {
         // given
         User user = User.builder()
                 .password(PasswordEncryption.getEncryptedPassword("notSoStrongPassword"))
@@ -135,12 +135,12 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("deleteUser with valid data - should delete User, all Records for User should be deleted")
+    @DisplayName("deleteUser with valid data - should delete User, all Records for User as client should be deleted")
     public void deleteUser() {
         // given
         session = getSessionFactory().openSession();
-        long userId = 1L;
-        User user = session.find(User.class, userId); // this User has 2 records
+        Long userId = 1L;
+        User user = session.find(User.class, userId); // this User has 2 records as client and 2 records as staff
         session.close();
 
         // when
@@ -149,16 +149,22 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
         // then
         session = getSessionFactory().openSession();
         assertNull(session.find(User.class, userId));
+        List<Record> recordsForClient = session.createQuery("FROM Record WHERE client_id = :id", Record.class)
+                .setParameter("id", userId)
+                .list();
+        assertTrue(recordsForClient.isEmpty());
 
-        Query<Record> query = session.createQuery("FROM Record WHERE user_id = :userId", Record.class);
-        query.setParameter("userId", userId);
-        assertTrue(query.list().isEmpty());
+        List<Record> recordsForStaff = session.createQuery("FROM Record WHERE staff_id = :id", Record.class)
+                .setParameter("id", userId)
+                .list();
+        assertTrue(recordsForStaff.isEmpty());
+
         session.close();
     }
 
     @Test
-    @DisplayName("changeEmail with valid data - 'e_mail' field should be changed for a User")
-    public void changeEmail() {
+    @DisplayName("updateUserInfo with valid data - updated fields should be changed for a User")
+    public void updateUserInfo() {
         // given
         session = getSessionFactory().openSession();
         User user = session.find(User.class, 1L);
@@ -166,7 +172,8 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
         String newEmail = "my_new_email@mail.ru";
 
         // when
-        repo.updateUserInfo(user, newEmail);
+        user.setEmail(newEmail);
+        repo.updateUserInfo(user);
 
         // then
         session = getSessionFactory().openSession();
@@ -176,30 +183,12 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("changeDiscount with valid data - 'discount' field should be changed for a User")
-    public void changeDiscount() {
-        // given
-        session = getSessionFactory().openSession();
-        User user = session.find(User.class, 1L);
-        session.close();
-        Discount newDiscount = Discount.TEN;
-
-        // when
-        repo.changeDiscount(user, newDiscount);
-
-        // then
-        session = getSessionFactory().openSession();
-        assertEquals(newDiscount, session.find(User.class, 1L).getDiscount());
-        session.close();
-    }
-
-    @Test
     @DisplayName("addRoleForUser with valid data - should add 1 row into ManyToMany join table")
     public void addRoleForUser() {
         // given
         session = getSessionFactory().openSession();
-        Role client = session.get(Role.class, 3L); // 2 Users have this role
-        User user = session.get(User.class, 1L); // this User have 2 roles, doesn't have "client" role
+        Role client = session.get(Role.class, 3); // 2 Users have this role
+        User user = session.get(User.class, 4L); // this User have 2 roles, doesn't have "client" role
         session.close();
 
         // when
@@ -207,8 +196,8 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
 
         // then
         session = getSessionFactory().openSession();
-        assertEquals(3, session.get(User.class, 1L).getUserRoles().size());
-        assertEquals(5, session.createSQLQuery("SELECT * FROM users_roles").list().size());
+        assertEquals(2, session.get(User.class, 1L).getUserRoles().size());
+        assertEquals(7, session.createSQLQuery("SELECT * FROM users_roles").list().size());
         session.close();
     }
 }

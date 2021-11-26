@@ -11,7 +11,6 @@ import org.itrex.exceptions.DatabaseEntryNotFoundException;
 import org.itrex.repositories.UserRepo;
 import org.springframework.stereotype.Repository;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -24,13 +23,22 @@ public class HibernateUserRepo implements UserRepo {
     private Session session;
 
     @Override
-    public User getUserById(Serializable id) {
+    public List<User> getAll() {
+        List<User> users;
+        session = sessionFactory.openSession();
+        users = session.createQuery("FROM User", User.class).list();
+        session.close();
+        return users;
+    }
+
+    @Override
+    public User getUserById(Long userId) {
         User user;
         session = sessionFactory.openSession();
-        user = session.get(User.class, id);
+        user = session.get(User.class, userId);
         session.close();
         if (user == null) {
-            String message = String.format("User with id %s wasn't found", id);
+            String message = String.format("User with id %s wasn't found", userId);
             log.debug(message + "DatabaseEntryNotFoundException was thrown while executing getUserById method.");
             throw new DatabaseEntryNotFoundException(message);
         }
@@ -51,17 +59,13 @@ public class HibernateUserRepo implements UserRepo {
     }
 
     @Override
-    public List<User> getAll() {
+    public User createUser(User user) {
+        Long userId;
         session = sessionFactory.openSession();
-        List<User> users = session.createQuery("FROM User", User.class).list();
+        userId = (Long) session.save(user);
+        User createdUser = session.load(User.class, userId);
         session.close();
-        return users;
-    }
-
-    @Override
-    public Long createUser(User user) {
-        session = sessionFactory.openSession();
-        return (Long) session.save(user);
+        return createdUser;
     }
 
     @Override
@@ -69,8 +73,7 @@ public class HibernateUserRepo implements UserRepo {
         inSession(() -> {
             session.beginTransaction();
             try {
-                session.update(user);
-                session.delete(user);
+                session.delete(session.merge(user));
                 session.getTransaction().commit();
             } catch (HibernateException ex) {
                 log.debug(Arrays.toString(ex.getStackTrace()));
@@ -81,7 +84,11 @@ public class HibernateUserRepo implements UserRepo {
 
     @Override
     public void updateUserInfo(User user) {
-        inSession(() -> session.update(user));
+        inSession(() -> {
+            session.beginTransaction();
+            session.update(user);
+            session.getTransaction().commit();
+        });
     }
 
     @Override

@@ -4,27 +4,23 @@ import org.itrex.dto.UserCreateDTO;
 import org.itrex.dto.UserResponseDTO;
 import org.itrex.dto.UserUpdateDTO;
 import org.itrex.entities.enums.Discount;
-import org.itrex.exceptions.DeletingUserWithActiveRecordsException;
+import org.itrex.exceptions.DeletingClientWithActiveRecordsException;
 import org.itrex.exceptions.UserExistsException;
 
 import java.util.List;
 
 public interface UserService {
-    UserResponseDTO getUserById(Long userId);
-
-    UserResponseDTO getUserByPhone(String phone);
-
     List<UserResponseDTO> getAll();
+
+    UserResponseDTO getUserById(Long userId);
 
     Long createUser(UserCreateDTO userCreateDTO) throws UserExistsException;
 
-    void deleteUser(Long userId) throws DeletingUserWithActiveRecordsException;
+    void deleteUser(Long userId) throws DeletingClientWithActiveRecordsException;
 
-    // TODO: update user
     void updateUserInfo(UserUpdateDTO userUpdateDTO);
 
-    void changeDiscount(Long clientId, Discount discount);
+    void changeClientDiscount(Long clientId, Discount newDiscount);
 
-    // TODO: decide whether to leave or not
     void addRoleForUser(Long userId, String roleName);
 }

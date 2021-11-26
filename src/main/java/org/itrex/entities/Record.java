@@ -2,10 +2,12 @@ package org.itrex.entities;
 
 import lombok.*;
 import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.itrex.entities.enums.RecordTime;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Builder
 @Getter
@@ -21,13 +23,12 @@ public class Record {
     private Long recordId;
 
     @Column(name = "date", nullable = false)
-    private Date date;
+    private LocalDate date;
 
     @Column(name = "time", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private RecordTime time;
 
-    @Immutable
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "client_id")
     private User client;

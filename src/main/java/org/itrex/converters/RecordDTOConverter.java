@@ -7,14 +7,12 @@ import org.itrex.dto.RecordOfClientDTO;
 import org.itrex.entities.Record;
 import org.springframework.stereotype.Component;
 
-import java.sql.Date;
-
 @Component
 public class RecordDTOConverter {
     public RecordForAdminDTO toRecordForAdminDTO(Record recordEntity) {
         return RecordForAdminDTO.builder()
                 .recordId(recordEntity.getRecordId())
-                .date(recordEntity.getDate().toString())
+                .date(recordEntity.getDate())
                 .time(recordEntity.getTime())
                 .clientFirstName(recordEntity.getClient().getFirstName())
                 .clientLastName(recordEntity.getClient().getLastName())
@@ -29,7 +27,7 @@ public class RecordDTOConverter {
     public RecordForStaffToDoDTO toRecordForStaffToDoDTO(Record recordEntity) {
         return RecordForStaffToDoDTO.builder()
                 .recordId(recordEntity.getRecordId())
-                .date(recordEntity.getDate().toString())
+                .date(recordEntity.getDate())
                 .time(recordEntity.getTime())
                 .clientFirstName(recordEntity.getClient().getFirstName())
                 .clientLastName(recordEntity.getClient().getLastName())
@@ -42,7 +40,7 @@ public class RecordDTOConverter {
     public RecordOfClientDTO toRecordOfClientDTO(Record recordEntity) {
         return RecordOfClientDTO.builder()
                 .recordId(recordEntity.getRecordId())
-                .date(recordEntity.getDate().toString())
+                .date(recordEntity.getDate())
                 .time(recordEntity.getTime())
                 .staffFirstName(recordEntity.getStaff().getFirstName())
                 .staffLastName(recordEntity.getStaff().getLastName())
@@ -51,7 +49,7 @@ public class RecordDTOConverter {
 
     public Record fromRecordCreateDTO(RecordCreateDTO recordCreateDTO) {
         return Record.builder()
-                .date(Date.valueOf(recordCreateDTO.getDate()))
+                .date(recordCreateDTO.getDate())
                 .time(recordCreateDTO.getTime())
                 .build();
     }

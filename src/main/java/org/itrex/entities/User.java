@@ -4,9 +4,7 @@ import lombok.*;
 import org.itrex.entities.enums.Discount;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -39,9 +37,6 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private Discount discount = Discount.ZERO;
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Record> records = new ArrayList<>();
-
     @ManyToMany
     @JoinTable(name = "users_roles", schema = "public",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -56,11 +51,6 @@ public class User {
         this.lastName = lastName;
         this.phone = phone;
         this.email = email;
-    }
-
-    public void addRecord(Record record) {
-        records.add(record);
-        record.setClient(this);
     }
 
     @Override

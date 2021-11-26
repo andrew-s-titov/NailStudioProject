@@ -4,10 +4,14 @@ import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.itrex.TestBaseHibernate;
 import org.itrex.dto.UserCreateDTO;
+import org.itrex.dto.UserResponseDTO;
+import org.itrex.dto.UserUpdateDTO;
 import org.itrex.entities.Record;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.Discount;
 import org.itrex.exceptions.DatabaseEntryNotFoundException;
+import org.itrex.exceptions.DeletingClientWithActiveRecordsException;
+import org.itrex.exceptions.UserExistsException;
 import org.itrex.services.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,16 +24,17 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UserServiceImplTest extends TestBaseHibernate {
     @Autowired
     private UserService service;
-    private final int usersTableInitialTestSize = 3;
+    private final int usersTableInitialTestSize = 4;
     private Session session;
 
     @Test
-    @DisplayName("getAll - should return 3 UserCreateDTO equal to testdata migration script")
+    @DisplayName("getAll - should return all UserResponseDTO equal to testdata migration script")
     public void getAll() {
         // given & when
-        List<UserCreateDTO> users = service.getAll();
+        List<UserResponseDTO> users = service.getAll();
 
         // then
+        users.forEach(System.out::println);
         assertEquals(usersTableInitialTestSize, users.size());
         assertEquals(1, users.get(0).getUserId());
         assertEquals("Andrew", users.get(0).getFirstName());
@@ -41,13 +46,13 @@ public class UserServiceImplTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("findUserById with valid data - should return a UserCreateDTO with given id")
-    public void findUserById1() {
+    @DisplayName("getUserById with valid data - should return a UserCreateDTO with given id")
+    public void getUserById1() {
         // given
-        long userId = 1L;
+        Long userId = 1L;
 
         // when
-        UserCreateDTO user = service.getUserById(userId);
+        UserResponseDTO user = service.getUserById(userId);
 
         // then
         assertEquals(userId, user.getUserId());
@@ -55,8 +60,8 @@ public class UserServiceImplTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("findUserById with invalid data - should throw DatabaseEntryNotFoundException")
-    public void findUserById2() {
+    @DisplayName("getUserById with invalid data - should throw DatabaseEntryNotFoundException")
+    public void getUserById2() {
         // given
         long userId = 7L; // there are no Users with this id
 
@@ -65,36 +70,8 @@ public class UserServiceImplTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("findUserByPhone with valid data - should return a UserВЕЩ with given phone number")
-    public void findUserByPhone1() {
-        // given
-        String phone = "+1946484888";
-
-        // when
-        UserCreateDTO user = service.getUserByPhone(phone);
-
-        // then
-        assertEquals(phone, user.getPhone());
-        assertEquals("hughjackman@gmail.com", user.getEmail());
-        assertEquals(3, user.getUserId());
-    }
-
-    @Test
-    @DisplayName("findUserByPhone with invalid data - should return null")
-    public void findUserByPhone2() {
-        // given
-        String phone = "+7777777777"; // there are no Users with this phone number
-
-        // when
-        UserCreateDTO user = service.getUserByPhone(phone);
-
-        // when & then
-        assertNull(user);
-    }
-
-    @Test
-    @DisplayName("addUser with valid data - users table should contain given User")
-    public void addUser1() {
+    @DisplayName("createUser with valid data - users table should contain given User")
+    public void createUser1() throws UserExistsException {
         // given
         UserCreateDTO user = UserCreateDTO.builder()
                 .password("notSoStrongPassword")
@@ -105,7 +82,7 @@ public class UserServiceImplTest extends TestBaseHibernate {
                 .build();
 
         // when
-        service.createUser(user);
+        Long createdUserId = service.createUser(user);
 
         // then
         session = getSessionFactory().openSession();
@@ -117,14 +94,16 @@ public class UserServiceImplTest extends TestBaseHibernate {
                 .filter(u -> u.getPhone().equals("1900909Fred")).count();
         assertEquals(1, usersCount);
 
+        assertEquals(usersTableInitialTestSize + 1, createdUserId);
+
         session.close();
     }
 
     @Test
-    @DisplayName("addUser with invalid data - users table shouldn't added users")
-    public void addUser2() {
+    @DisplayName("createUser with invalid data - users table shouldn't added users")
+    public void createUser2() {
         // given
-        UserCreateDTO user2 = UserCreateDTO.builder()
+        UserCreateDTO user = UserCreateDTO.builder()
                 .password("notSoStrongPassword")
                 .firstName("Edward")
                 .lastName("Scissorshands")
@@ -133,22 +112,15 @@ public class UserServiceImplTest extends TestBaseHibernate {
                 .email("holdme@yahoo.com")
                 .build();
 
-        // when
-        String message = service.createUser(user2);
-
-        // then
-        assertEquals("User with the same phone number already exists!", message);
-        session = getSessionFactory().openSession();
-        assertEquals(usersTableInitialTestSize,
-                session.createQuery("FROM User", User.class).list().size());
-        session.close();
+        // then & when
+        assertThrows(UserExistsException.class, () -> service.createUser(user));
     }
 
     @Test
     @DisplayName("deleteUser with valid data - should delete User, all Records for User should be deleted")
-    public void deleteUser() {
+    public void deleteUser() throws DeletingClientWithActiveRecordsException {
         // given
-        long userId = 1L;
+        Long userId = 1L;
 
         // when
         service.deleteUser(userId);
@@ -166,14 +138,20 @@ public class UserServiceImplTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("changeEmail with valid data - 'e_mail' field should be changed for a User with given ID")
-    public void changeEmail() {
+    @DisplayName("updateUserInfo with valid data - edited fields should be changed for a User with given id")
+    public void updateUserInfo() {
         // given
-        long userId = 1L;
+        Long userId = 1L;
         String newEmail = "my_new_email@mail.ru";
+        UserUpdateDTO user = UserUpdateDTO.builder()
+                .userId(userId)
+                .firstName("Andrew")
+                .lastName("T")
+                .email(newEmail)
+                .build();
 
         // when
-        service.updateUserInfo(userId, newEmail);
+        service.updateUserInfo(user);
 
         // then
         session = getSessionFactory().openSession();
@@ -182,14 +160,14 @@ public class UserServiceImplTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("changeDiscount with valid data - 'discount' field should be changed for a User with given ID")
-    public void changeDiscount() {
+    @DisplayName("changeClientDiscount with valid data - 'discount' field should be changed for a User with given ID")
+    public void changeClientDiscount() {
         // given
-        long userId = 1L;
+        Long userId = 1L;
         Discount newDiscount = Discount.TEN;
 
         // when
-        service.changeDiscount(userId, newDiscount);
+        service.changeClientDiscount(userId, newDiscount);
 
         // then
         session = getSessionFactory().openSession();
@@ -201,10 +179,8 @@ public class UserServiceImplTest extends TestBaseHibernate {
     @DisplayName("addRoleForUser with valid data - should add 1 row into ManyToMany join table")
     public void addRoleForUser() {
         // given
-        session = getSessionFactory().openSession();
-        long userId = 1L; // this User have 2 roles, doesn't have "client" role
-        String roleName = "client"; // 2 Users have this role
-        session.close();
+        Long userId = 2L; // this User have 1 role, doesn't have "staff" role
+        String roleName = "staff"; // 2 Users have this role
 
         // when
         service.addRoleForUser(userId, roleName);
@@ -212,8 +188,8 @@ public class UserServiceImplTest extends TestBaseHibernate {
         // then
         session = getSessionFactory().openSession();
 
-        assertEquals(3, session.get(User.class, 1L).getUserRoles().size());
-        assertEquals(5, session.createSQLQuery("SELECT * FROM users_roles").list().size());
+        assertEquals(2, session.get(User.class, userId).getUserRoles().size());
+        assertEquals(7, session.createSQLQuery("SELECT * FROM users_roles").list().size());
 
         session.close();
     }

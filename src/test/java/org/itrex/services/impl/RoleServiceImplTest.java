@@ -60,7 +60,7 @@ public class RoleServiceImplTest extends TestBaseHibernate {
     @DisplayName("getRoleById with valid data - should return a RoleDTO with given id")
     public void getRoleById1() {
         // given
-        long roleId = 1L;
+        Integer roleId = 1;
 
         // when
         RoleDTO roleDTO = service.getRoleById(roleId);
@@ -74,7 +74,7 @@ public class RoleServiceImplTest extends TestBaseHibernate {
     @DisplayName("getRoleById with invalid data - should throw DatabaseEntryNotFoundException")
     public void getRoleById2() {
         // given
-        long roleId = 150L;
+        Integer roleId = 150;
 
         // when & then
         assertThrows(DatabaseEntryNotFoundException.class, () -> service.getRoleById(roleId));

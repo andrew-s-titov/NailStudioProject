@@ -9,7 +9,7 @@ import org.itrex.entities.Record;
 import org.itrex.entities.Role;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.Discount;
-import org.itrex.exceptions.DeletingUserWithActiveRecordsException;
+import org.itrex.exceptions.DeletingClientWithActiveRecordsException;
 import org.itrex.exceptions.UserExistsException;
 import org.itrex.repositories.RecordRepo;
 import org.itrex.repositories.RoleRepo;
@@ -18,7 +18,6 @@ import org.itrex.services.UserService;
 import org.itrex.util.PasswordEncryption;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,12 +37,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDTO getUserByPhone(String phone) {
-        User userEntity = userRepo.getUserByPhone(phone);
-        return userEntity == null ? null : toUserResponseDTO(userEntity);
-    }
-
-    @Override
     public List<UserResponseDTO> getAll() {
         return userRepo.getAll().stream()
                 .map(this::toUserResponseDTO)
@@ -55,13 +48,13 @@ public class UserServiceImpl implements UserService {
         String phone = user.getPhone();
         checkExistingUser(phone);
         User newUser = fromUserCreateDTO(user);
-        return userRepo.createUser(newUser);
+        return userRepo.createUser(newUser).getUserId();
     }
 
     @Override
-    public void deleteUser(Long userId) throws DeletingUserWithActiveRecordsException {
+    public void deleteUser(Long userId) throws DeletingClientWithActiveRecordsException {
         User userEntity = userRepo.getUserById(userId);
-        List<Record> records = recordRepo.getRecordsForUser(userId);
+        List<Record> records = recordRepo.getRecordsForClient(userId);
         checkActiveRecords(records);
         userRepo.deleteUser(userEntity);
     }
@@ -76,9 +69,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changeDiscount(Long clientId, Discount discount) {
+    public void changeClientDiscount(Long clientId, Discount newDiscount) {
         User user = userRepo.getUserById(clientId);
-        user.setDiscount(discount);
+        user.setDiscount(newDiscount);
         userRepo.updateUserInfo(user);
     }
 
@@ -95,14 +88,12 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void checkActiveRecords(List<Record> records) throws DeletingUserWithActiveRecordsException {
+    private void checkActiveRecords(List<Record> records) throws DeletingClientWithActiveRecordsException {
         if (!records.isEmpty()) {
-            Date today = Date.valueOf(LocalDate.now());
-            long futureRecordsCount = records.stream()
-                    .filter(r -> r.getDate().compareTo(today) >= 0)
-                    .count();
-            if (futureRecordsCount > 0) {
-                throw new DeletingUserWithActiveRecordsException();
+            boolean hasActiveRecords = records.stream()
+                    .anyMatch(r -> r.getDate().compareTo(LocalDate.now()) >= 0);
+            if (hasActiveRecords) {
+                throw new DeletingClientWithActiveRecordsException();
             }
         }
     }

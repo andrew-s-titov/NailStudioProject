@@ -12,12 +12,13 @@ import org.itrex.entities.User;
 import org.itrex.entities.enums.RecordTime;
 import org.itrex.exceptions.BookingUnavailableException;
 import org.itrex.repositories.RecordRepo;
+import org.itrex.repositories.RoleRepo;
 import org.itrex.repositories.UserRepo;
 import org.itrex.services.RecordService;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class RecordServiceImpl implements RecordService {
     private final RecordRepo recordRepo;
     private final UserRepo userRepo;
+    private final RoleRepo roleRepo;
     private final RecordDTOConverter converter;
 
     @Override
@@ -33,38 +35,32 @@ public class RecordServiceImpl implements RecordService {
         return recordRepo.getAll().stream()
                 .map(converter::toRecordForAdminDTO)
                 .collect(Collectors.toList());
+        // TODO: filter to show only active records or paging
     }
 
     @Override
-    public List<RecordOfClientDTO> getRecordsForUser(Long clientId) {
-        return recordRepo.getRecordsForUser(clientId).stream()
+    public List<RecordOfClientDTO> getRecordsForClient(Long clientId) {
+        return recordRepo.getRecordsForClient(clientId).stream()
                 .map(converter::toRecordOfClientDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<RecordForStaffToDoDTO> getRecordsForStaffToDo(Long staffId) {
-        return recordRepo.getRecordsForUser(staffId).stream()
+        return recordRepo.getRecordsForStaffToDo(staffId).stream()
                 .map(converter::toRecordForStaffToDoDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Long createRecordForClient(RecordCreateDTO recordCreateDTO) throws BookingUnavailableException {
+    public Long createRecord(RecordCreateDTO recordCreateDTO) throws BookingUnavailableException {
         User client = userRepo.getUserById(recordCreateDTO.getUserId());
         User staff = userRepo.getUserById(recordCreateDTO.getStaffId());
-        RecordTime time = recordCreateDTO.getTime();
-        Date date = Date.valueOf(recordCreateDTO.getDate());
-        // TODO: add logic - check depending on staff free slots
-        checkTimeAvailability(date, time);
         Record newRecord = converter.fromRecordCreateDTO(recordCreateDTO);
-        // TODO: check implicit setClient (createRecordForClient calls User.addRecord)
         newRecord.setClient(client);
         newRecord.setStaff(staff);
-        // TODO: check createRecord logic
-        recordRepo.createRecordForClient(client, newRecord);
-        // TODO: change return
-        return 0L;
+        checkRecordAvailability(recordCreateDTO);
+        return recordRepo.createRecord(newRecord).getRecordId();
     }
 
     @Override
@@ -73,8 +69,33 @@ public class RecordServiceImpl implements RecordService {
         recordRepo.deleteRecord(recordEntity);
     }
 
-    private void checkTimeAvailability(Date date, RecordTime newTime) throws BookingUnavailableException {
-        if (!recordRepo.getFreeTimeForDate(date).contains(newTime)) {
+    @Override
+    public HashMap<LocalDate, List<RecordTime>> getFreeRecordsFor3MonthsByStaffId(Long staffId) {
+        LocalDate now = LocalDate.now();
+        LocalDate lastDate = now.plusMonths(3);
+
+        HashMap<LocalDate, List<RecordTime>> timeSlotsFor3Months = new HashMap<>();
+
+        // fill the map with every time slot for every day in 3 months range
+        LocalDate startDate = now;
+        while (!startDate.equals(lastDate)) {
+            timeSlotsFor3Months.put(startDate, new ArrayList<>(Arrays.asList(RecordTime.values())));
+            startDate = startDate.plusDays(1);
+        }
+
+        // remove booked time slot from the map for staff person
+        List<Record> recordsForStaffToDo = recordRepo.getRecordsForStaffToDo(staffId);
+        recordsForStaffToDo.stream()
+                .filter(r -> timeSlotsFor3Months.containsKey(r.getDate()))
+                .forEach(r -> timeSlotsFor3Months.get(r.getDate()).remove(r.getTime()));
+
+        return timeSlotsFor3Months;
+    }
+
+    private void checkRecordAvailability(RecordCreateDTO record) throws BookingUnavailableException {
+        boolean booked = recordRepo.getRecordsForStaffToDo(record.getStaffId()).stream()
+                .anyMatch(r -> r.getDate().equals(record.getDate()) && r.getTime().equals(record.getTime()));
+        if (booked) {
             throw new BookingUnavailableException();
         }
     }

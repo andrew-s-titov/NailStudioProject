@@ -5,10 +5,12 @@ import lombok.Data;
 
 import org.itrex.entities.enums.RecordTime;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 public class RecordCreateDTO {
-    String date;
+    LocalDate date;
     RecordTime time;
     Long userId;
     Long staffId;

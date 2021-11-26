@@ -4,19 +4,23 @@ import org.itrex.dto.RecordCreateDTO;
 import org.itrex.dto.RecordForAdminDTO;
 import org.itrex.dto.RecordForStaffToDoDTO;
 import org.itrex.dto.RecordOfClientDTO;
+import org.itrex.entities.enums.RecordTime;
 import org.itrex.exceptions.BookingUnavailableException;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 
 public interface RecordService {
-    // TODO: remove
     List<RecordForAdminDTO> getAll();
 
-    List<RecordOfClientDTO> getRecordsForUser(Long clientId);
+    List<RecordOfClientDTO> getRecordsForClient(Long clientId);
 
     List<RecordForStaffToDoDTO> getRecordsForStaffToDo(Long staffId);
 
-    Long createRecordForClient(RecordCreateDTO recordCreateDTO) throws BookingUnavailableException;
+    HashMap<LocalDate, List<RecordTime>> getFreeRecordsFor3MonthsByStaffId(Long staffId);
+
+    Long createRecord(RecordCreateDTO recordCreateDTO) throws BookingUnavailableException;
 
     void deleteRecord(Long recordId);
 }

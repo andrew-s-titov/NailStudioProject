@@ -2,7 +2,6 @@ package org.itrex.services;
 
 import org.itrex.dto.RoleDTO;
 
-import java.io.Serializable;
 import java.util.List;
 
 public interface RoleService {

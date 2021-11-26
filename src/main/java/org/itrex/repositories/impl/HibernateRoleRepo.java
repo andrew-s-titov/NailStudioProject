@@ -10,7 +10,6 @@ import org.itrex.exceptions.DatabaseEntryNotFoundException;
 import org.itrex.repositories.RoleRepo;
 import org.springframework.stereotype.Repository;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +49,7 @@ public class HibernateRoleRepo implements RoleRepo {
     }
 
     @Override
-    public Role getRoleById(Serializable id) {
+    public Role getRoleById(Integer id) {
         Optional<Role> role;
         session = sessionFactory.openSession();
         role = session.createQuery("FROM Role WHERE role_id = :id", Role.class)

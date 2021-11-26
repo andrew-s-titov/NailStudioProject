@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users
 
 CREATE TABLE IF NOT EXISTS roles
 (
-    role_id   IDENTITY NOT NULL,
+    role_id   IDENTITY                          NOT NULL,
     role_name ENUM ('ADMIN', 'STAFF', 'CLIENT') NOT NULL,
     PRIMARY KEY (role_id),
     UNIQUE (role_name)
@@ -36,13 +36,13 @@ CREATE TABLE IF NOT EXISTS records
 (
     record_id IDENTITY                               NOT NULL,
     client_id BIGINT                                 NOT NULL,
-    staff_id  BIGINT                                 NOT NULL,
+    staff_id  BIGINT,
     date      DATE                                   NOT NULL,
     time      ENUM ('NINE', 'THIRTEEN', 'SEVENTEEN') NOT NULL,
     PRIMARY KEY (record_id),
     FOREIGN KEY (client_id) REFERENCES users (user_id),
     FOREIGN KEY (staff_id) REFERENCES users (user_id),
-    UNIQUE (date, time)
+    UNIQUE (date, time, staff_id)
 );
 
 COMMIT;

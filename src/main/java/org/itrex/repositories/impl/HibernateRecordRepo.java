@@ -5,16 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.itrex.entities.Record;
-import org.itrex.entities.User;
-import org.itrex.entities.enums.RecordTime;
 import org.itrex.exceptions.DatabaseEntryNotFoundException;
 import org.itrex.repositories.RecordRepo;
 import org.springframework.stereotype.Repository;
 
-import java.io.Serializable;
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -33,7 +28,7 @@ public class HibernateRecordRepo implements RecordRepo {
     }
 
     @Override
-    public Record getRecordById(Serializable id) {
+    public Record getRecordById(Long id) {
         session = sessionFactory.openSession();
         Record record = session.get(Record.class, id);
         session.close();
@@ -46,13 +41,34 @@ public class HibernateRecordRepo implements RecordRepo {
     }
 
     @Override
-    public List<Record> getRecordsForUser(Serializable userId) {
+    public List<Record> getRecordsForClient(Long clientId) {
         session = sessionFactory.openSession();
-        List<Record> records = session.createQuery("FROM Record WHERE user_id = :id", Record.class)
-                .setParameter("id", userId)
+        List<Record> records = session.createQuery("FROM Record WHERE client_id = :id", Record.class)
+                .setParameter("id", clientId)
                 .list();
         session.close();
         return records;
+    }
+
+    @Override
+    public List<Record> getRecordsForStaffToDo(Long staffId) {
+        session = sessionFactory.openSession();
+        List<Record> records = session.createQuery("FROM Record WHERE staff_id = :id AND date >= :date", Record.class)
+                .setParameter("id", staffId)
+                .setParameter("date", LocalDate.now())
+                .list();
+        session.close();
+        return records;
+    }
+
+    @Override
+    public Record createRecord(Record record) {
+        Long recordId;
+        session = sessionFactory.openSession();
+        recordId = (Long) session.save(record);
+        Record createdRecord = session.load(Record.class, recordId);
+        session.close();
+        return createdRecord;
     }
 
     @Override
@@ -63,31 +79,6 @@ public class HibernateRecordRepo implements RecordRepo {
             session.delete(record);
             session.getTransaction().commit();
         });
-    }
-
-    @Override
-    public void createRecordForClient(User user, Record record) {
-        inSession(() -> {
-            session.beginTransaction();
-            session.update(user);
-            user.addRecord(record);
-            session.getTransaction().commit();
-        });
-    }
-
-    public List<RecordTime> getFreeTimeForDate(Date date) {
-        session = sessionFactory.openSession();
-        final List<RecordTime> availableTime = new ArrayList<>(Arrays.asList(RecordTime.values()));
-        List<Record> recordsWithGivenDate = session.createQuery("FROM Record WHERE date = :date", Record.class)
-                .setParameter("date", date)
-                .list();
-        session.close();
-        if (!recordsWithGivenDate.isEmpty()) {
-            recordsWithGivenDate.stream()
-                    .map(Record::getTime)
-                    .forEach(availableTime::remove);
-        }
-        return availableTime;
     }
 
     private void inSession(Runnable runnable) {

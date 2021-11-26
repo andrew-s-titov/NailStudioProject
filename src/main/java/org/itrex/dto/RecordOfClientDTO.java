@@ -4,11 +4,13 @@ import lombok.Builder;
 import lombok.Data;
 import org.itrex.entities.enums.RecordTime;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 public class RecordOfClientDTO {
     Long recordId;
-    String date;
+    LocalDate date;
     RecordTime time;
     String staffFirstName;
     String staffLastName;

@@ -3,15 +3,20 @@ package org.itrex.services.impl;
 import org.hibernate.Session;
 import org.itrex.TestBaseHibernate;
 import org.itrex.dto.RecordCreateDTO;
+import org.itrex.dto.RecordForAdminDTO;
+import org.itrex.dto.RecordForStaffToDoDTO;
+import org.itrex.dto.RecordOfClientDTO;
 import org.itrex.entities.Record;
 import org.itrex.entities.User;
 import org.itrex.entities.enums.RecordTime;
-import org.itrex.exceptions.DatabaseEntryNotFoundException;
+import org.itrex.exceptions.BookingUnavailableException;
 import org.itrex.services.RecordService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,154 +28,142 @@ public class RecordServiceImplTest extends TestBaseHibernate {
     private Session session;
 
     @Test
-    @DisplayName("getAll - should return 4 Records equal to testdata migration script")
+    @DisplayName("getAll - should return all RecordForAdminDTO equal to testdata migration script")
     public void getAll() {
         // given & when
-        List<RecordCreateDTO> records = service.getAll();
+        List<RecordForAdminDTO> records = service.getAll();
 
         // then
         assertEquals(recordsTableInitialTestSize, records.size());
-        assertEquals(1, records.get(0).getUserId());
-        assertEquals("2021-10-18", records.get(0).getDate());
+
+        assertEquals(1, records.get(0).getRecordId());
         assertEquals(RecordTime.NINE, records.get(0).getTime());
-        assertEquals(2, records.get(3).getUserId());
-        assertEquals(RecordTime.SEVENTEEN, records.get(3).getTime());
+        assertEquals(LocalDate.of(2021, 10, 18), records.get(0).getDate());
+        assertEquals("wow@gmail.com", records.get(0).getClientEmail());
+        assertEquals("Senior", records.get(0).getStaffLastName());
     }
 
     @Test
-    @DisplayName("getRecordById with valid data - should return existing Record")
-    public void getRecordById1() {
-        // given & when
-        RecordCreateDTO recordCreateDTO1 = service.getRecordById(1L);
-        RecordCreateDTO recordCreateDTO2 = service.getRecordById(3L);
+    @DisplayName("getRecordsForClient with valid data - should return a list of RecordOfClientDTO for User client")
+    public void getRecordsForClient1() {
+        // given
+        Long userId = 1L; // User with this id has 2 records as client
+
+        // when
+        List<RecordOfClientDTO> recordsForClient = service.getRecordsForClient(userId);
 
         // then
-        assertEquals(1, recordCreateDTO1.getRecordId());
-        assertEquals(RecordTime.NINE, recordCreateDTO1.getTime());
-        assertEquals("2021-10-18", recordCreateDTO1.getDate());
-        assertEquals(3, recordCreateDTO2.getRecordId());
-        assertEquals(RecordTime.THIRTEEN, recordCreateDTO2.getTime());
-        assertEquals("2021-10-18", recordCreateDTO2.getDate());
+        assertEquals(2, recordsForClient.size());
+        System.out.println(recordsForClient.get(0).getStaffLastName());
+        assertEquals(2, recordsForClient.stream().filter(r -> r.getStaffLastName().equals("Senior")).count());
     }
 
     @Test
-    @DisplayName("getRecordById with invalid data - should throw DatabaseEntryNotFoundException")
-    public void getRecordById2() {
+    @DisplayName("getRecordsForClient with invalid data - should return empty list")
+    public void getRecordsForClient2() {
         // given
-        long recordId1 = 7L;
-        long recordId2 = 180L;
+        Long userId = 7L; // there are no Users with this id
 
-        // when & then
-        assertThrows(DatabaseEntryNotFoundException.class, () -> service.getRecordById(recordId1));
-        assertThrows(DatabaseEntryNotFoundException.class, () -> service.getRecordById(recordId2));
+        // when
+        List<RecordOfClientDTO> recordsForClient = service.getRecordsForClient(userId);
+
+        // when
+        assertEquals(0, recordsForClient.size());
     }
 
     @Test
-    @DisplayName("getRecordsForUserByUserId with valid data - should return a list of Records for User")
-    public void getRecordsForUserByUserId1() {
-        // given & when
-        long userId = 1L; // User with this id has 2 records
-        List<RecordCreateDTO> records = service.getRecordsForUser(userId);
+    @DisplayName("getRecordsForStaffToDo with valid data - should return a list of RecordForStaffToDoDTO for User staff")
+    public void getRecordsForStaffToDo1() {
+        // given
+        Long staffId = 1L; // User with this id has 1 record as staff to-do and 1 done record-task
+
+        // when
+        List<RecordForStaffToDoDTO> recordsForStaffToDo = service.getRecordsForStaffToDo(staffId);
 
         // then
-        assertEquals(2, records.size());
-        assertEquals(2, records.stream().filter(r -> r.getUserId() == userId).count());
+        assertEquals(1, recordsForStaffToDo.size());
+        assertEquals("bp@yahoo.com", recordsForStaffToDo.get(0).getClientEmail());
     }
 
     @Test
-    @DisplayName("getRecordsForUserByUserId with invalid data - should return empty list")
-    public void getRecordsForUserByUserId2() {
+    @DisplayName("getRecordsForStaffToDo with invalid data - should return empty list")
+    public void getRecordsForStaffToDo2() {
         // given
-        long userId = 7L; // there are no Users with this id
-        List<RecordCreateDTO> records = service.getRecordsForUser(userId);
+        Long userId = 7L; // there are no Users with this id
 
-        // when & then
-        assertEquals(0, records.size());
+        // when
+        List<RecordForStaffToDoDTO> recordsForStaffToDo = service.getRecordsForStaffToDo(userId);
+
+        // then
+        assertEquals(0, recordsForStaffToDo.size());
     }
 
     @Test
-    @DisplayName("addRecordForUser with valid data - records table should contain record with given parameters")
-    public void addRecordForUser() {
+    @DisplayName("getFreeRecordsFor3MonthsByStaffId with valid data - should return hashmap " +
+            "without info about booked records for User staff")
+    public void getFreeRecordsFor3MonthsByStaffId() {
         // given
-        long userId = 1L;
-        long numberOfRecordsForUser = 2L;
+        Long staffId = 1L; // User with this id has 1 record as staff to-do
+
+        // when
+        HashMap<LocalDate, List<RecordTime>> result = service.getFreeRecordsFor3MonthsByStaffId(staffId);
+
+        // then
+        assertEquals(2, result.get(LocalDate.of(2021, 12, 31)).size());
+        assertFalse(result.get(LocalDate.of(2021, 12, 31)).contains(RecordTime.SEVENTEEN));
+    }
+
+    @Test
+    @DisplayName("createRecord with valid data - records table should contain record with given parameters")
+    public void createRecord1() throws BookingUnavailableException {
+        // given
+        Long userId = 1L;
+        Long staffId = 4L;
         RecordCreateDTO record = RecordCreateDTO.builder()
-                .date("2021-10-19")
+                .date(LocalDate.of(2021, 12, 30))
                 .time(RecordTime.NINE)
+                .userId(userId)
+                .staffId(staffId)
                 .build();
 
         // when
-        service.createRecordForClient(userId, record);
+        Long recordId = service.createRecord(record);
 
         // then
         session = getSessionFactory().openSession();
-        assertEquals(recordsTableInitialTestSize + 1,
-                session.createQuery("FROM Record", Record.class).list().size());
-        assertEquals(numberOfRecordsForUser + 1, session.get(User.class, userId).getRecords().size());
+        List<Record> records = session.createQuery("FROM Record", Record.class).list();
+        assertEquals(recordsTableInitialTestSize + 1, records.size());
+        assertEquals(1, records.stream()
+                .filter(r -> r.getDate().equals(record.getDate()))
+                .count());
+        assertEquals(5, recordId);
         session.close();
     }
 
     @Test
-    @DisplayName("addRecordForUser with invalid data - shouldn't add record and should return BookingUnavailableException message")
-    public void addRecordForUser2() {
+    @DisplayName("createRecord with invalid data - shouldn't add record and should throw BookingUnavailableException message")
+    public void createRecord2() {
         // given
-        long userId = 1L;
+        Long userId = 2L;
+        Long staffId = 1L;
         RecordCreateDTO record = RecordCreateDTO.builder()
-                .date("2021-10-18")
-                .time(RecordTime.NINE) // this time has been already booked for given date
+                .date(LocalDate.of(2021, 12, 31))
+                .time(RecordTime.SEVENTEEN) // this time has been already booked for given date
+                .userId(userId)
+                .staffId(staffId)
                 .build();
 
         // when & then
-        assertEquals("This time has already been booked!", service.createRecordForClient(userId, record));
-        session = getSessionFactory().openSession();
-        assertEquals(recordsTableInitialTestSize,
-                session.createQuery("FROM Record", Record.class).list().size());
-        session.close();
-    }
-
-    @Test
-    @DisplayName("changeRecordTime with valid data - records table should update time for this record")
-    public void changeRecordTime1() {
-        // given
-        long recordId = 1L; // time 09:00
-        RecordTime newTime = RecordTime.SEVENTEEN; // not booked for the same date
-
-        // when
-        service.changeRecordTime(recordId, newTime);
-
-        // then
-        session = getSessionFactory().openSession();
-
-        assertEquals(newTime, session.find(Record.class, recordId).getTime());
-        assertEquals(recordsTableInitialTestSize, session.createQuery("FROM Record", Record.class).list().size());
-
-        session.close();
-    }
-
-    @Test
-    @DisplayName("changeRecordTime with invalid data - shouldn't change time, should return BookingUnavailableException message")
-    public void changeRecordTime2() {
-        // given
-        long recordId = 1L; // time 09:00
-        RecordTime currentTime = RecordTime.NINE;
-        RecordTime newTime = RecordTime.THIRTEEN; // already booked for the same date
-
-        // when & then
-        assertEquals("This time has already been booked!", service.changeRecordTime(recordId, newTime));
-        session = getSessionFactory().openSession();
-
-        assertEquals(currentTime, session.find(Record.class, recordId).getTime());
-        assertEquals(recordsTableInitialTestSize, session.createQuery("FROM Record", Record.class).list().size());
-
-        session.close();
+        assertThrows(BookingUnavailableException.class, () -> service.createRecord(record));
     }
 
     @Test
     @DisplayName("deleteRecord with valid data - records table shouldn't contain Record with given ID")
     public void deleteRecord() {
         // given
-        long recordId = 1L;
-        long userIdWithThisRecord = 1L;
+        Long recordId = 1L;
+        Long clientId = 1L;
+        Long staffId = 4L;
 
         // when
         service.deleteRecord(recordId);
@@ -179,8 +172,8 @@ public class RecordServiceImplTest extends TestBaseHibernate {
         session = getSessionFactory().openSession();
 
         assertNull(session.find(Record.class, recordId));
-        User user = session.find(User.class, userIdWithThisRecord);
-        assertNotNull(session.find(User.class, userIdWithThisRecord));
+        assertNotNull(session.find(User.class, clientId));
+        assertNotNull(session.find(User.class, staffId));
         assertEquals(recordsTableInitialTestSize - 1,
                 session.createQuery("FROM Record", Record.class).list().size());
 
