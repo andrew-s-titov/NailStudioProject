@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class SuccessfulRepoGetMethodExecutionAdvice {
-    @Pointcut("within(org.itrex.repositories..*)")
+    @Pointcut("within(org.itrex.repository..*)")
     public void repositoryMethods() {}
 
     @Pointcut("execution(* *..get*(..))")

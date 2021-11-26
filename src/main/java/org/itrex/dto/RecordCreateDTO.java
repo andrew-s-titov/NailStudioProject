@@ -3,7 +3,7 @@ package org.itrex.dto;
 import lombok.Builder;
 import lombok.Data;
 
-import org.itrex.entities.enums.RecordTime;
+import org.itrex.entity.enums.RecordTime;
 
 import java.time.LocalDate;
 

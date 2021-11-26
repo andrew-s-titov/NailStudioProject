@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ExceptionLoggingAdvice {
 
-    @Around("execution(* org.itrex.repositories..*.*(..))")
+    @Around("execution(* org.itrex.repository..*.*(..))")
     public Object checkIfRepoMethodFailedWithException(ProceedingJoinPoint joinPoint) throws Throwable {
         Object result = null;
         try {
