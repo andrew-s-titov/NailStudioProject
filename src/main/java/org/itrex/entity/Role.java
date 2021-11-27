@@ -7,6 +7,7 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+@EqualsAndHashCode
 @Setter
 @Getter
 @NoArgsConstructor
@@ -22,6 +23,7 @@ public class Role {
     @Enumerated(value = EnumType.STRING)
     private RoleType roletype;
 
+    @EqualsAndHashCode.Exclude
     @ManyToMany(mappedBy = "userRoles")
     private Set<User> users = new HashSet<>();
 

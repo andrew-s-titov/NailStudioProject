@@ -181,23 +181,4 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
         assertEquals(newEmail, user.getEmail());
         session.close();
     }
-
-    @Test
-    @DisplayName("addRoleForUser with valid data - should add 1 row into ManyToMany join table")
-    public void addRoleForUser() {
-        // given
-        session = getSessionFactory().openSession();
-        Role client = session.get(Role.class, 3); // 2 Users have this role
-        User user = session.get(User.class, 4L); // this User have 2 roles, doesn't have "client" role
-        session.close();
-
-        // when
-        repo.addRoleForUser(user, client);
-
-        // then
-        session = getSessionFactory().openSession();
-        assertEquals(2, session.get(User.class, 1L).getUserRoles().size());
-        assertEquals(7, session.createSQLQuery("SELECT * FROM users_roles").list().size());
-        session.close();
-    }
 }

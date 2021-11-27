@@ -2,24 +2,27 @@ package org.itrex.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.itrex.converter.UserDTOConverter;
 import org.itrex.dto.UserCreateDTO;
 import org.itrex.dto.UserResponseDTO;
+import org.itrex.dto.UserCreditsDTO;
 import org.itrex.dto.UserUpdateDTO;
 import org.itrex.entity.Record;
 import org.itrex.entity.Role;
 import org.itrex.entity.User;
 import org.itrex.entity.enums.Discount;
 import org.itrex.exception.DeletingClientWithActiveRecordsException;
+import org.itrex.exception.RoleManagementException;
 import org.itrex.exception.UserExistsException;
 import org.itrex.repository.RecordRepo;
 import org.itrex.repository.RoleRepo;
 import org.itrex.repository.UserRepo;
 import org.itrex.service.UserService;
-import org.itrex.util.PasswordEncryption;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,26 +32,34 @@ public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final RecordRepo recordRepo;
     private final RoleRepo roleRepo;
+    private final UserDTOConverter converter;
 
     @Override
     public UserResponseDTO getUserById(Long userId) {
         User userEntity = userRepo.getUserById(userId);
-        return toUserResponseDTO(userEntity);
+        return converter.toUserResponseDTO(userEntity);
+    }
+
+    @Override
+    public UserCreditsDTO getUserByPhone(String phone) {
+        User userEntity = userRepo.getUserByPhone(phone);
+        return userEntity == null ? null : converter.toUserCreditsDTO(userEntity);
     }
 
     @Override
     public List<UserResponseDTO> getAll() {
         return userRepo.getAll().stream()
-                .map(this::toUserResponseDTO)
+                .map(converter::toUserResponseDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Long createUser(UserCreateDTO user) throws UserExistsException {
+    public UserResponseDTO createUser(UserCreateDTO user) throws UserExistsException {
         String phone = user.getPhone();
         checkExistingUser(phone);
-        User newUser = fromUserCreateDTO(user);
-        return userRepo.createUser(newUser).getUserId();
+        User newUser = converter.fromUserCreateDTO(user);
+        User createdUser = userRepo.createUser(newUser);
+        return converter.toUserResponseDTO(createdUser);
     }
 
     @Override
@@ -71,15 +82,42 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changeClientDiscount(Long clientId, Discount newDiscount) {
         User user = userRepo.getUserById(clientId);
-        user.setDiscount(newDiscount);
+        if (!user.getDiscount().equals(newDiscount)) { // avoiding unnecessary request to db
+            user.setDiscount(newDiscount);
+            userRepo.updateUserInfo(user);
+        }
+    }
+
+    @Override
+    public void addRoleForUser(Long userId, String roleName) throws RoleManagementException {
+        User user = userRepo.getUserById(userId);
+        Role role = roleRepo.getRoleByName(roleName);
+        Set<Role> userRoles = user.getUserRoles();
+        if (userRoles.contains(role)) {
+            String message = String.format("Failed to add role: User with id %s already has role %s.",
+                    userId, roleName.toUpperCase());
+            throw new RoleManagementException(message);
+        }
+        user.getUserRoles().add(role);
         userRepo.updateUserInfo(user);
     }
 
     @Override
-    public void addRoleForUser(Long userId, String roleName) {
+    public void revokeRole(Long userId, String roleName) throws RoleManagementException {
         User user = userRepo.getUserById(userId);
         Role role = roleRepo.getRoleByName(roleName);
-        userRepo.addRoleForUser(user, role);
+        Set<Role> userRoles = user.getUserRoles();
+        if (userRoles.size() == 1) {
+            String message = String.format("Failed to revoke role: User with id %s has only one role", userId);
+            throw new RoleManagementException(message);
+        }
+        if (!userRoles.contains(role)) {
+            String message = String.format("Failed to revoke role: User with id %s doesn't have role %s.",
+                    userId, roleName.toUpperCase());
+            throw new RoleManagementException(message);
+        }
+        user.getUserRoles().remove(role);
+        userRepo.updateUserInfo(user);
     }
 
     private void checkExistingUser(String phone) throws UserExistsException {
@@ -96,26 +134,5 @@ public class UserServiceImpl implements UserService {
                 throw new DeletingClientWithActiveRecordsException();
             }
         }
-    }
-
-    private UserResponseDTO toUserResponseDTO(User userEntity) {
-        return UserResponseDTO.builder()
-                .userId(userEntity.getUserId())
-                .firstName(userEntity.getFirstName())
-                .lastName(userEntity.getLastName())
-                .phone(userEntity.getPhone())
-                .email(userEntity.getEmail())
-                .discount(userEntity.getDiscount())
-                .build();
-    }
-
-    private User fromUserCreateDTO(UserCreateDTO dto) {
-        return User.builder()
-                .firstName(dto.getFirstName())
-                .lastName(dto.getLastName())
-                .password(PasswordEncryption.getEncryptedPassword(dto.getPassword()))
-                .phone(dto.getPhone())
-                .email(dto.getEmail())
-                .build();
     }
 }

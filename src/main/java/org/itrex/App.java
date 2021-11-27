@@ -5,16 +5,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 @RequiredArgsConstructor
 @SpringBootApplication
-public class App implements CommandLineRunner {
+public class App extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
         SpringApplication.run(App.class, args);
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+        return builder.sources(SpringBootServletInitializer.class);
     }
 }

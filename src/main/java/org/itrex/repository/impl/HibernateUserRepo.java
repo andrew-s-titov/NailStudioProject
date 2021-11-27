@@ -91,16 +91,6 @@ public class HibernateUserRepo implements UserRepo {
         });
     }
 
-    @Override
-    public void addRoleForUser(User user, Role role) {
-        inSession(() -> {
-            session.beginTransaction();
-            session.update(user);
-            user.getUserRoles().add(role);
-            session.getTransaction().commit();
-        });
-    }
-
     private void inSession(Runnable runnable) {
         try {
             session = sessionFactory.openSession();

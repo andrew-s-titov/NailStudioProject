@@ -8,8 +8,8 @@ import org.itrex.entity.enums.RecordTime;
 import org.itrex.exception.BookingUnavailableException;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface RecordService {
     List<RecordForAdminDTO> getAll();
@@ -18,9 +18,9 @@ public interface RecordService {
 
     List<RecordForStaffToDoDTO> getRecordsForStaffToDo(Long staffId);
 
-    HashMap<LocalDate, List<RecordTime>> getFreeRecordsFor3MonthsByStaffId(Long staffId);
+    Map<LocalDate, List<RecordTime>> getFreeRecordsFor3MonthsByStaffId(Long staffId);
 
-    Long createRecord(RecordCreateDTO recordCreateDTO) throws BookingUnavailableException;
+    RecordOfClientDTO createRecord(RecordCreateDTO recordCreateDTO) throws BookingUnavailableException;
 
     void deleteRecord(Long recordId);
 }

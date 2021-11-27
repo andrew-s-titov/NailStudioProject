@@ -11,6 +11,7 @@ import org.itrex.entity.User;
 import org.itrex.entity.enums.Discount;
 import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.exception.DeletingClientWithActiveRecordsException;
+import org.itrex.exception.RoleManagementException;
 import org.itrex.exception.UserExistsException;
 import org.itrex.service.UserService;
 import org.junit.jupiter.api.DisplayName;
@@ -82,7 +83,7 @@ public class UserServiceImplTest extends TestBaseHibernate {
                 .build();
 
         // when
-        Long createdUserId = service.createUser(user);
+        UserResponseDTO createdUser = service.createUser(user);
 
         // then
         session = getSessionFactory().openSession();
@@ -94,7 +95,7 @@ public class UserServiceImplTest extends TestBaseHibernate {
                 .filter(u -> u.getPhone().equals("1900909Fred")).count();
         assertEquals(1, usersCount);
 
-        assertEquals(usersTableInitialTestSize + 1, createdUserId);
+        assertEquals(usersTableInitialTestSize + 1, createdUser.getUserId());
 
         session.close();
     }
@@ -177,7 +178,7 @@ public class UserServiceImplTest extends TestBaseHibernate {
 
     @Test
     @DisplayName("addRoleForUser with valid data - should add 1 row into ManyToMany join table")
-    public void addRoleForUser() {
+    public void addRoleForUser1() throws RoleManagementException {
         // given
         Long userId = 2L; // this User have 1 role, doesn't have "staff" role
         String roleName = "staff"; // 2 Users have this role
@@ -192,5 +193,50 @@ public class UserServiceImplTest extends TestBaseHibernate {
         assertEquals(7, session.createSQLQuery("SELECT * FROM users_roles").list().size());
 
         session.close();
+    }
+
+    @Test
+    @DisplayName("addRoleForUser with invalid data - should throw RoleManagementException")
+    public void addRoleForUser2() {
+        // given
+        Long userId = 2L; // this User have 1 role "client"
+        String roleName = "client";
+
+        // when & then
+        assertThrows(RoleManagementException.class, () -> service.addRoleForUser(userId, roleName));
+    }
+
+    @Test
+    @DisplayName("revokeRole with valid data - should remove 1 row from ManyToMany join table")
+    public void revokeRole1() throws RoleManagementException {
+        // given
+        Long userId = 1L; // this User has roles "client" and "staff"
+        String roleName = "staff";
+
+        // when
+        service.revokeRole(userId, roleName);
+
+        // then
+        session = getSessionFactory().openSession();
+
+        assertEquals(1, session.get(User.class, userId).getUserRoles().size());
+        assertEquals(5, session.createSQLQuery("SELECT * FROM users_roles").list().size());
+
+        session.close();
+    }
+
+    @Test
+    @DisplayName("revokeRole with invalid data - should throw RoleManagementException")
+    public void revokeRole2() {
+        // given
+        Long userId1 = 1L; // this User has roles "client" and "staff"
+        String roleName1 = "admin";
+
+        Long userId2 = 2L; // this User has only 1 role
+        String roleName2 = "client";
+
+        // when & then
+        assertThrows(RoleManagementException.class, () -> service.revokeRole(userId1, roleName1));
+        assertThrows(RoleManagementException.class, () -> service.revokeRole(userId2, roleName2));
     }
 }

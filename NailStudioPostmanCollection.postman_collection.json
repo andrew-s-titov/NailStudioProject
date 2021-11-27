@@ -1,0 +1,584 @@
+{
+	"info": {
+		"_postman_id": "6f96f4d8-d0ba-46a2-a763-f309275bab5a",
+		"name": "NailStudioPostmanCollection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/users/create 1",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Edward\",\r\n    \"lastName\": \"Scissorhands\",\r\n    \"phone\": \"375291001010\",\r\n    \"email\": \"IAmNotComplete@yahoo.com\",\r\n    \"password\": \"strongpassword1111\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/create",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"create"
+					]
+				},
+				"description": "create user 1"
+			},
+			"response": []
+		},
+		{
+			"name": "/users/create 2",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Freddy\",\r\n    \"lastName\": \"Krueger\",\r\n    \"phone\": \"19008604Fred\",\r\n    \"email\": \"freshmeat@google.com\",\r\n    \"password\": \"pass2222\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/create",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"create"
+					]
+				},
+				"description": "create user 2"
+			},
+			"response": []
+		},
+		{
+			"name": "/users/create 3",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Logan\",\r\n    \"lastName\": \"Wolverine\",\r\n    \"phone\": \"1946484888\",\r\n    \"email\": \"hughjackman@gmail.com\",\r\n    \"password\": \"adamantium\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/create",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"create"
+					]
+				},
+				"description": "create user 3"
+			},
+			"response": []
+		},
+		{
+			"name": "/login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"phone\": \"375291001010\",\r\n    \"password\": \"strongpassword1111\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"login"
+					]
+				},
+				"description": "login for user 1"
+			},
+			"response": []
+		},
+		{
+			"name": "/users/get/1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/users/get/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"get",
+						"1"
+					]
+				},
+				"description": "get user 1"
+			},
+			"response": []
+		},
+		{
+			"name": "/users/get/all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/users/get/all",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"get",
+						"all"
+					]
+				},
+				"description": "get all users"
+			},
+			"response": []
+		},
+		{
+			"name": "/users/update",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": 1,\r\n    \"firstName\": \"Eddy\",\r\n    \"lastName\": \"Scissorhands\", \r\n    \"email\": \"myNewEmail@gmail.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/update",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"update"
+					]
+				},
+				"description": "update info for user 1"
+			},
+			"response": []
+		},
+		{
+			"name": "/users/change_discount",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/users/change_discount?clientId=2&newDiscount=TWO",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"change_discount"
+					],
+					"query": [
+						{
+							"key": "clientId",
+							"value": "2"
+						},
+						{
+							"key": "newDiscount",
+							"value": "TWO"
+						}
+					]
+				},
+				"description": "change discount for user 2"
+			},
+			"response": []
+		},
+		{
+			"name": "/users/add_role 1",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/add_role?userId=1&roleName=staff",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"add_role"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "1"
+						},
+						{
+							"key": "roleName",
+							"value": "staff"
+						}
+					]
+				},
+				"description": "add role \"staff\" for user 1"
+			},
+			"response": []
+		},
+		{
+			"name": "/users/add_role 2",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/add_role?userId=1&roleName=admin",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"add_role"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "1"
+						},
+						{
+							"key": "roleName",
+							"value": "admin"
+						}
+					]
+				},
+				"description": "add role \"admin\" for user 1"
+			},
+			"response": []
+		},
+		{
+			"name": "/users/revoke_role",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/users/revoke_role?userId=1&roleName=admin",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"revoke_role"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "1"
+						},
+						{
+							"key": "roleName",
+							"value": "admin"
+						}
+					]
+				},
+				"description": "revoke role \"admin\" for user 1"
+			},
+			"response": []
+		},
+		{
+			"name": "/users/delete/3",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/users/delete/3",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"delete",
+						"3"
+					]
+				},
+				"description": "delete user with id 3"
+			},
+			"response": []
+		},
+		{
+			"name": "/roles",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/roles",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"roles"
+					]
+				},
+				"description": "get all roles"
+			},
+			"response": []
+		},
+		{
+			"name": "/roles/get/id/1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/roles/get/id/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"roles",
+						"get",
+						"id",
+						"1"
+					]
+				},
+				"description": "get role with id 1"
+			},
+			"response": []
+		},
+		{
+			"name": "/roles/get/name/client",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/roles/get/name/client",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"roles",
+						"get",
+						"name",
+						"client"
+					]
+				},
+				"description": "get role with a name \"client\""
+			},
+			"response": []
+		},
+		{
+			"name": "/records/create 1",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"date\": \"2022-01-01\",\r\n    \"time\": \"NINE\",\r\n    \"clientId\": 2,\r\n    \"staffId\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/records/create",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"records",
+						"create"
+					]
+				},
+				"description": "create record 1 for client with id 2, set staff with id 1"
+			},
+			"response": []
+		},
+		{
+			"name": "/records/create 2",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"date\": \"2022-01-01\",\r\n    \"time\": \"SEVENTEEN\",\r\n    \"clientId\": 2,\r\n    \"staffId\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/records/create",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"records",
+						"create"
+					]
+				},
+				"description": "create record 2 for client with id 2, set staff with id 1"
+			},
+			"response": []
+		},
+		{
+			"name": "/records/delete/2",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/records/delete/2",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"records",
+						"delete",
+						"2"
+					]
+				},
+				"description": "delete record with id 2"
+			},
+			"response": []
+		},
+		{
+			"name": "/records/get/for_client/2",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/records/get/for_client/2",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"records",
+						"get",
+						"for_client",
+						"2"
+					]
+				},
+				"description": "get records for client with id 2"
+			},
+			"response": []
+		},
+		{
+			"name": "/records/get/for_staff/1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/records/get/for_staff/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"records",
+						"get",
+						"for_staff",
+						"1"
+					]
+				},
+				"description": "get records for staff with id 1"
+			},
+			"response": []
+		},
+		{
+			"name": "/records/get/all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/records/get/all",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"records",
+						"get",
+						"all"
+					]
+				},
+				"description": "get all records"
+			},
+			"response": []
+		},
+		{
+			"name": "/records/get/free/staff/1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/records/get/free/staff/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"records",
+						"get",
+						"free",
+						"staff",
+						"1"
+					]
+				},
+				"description": "get free time slots for future 3 months for staff with id 1"
+			},
+			"response": []
+		}
+	]
+}

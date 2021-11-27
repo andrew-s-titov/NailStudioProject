@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS users
 (
     user_id    IDENTITY    NOT NULL,
-    password   BINARY(160) NOT NULL,
+    password   BINARY(1000) NOT NULL,
     first_name VARCHAR(50) NOT NULL,
     last_name  VARCHAR(50) NOT NULL,
     phone      VARCHAR(13) UNIQUE,

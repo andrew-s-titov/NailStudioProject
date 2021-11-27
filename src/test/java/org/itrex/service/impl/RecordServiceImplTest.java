@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -106,7 +106,7 @@ public class RecordServiceImplTest extends TestBaseHibernate {
         Long staffId = 1L; // User with this id has 1 record as staff to-do
 
         // when
-        HashMap<LocalDate, List<RecordTime>> result = service.getFreeRecordsFor3MonthsByStaffId(staffId);
+        Map<LocalDate, List<RecordTime>> result = service.getFreeRecordsFor3MonthsByStaffId(staffId);
 
         // then
         assertEquals(2, result.get(LocalDate.of(2021, 12, 31)).size());
@@ -122,12 +122,12 @@ public class RecordServiceImplTest extends TestBaseHibernate {
         RecordCreateDTO record = RecordCreateDTO.builder()
                 .date(LocalDate.of(2021, 12, 30))
                 .time(RecordTime.NINE)
-                .userId(userId)
+                .clientId(userId)
                 .staffId(staffId)
                 .build();
 
         // when
-        Long recordId = service.createRecord(record);
+        RecordOfClientDTO record1 = service.createRecord(record);
 
         // then
         session = getSessionFactory().openSession();
@@ -136,7 +136,7 @@ public class RecordServiceImplTest extends TestBaseHibernate {
         assertEquals(1, records.stream()
                 .filter(r -> r.getDate().equals(record.getDate()))
                 .count());
-        assertEquals(5, recordId);
+        assertEquals(5, record1.getRecordId());
         session.close();
     }
 
@@ -149,7 +149,7 @@ public class RecordServiceImplTest extends TestBaseHibernate {
         RecordCreateDTO record = RecordCreateDTO.builder()
                 .date(LocalDate.of(2021, 12, 31))
                 .time(RecordTime.SEVENTEEN) // this time has been already booked for given date
-                .userId(userId)
+                .clientId(userId)
                 .staffId(staffId)
                 .build();
 

@@ -17,6 +17,4 @@ public interface UserRepo {
     void deleteUser(User user);
 
     void updateUserInfo(User user);
-
-    void addRoleForUser(User user, Role role);
 }

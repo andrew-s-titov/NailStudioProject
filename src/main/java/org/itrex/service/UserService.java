@@ -2,9 +2,11 @@ package org.itrex.service;
 
 import org.itrex.dto.UserCreateDTO;
 import org.itrex.dto.UserResponseDTO;
+import org.itrex.dto.UserCreditsDTO;
 import org.itrex.dto.UserUpdateDTO;
 import org.itrex.entity.enums.Discount;
 import org.itrex.exception.DeletingClientWithActiveRecordsException;
+import org.itrex.exception.RoleManagementException;
 import org.itrex.exception.UserExistsException;
 
 import java.util.List;
@@ -12,9 +14,11 @@ import java.util.List;
 public interface UserService {
     List<UserResponseDTO> getAll();
 
+    UserCreditsDTO getUserByPhone(String phone);
+
     UserResponseDTO getUserById(Long userId);
 
-    Long createUser(UserCreateDTO userCreateDTO) throws UserExistsException;
+    UserResponseDTO createUser(UserCreateDTO userCreateDTO) throws UserExistsException;
 
     void deleteUser(Long userId) throws DeletingClientWithActiveRecordsException;
 
@@ -22,5 +26,7 @@ public interface UserService {
 
     void changeClientDiscount(Long clientId, Discount newDiscount);
 
-    void addRoleForUser(Long userId, String roleName);
+    void addRoleForUser(Long userId, String roleName) throws RoleManagementException;
+
+    void revokeRole(Long userId, String roleName) throws RoleManagementException;
 }

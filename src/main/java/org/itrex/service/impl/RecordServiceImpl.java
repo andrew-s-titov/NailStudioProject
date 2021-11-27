@@ -12,7 +12,6 @@ import org.itrex.entity.User;
 import org.itrex.entity.enums.RecordTime;
 import org.itrex.exception.BookingUnavailableException;
 import org.itrex.repository.RecordRepo;
-import org.itrex.repository.RoleRepo;
 import org.itrex.repository.UserRepo;
 import org.itrex.service.RecordService;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,6 @@ import java.util.stream.Collectors;
 public class RecordServiceImpl implements RecordService {
     private final RecordRepo recordRepo;
     private final UserRepo userRepo;
-    private final RoleRepo roleRepo;
     private final RecordDTOConverter converter;
 
     @Override
@@ -53,14 +51,15 @@ public class RecordServiceImpl implements RecordService {
     }
 
     @Override
-    public Long createRecord(RecordCreateDTO recordCreateDTO) throws BookingUnavailableException {
-        User client = userRepo.getUserById(recordCreateDTO.getUserId());
+    public RecordOfClientDTO createRecord(RecordCreateDTO recordCreateDTO) throws BookingUnavailableException {
+        User client = userRepo.getUserById(recordCreateDTO.getClientId());
         User staff = userRepo.getUserById(recordCreateDTO.getStaffId());
         Record newRecord = converter.fromRecordCreateDTO(recordCreateDTO);
         newRecord.setClient(client);
         newRecord.setStaff(staff);
         checkRecordAvailability(recordCreateDTO);
-        return recordRepo.createRecord(newRecord).getRecordId();
+        Record createdRecord = recordRepo.createRecord(newRecord);
+        return converter.toRecordOfClientDTO(createdRecord);
     }
 
     @Override
@@ -70,11 +69,11 @@ public class RecordServiceImpl implements RecordService {
     }
 
     @Override
-    public HashMap<LocalDate, List<RecordTime>> getFreeRecordsFor3MonthsByStaffId(Long staffId) {
+    public Map<LocalDate, List<RecordTime>> getFreeRecordsFor3MonthsByStaffId(Long staffId) {
         LocalDate now = LocalDate.now();
         LocalDate lastDate = now.plusMonths(3);
 
-        HashMap<LocalDate, List<RecordTime>> timeSlotsFor3Months = new HashMap<>();
+        Map<LocalDate, List<RecordTime>> timeSlotsFor3Months = new TreeMap<>();
 
         // fill the map with every time slot for every day in 3 months range
         LocalDate startDate = now;
