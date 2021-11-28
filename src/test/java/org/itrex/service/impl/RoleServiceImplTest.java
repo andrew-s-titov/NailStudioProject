@@ -26,9 +26,9 @@ public class RoleServiceImplTest extends TestBaseHibernate {
 
         // then
         assertEquals(3, roles.size());
-        assertEquals(RoleType.ADMIN, roles.get(0).getRoletype());
-        assertEquals(RoleType.STAFF, roles.get(1).getRoletype());
-        assertEquals(RoleType.CLIENT, roles.get(2).getRoletype());
+        assertEquals(RoleType.ADMIN, roles.get(0).getRoleType());
+        assertEquals(RoleType.STAFF, roles.get(1).getRoleType());
+        assertEquals(RoleType.CLIENT, roles.get(2).getRoleType());
     }
 
     @Test
@@ -41,8 +41,8 @@ public class RoleServiceImplTest extends TestBaseHibernate {
         RoleDTO roleDTO2 = service.getRoleByName(roleName2);
 
         // then
-        assertEquals(RoleType.ADMIN, roleDTO1.getRoletype());
-        assertEquals(RoleType.ADMIN, roleDTO2.getRoletype());
+        assertEquals(RoleType.ADMIN, roleDTO1.getRoleType());
+        assertEquals(RoleType.ADMIN, roleDTO2.getRoleType());
         assertEquals(1, roleDTO1.getRoleId());
     }
 
@@ -67,7 +67,7 @@ public class RoleServiceImplTest extends TestBaseHibernate {
 
         // then
         assertEquals(1, roleDTO.getRoleId());
-        assertEquals(RoleType.ADMIN, roleDTO.getRoletype());
+        assertEquals(RoleType.ADMIN, roleDTO.getRoleType());
     }
 
     @Test

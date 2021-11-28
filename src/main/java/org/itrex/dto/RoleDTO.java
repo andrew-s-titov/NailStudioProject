@@ -7,6 +7,6 @@ import org.itrex.entity.enums.RoleType;
 @Data
 @Builder
 public class RoleDTO {
-    private long roleId;
-    private RoleType roletype;
+    private Integer roleId;
+    private RoleType roleType;
 }

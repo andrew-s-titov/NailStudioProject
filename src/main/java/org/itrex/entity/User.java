@@ -1,6 +1,9 @@
 package org.itrex.entity;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.itrex.entity.enums.Discount;
 
 import javax.persistence.*;

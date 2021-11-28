@@ -9,6 +9,7 @@ import org.itrex.entity.enums.RecordTime;
 import org.itrex.exception.BookingUnavailableException;
 import org.itrex.service.RecordService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -26,34 +27,39 @@ public class RecordController {
     // TODO: pagination
     // TODO: restrict use - only for admin
     @GetMapping("/get/all")
-    public List<RecordForAdminDTO> getAll() {
-        return recordService.getAll();
+    public ResponseEntity<List<RecordForAdminDTO>> getAll() {
+        List<RecordForAdminDTO> recordsForAdmin = recordService.getAll();
+        return new ResponseEntity<>(recordsForAdmin, HttpStatus.OK);
     }
 
     @GetMapping("/get/for_client/{clientId}")
-    public List<RecordOfClientDTO> getRecordsForClient(@PathVariable Long clientId) {
-        return recordService.getRecordsForClient(clientId);
+    public ResponseEntity<List<RecordOfClientDTO>> getRecordsForClient(@PathVariable Long clientId) {
+        List<RecordOfClientDTO> recordsForClient = recordService.getRecordsForClient(clientId);
+        return new ResponseEntity<>(recordsForClient, HttpStatus.OK);
     }
 
     // TODO: restrict use - only for staff and admin
     @GetMapping("/get/for_staff/{staffId}")
-    public List<RecordForStaffToDoDTO> getRecordsForStaffToDo(@PathVariable Long staffId) {
-        return recordService.getRecordsForStaffToDo(staffId);
+    public ResponseEntity<List<RecordForStaffToDoDTO>> getRecordsForStaffToDo(@PathVariable Long staffId) {
+        List<RecordForStaffToDoDTO> recordsForStaff = recordService.getRecordsForStaffToDo(staffId);
+        return new ResponseEntity<>(recordsForStaff, HttpStatus.OK);
     }
 
     @GetMapping("/get/free/staff/{staffId}")
-    public Map<LocalDate, List<RecordTime>> getFreeRecordsFor3MonthsByStaffId(@PathVariable Long staffId) {
-        return recordService.getFreeRecordsFor3MonthsByStaffId(staffId);
+    public ResponseEntity<Map<LocalDate, List<RecordTime>>> getFreeRecordsFor3MonthsByStaffId(@PathVariable Long staffId) {
+        Map<LocalDate, List<RecordTime>> freeRecords = recordService.getFreeRecordsFor3MonthsByStaffId(staffId);
+        return new ResponseEntity<>(freeRecords, HttpStatus.OK);
     }
 
     @PostMapping("/create")
-    public RecordOfClientDTO createRecord(@Valid @RequestBody RecordCreateDTO recordCreateDTO) throws BookingUnavailableException {
-        return recordService.createRecord(recordCreateDTO);
+    public ResponseEntity<RecordOfClientDTO> createRecord(@Valid @RequestBody RecordCreateDTO recordCreateDTO) throws BookingUnavailableException {
+        RecordOfClientDTO createdRecord = recordService.createRecord(recordCreateDTO);
+        return new ResponseEntity<>(createdRecord, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/delete/{recordId}")
-    public HttpStatus deleteRecord(@PathVariable Long recordId) {
+    public ResponseEntity<Object> deleteRecord(@PathVariable Long recordId) {
         recordService.deleteRecord(recordId);
-        return HttpStatus.OK;
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

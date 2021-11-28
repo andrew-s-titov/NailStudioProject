@@ -1,6 +1,7 @@
 package org.itrex.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.itrex.dto.RoleDTO;
 import org.itrex.dto.UserCreateDTO;
 import org.itrex.dto.UserResponseDTO;
 import org.itrex.dto.UserUpdateDTO;
@@ -10,6 +11,7 @@ import org.itrex.exception.RoleManagementException;
 import org.itrex.exception.UserExistsException;
 import org.itrex.service.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -23,52 +25,55 @@ public class UserController {
 
     // TODO: restrict use - only for admin and staff
     // TODO: pagination
-    @GetMapping("get/all")
-    public List<UserResponseDTO> getAll() {
-        return userService.getAll();
+    @GetMapping("/get/all")
+    public ResponseEntity<List<UserResponseDTO>> getAll() {
+        List<UserResponseDTO> allUsers = userService.getAll();
+        return new ResponseEntity<>(allUsers, HttpStatus.OK);
     }
 
-    @GetMapping("get/{userId}")
-    public UserResponseDTO getUserById(@PathVariable Long userId) {
-        return userService.getUserById(userId);
+    @GetMapping("/get/{userId}")
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long userId) {
+        UserResponseDTO user = userService.getUserById(userId);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PostMapping("/create")
-    public UserResponseDTO createUser(@Valid @RequestBody UserCreateDTO user) throws UserExistsException {
-        return userService.createUser(user);
+    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserCreateDTO user) throws UserExistsException {
+        UserResponseDTO createdUser = userService.createUser(user);
+        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 
     // TODO: restrict use - only for admin
-    @DeleteMapping ("/delete/{userId}")
-    public HttpStatus deleteUser(@PathVariable Long userId) throws DeletingClientWithActiveRecordsException {
+    @DeleteMapping("/delete/{userId}")
+    public ResponseEntity<Object> deleteUser(@PathVariable Long userId) throws DeletingClientWithActiveRecordsException {
         userService.deleteUser(userId);
-        return HttpStatus.OK;
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping("/update")
-    public HttpStatus updateUserInfo(@Valid @RequestBody UserUpdateDTO userUpdateDTO) {
+    public ResponseEntity<Object> updateUserInfo(@Valid @RequestBody UserUpdateDTO userUpdateDTO) {
         userService.updateUserInfo(userUpdateDTO);
-        return HttpStatus.OK;
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     // TODO: restrict use - only for admin and staff
     @PutMapping("/change_discount")
-    public HttpStatus changeClientDiscount(@RequestParam Long clientId, @RequestParam Discount newDiscount) {
+    public ResponseEntity<Object> changeClientDiscount(@RequestParam Long clientId, @RequestParam Discount newDiscount) {
         userService.changeClientDiscount(clientId, newDiscount);
-        return HttpStatus.OK;
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     // TODO: restrict use - only for admin
     @PostMapping("/add_role")
-    public HttpStatus addRoleForUser(@RequestParam Long userId, @RequestParam String roleName) throws RoleManagementException {
-        userService.addRoleForUser(userId, roleName);
-        return HttpStatus.OK;
+    public ResponseEntity<Object> addRoleForUser(@RequestParam Long userId, @RequestBody RoleDTO roleDTO) throws RoleManagementException {
+        userService.addRoleForUser(userId, roleDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // TODO: restrict use - only for admin
     @DeleteMapping("/revoke_role")
-    public HttpStatus revokeRole(@RequestParam Long userId, @RequestParam String roleName) throws RoleManagementException {
-        userService.revokeRole(userId, roleName);
-        return HttpStatus.OK;
+    public ResponseEntity<Object> revokeRole(@RequestParam Long userId, @RequestBody RoleDTO roleDTO) throws RoleManagementException {
+        userService.revokeRole(userId, roleDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

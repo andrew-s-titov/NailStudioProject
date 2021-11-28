@@ -19,14 +19,14 @@ public class RecordCreateDTO {
 
     @FutureOrPresent
     @NotNull
-    LocalDate date;
+    private LocalDate date;
 
     @NotNull
-    RecordTime time;
+    private RecordTime time;
 
     @NotNull
-    Long clientId;
+    private Long clientId;
 
     @NotNull
-    Long staffId;
+    private Long staffId;
 }

@@ -1,7 +1,6 @@
 package org.itrex.entity;
 
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
 import org.itrex.entity.enums.RecordTime;
 
 import javax.persistence.*;

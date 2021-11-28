@@ -1,14 +1,15 @@
 package org.itrex.service.impl;
 
 import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.itrex.TestBaseHibernate;
+import org.itrex.dto.RoleDTO;
 import org.itrex.dto.UserCreateDTO;
 import org.itrex.dto.UserResponseDTO;
 import org.itrex.dto.UserUpdateDTO;
 import org.itrex.entity.Record;
 import org.itrex.entity.User;
 import org.itrex.entity.enums.Discount;
+import org.itrex.entity.enums.RoleType;
 import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.exception.DeletingClientWithActiveRecordsException;
 import org.itrex.exception.RoleManagementException;
@@ -199,10 +200,13 @@ public class UserServiceImplTest extends TestBaseHibernate {
     public void addRoleForUser1() throws RoleManagementException {
         // given
         Long userId = 2L; // this User have 1 role, doesn't have "staff" role
-        String roleName = "staff"; // 2 Users have this role
+        RoleDTO role = RoleDTO.builder()
+                .roleId(2)
+                .roleType(RoleType.STAFF) // 2 Users have this role
+                .build();
 
         // when
-        service.addRoleForUser(userId, roleName);
+        service.addRoleForUser(userId, role);
 
         // then
         session = getSessionFactory().openSession();
@@ -218,10 +222,13 @@ public class UserServiceImplTest extends TestBaseHibernate {
     public void addRoleForUser2() {
         // given
         Long userId = 2L; // this User have 1 role "client"
-        String roleName = "client";
+        RoleDTO role = RoleDTO.builder()
+                .roleId(3)
+                .roleType(RoleType.CLIENT) // 2 Users have this role
+                .build();
 
         // when & then
-        assertThrows(RoleManagementException.class, () -> service.addRoleForUser(userId, roleName));
+        assertThrows(RoleManagementException.class, () -> service.addRoleForUser(userId, role));
     }
 
     @Test
@@ -229,10 +236,13 @@ public class UserServiceImplTest extends TestBaseHibernate {
     public void revokeRole1() throws RoleManagementException {
         // given
         Long userId = 1L; // this User has roles "client" and "staff"
-        String roleName = "staff";
+        RoleDTO role = RoleDTO.builder()
+                .roleId(2)
+                .roleType(RoleType.STAFF) // 2 Users have this role
+                .build();
 
         // when
-        service.revokeRole(userId, roleName);
+        service.revokeRole(userId, role);
 
         // then
         session = getSessionFactory().openSession();
@@ -248,13 +258,19 @@ public class UserServiceImplTest extends TestBaseHibernate {
     public void revokeRole2() {
         // given
         Long userId1 = 1L; // this User has roles "client" and "staff"
-        String roleName1 = "admin";
+        RoleDTO role1 = RoleDTO.builder()
+                .roleId(1)
+                .roleType(RoleType.ADMIN) // 2 Users have this role
+                .build();
 
         Long userId2 = 2L; // this User has only 1 role
-        String roleName2 = "client";
+        RoleDTO role2 = RoleDTO.builder()
+                .roleId(3)
+                .roleType(RoleType.CLIENT) // 2 Users have this role
+                .build();
 
         // when & then
-        assertThrows(RoleManagementException.class, () -> service.revokeRole(userId1, roleName1));
-        assertThrows(RoleManagementException.class, () -> service.revokeRole(userId2, roleName2));
+        assertThrows(RoleManagementException.class, () -> service.revokeRole(userId1, role1));
+        assertThrows(RoleManagementException.class, () -> service.revokeRole(userId2, role2));
     }
 }

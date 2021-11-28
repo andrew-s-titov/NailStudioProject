@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.itrex.entity.Role;
 import org.itrex.entity.User;
 import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.repository.UserRepo;

@@ -10,14 +10,14 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class RecordForAdminDTO {
-    Long recordId;
-    LocalDate date;
-    RecordTime time;
-    String clientFirstName;
-    String clientLastName;
-    String clientPhone;
-    String clientEmail;
-    Discount clientDiscount;
-    String staffFirstName;
-    String staffLastName;
+    private Long recordId;
+    private LocalDate date;
+    private RecordTime time;
+    private String clientFirstName;
+    private String clientLastName;
+    private String clientPhone;
+    private String clientEmail;
+    private Discount clientDiscount;
+    private String staffFirstName;
+    private String staffLastName;
 }

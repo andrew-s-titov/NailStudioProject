@@ -93,6 +93,35 @@
 			"response": []
 		},
 		{
+			"name": "/users/create 4 - code 400",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"L\",\r\n    \"lastName\": \"W\",\r\n    \"phone\": \"1\",\r\n    \"email\": \"hu\",\r\n    \"password\": \"a1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/create",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"create"
+					]
+				},
+				"description": "create user with invalid request"
+			},
+			"response": []
+		},
+		{
 			"name": "/login",
 			"request": {
 				"method": "POST",
@@ -121,6 +150,34 @@
 			"response": []
 		},
 		{
+			"name": "/login - code 401",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"phone\": \"375291001010\",\r\n    \"password\": \"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"login"
+					]
+				},
+				"description": "login for user 1 with invalid credits"
+			},
+			"response": []
+		},
+		{
 			"name": "/users/get/1",
 			"request": {
 				"method": "GET",
@@ -138,6 +195,27 @@
 					]
 				},
 				"description": "get user 1"
+			},
+			"response": []
+		},
+		{
+			"name": "/users/get/1000 - code 404",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/users/get/1000",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"get",
+						"1000"
+					]
+				},
+				"description": "get non-existing user with id 1000"
 			},
 			"response": []
 		},
@@ -228,15 +306,15 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "",
+					"raw": "{\r\n    \"roleId\": 2,\r\n    \"roleType\": \"STAFF\"\r\n}",
 					"options": {
 						"raw": {
-							"language": "text"
+							"language": "json"
 						}
 					}
 				},
 				"url": {
-					"raw": "localhost:8080/users/add_role?userId=1&roleName=staff",
+					"raw": "localhost:8080/users/add_role?userId=1",
 					"host": [
 						"localhost"
 					],
@@ -249,10 +327,6 @@
 						{
 							"key": "userId",
 							"value": "1"
-						},
-						{
-							"key": "roleName",
-							"value": "staff"
 						}
 					]
 				},
@@ -267,15 +341,15 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "",
+					"raw": "{\r\n    \"roleId\": 1,\r\n    \"roleType\": \"ADMIN\"\r\n}",
 					"options": {
 						"raw": {
-							"language": "text"
+							"language": "json"
 						}
 					}
 				},
 				"url": {
-					"raw": "localhost:8080/users/add_role?userId=1&roleName=admin",
+					"raw": "localhost:8080/users/add_role?userId=1",
 					"host": [
 						"localhost"
 					],
@@ -288,10 +362,6 @@
 						{
 							"key": "userId",
 							"value": "1"
-						},
-						{
-							"key": "roleName",
-							"value": "admin"
 						}
 					]
 				},
@@ -300,12 +370,56 @@
 			"response": []
 		},
 		{
+			"name": "/users/add_role 3 - code 400",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"roleId\": 1,\r\n    \"roleType\": \"ADMIN\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/add_role?userId=1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"add_role"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "1"
+						}
+					]
+				},
+				"description": "trying to add role \"admin\" for user 1 again"
+			},
+			"response": []
+		},
+		{
 			"name": "/users/revoke_role",
 			"request": {
 				"method": "DELETE",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"roleId\": 1,\r\n    \"roleType\": \"ADMIN\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "localhost:8080/users/revoke_role?userId=1&roleName=admin",
+					"raw": "localhost:8080/users/revoke_role?userId=1",
 					"host": [
 						"localhost"
 					],
@@ -318,14 +432,45 @@
 						{
 							"key": "userId",
 							"value": "1"
-						},
-						{
-							"key": "roleName",
-							"value": "admin"
 						}
 					]
 				},
 				"description": "revoke role \"admin\" for user 1"
+			},
+			"response": []
+		},
+		{
+			"name": "/users/revoke_role - code 400",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"roleId\": 1,\r\n    \"roleType\": \"ADMIN\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/revoke_role?userId=1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"revoke_role"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "1"
+						}
+					]
+				},
+				"description": "trying to revoke role \"admin\" for user 1 who doesn't have this role"
 			},
 			"response": []
 		},
@@ -392,6 +537,28 @@
 			"response": []
 		},
 		{
+			"name": "/roles/get/id/500 - code 404",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/roles/get/id/500",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"roles",
+						"get",
+						"id",
+						"500"
+					]
+				},
+				"description": "get rnon-existing role with id 500"
+			},
+			"response": []
+		},
+		{
 			"name": "/roles/get/name/client",
 			"request": {
 				"method": "GET",
@@ -410,6 +577,28 @@
 					]
 				},
 				"description": "get role with a name \"client\""
+			},
+			"response": []
+		},
+		{
+			"name": "/roles/get/name/somethingElse - code 404",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/roles/get/name/somethingElse",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"roles",
+						"get",
+						"name",
+						"somethingElse"
+					]
+				},
+				"description": "get non-existing role with a name \"somethingElse\""
 			},
 			"response": []
 		},
@@ -468,6 +657,35 @@
 					]
 				},
 				"description": "create record 2 for client with id 2, set staff with id 1"
+			},
+			"response": []
+		},
+		{
+			"name": "/records/create 2 - code 409",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"date\": \"2022-01-01\",\r\n    \"time\": \"SEVENTEEN\",\r\n    \"clientId\": 2,\r\n    \"staffId\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/records/create",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"records",
+						"create"
+					]
+				},
+				"description": "trying to create booked record for staff with id 1"
 			},
 			"response": []
 		},

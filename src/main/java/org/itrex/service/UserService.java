@@ -1,9 +1,6 @@
 package org.itrex.service;
 
-import org.itrex.dto.UserCreateDTO;
-import org.itrex.dto.UserResponseDTO;
-import org.itrex.dto.UserCreditsDTO;
-import org.itrex.dto.UserUpdateDTO;
+import org.itrex.dto.*;
 import org.itrex.entity.enums.Discount;
 import org.itrex.exception.DeletingClientWithActiveRecordsException;
 import org.itrex.exception.RoleManagementException;
@@ -26,7 +23,7 @@ public interface UserService {
 
     void changeClientDiscount(Long clientId, Discount newDiscount);
 
-    void addRoleForUser(Long userId, String roleName) throws RoleManagementException;
+    void addRoleForUser(Long userId, RoleDTO roleDTO) throws RoleManagementException;
 
-    void revokeRole(Long userId, String roleName) throws RoleManagementException;
+    void revokeRole(Long userId, RoleDTO roleDTO) throws RoleManagementException;
 }

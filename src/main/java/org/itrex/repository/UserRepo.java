@@ -1,6 +1,5 @@
 package org.itrex.repository;
 
-import org.itrex.entity.Role;
 import org.itrex.entity.User;
 
 import java.util.List;

@@ -1,17 +1,19 @@
 package org.itrex.controller;
 
 import lombok.RequiredArgsConstructor;
-
 import lombok.extern.slf4j.Slf4j;
-import org.itrex.dto.UserLoginDTO;
 import org.itrex.dto.UserCreditsDTO;
+import org.itrex.dto.UserLoginDTO;
 import org.itrex.dto.UserResponseDTO;
 import org.itrex.exception.LoginFailedException;
 import org.itrex.service.UserService;
 import org.itrex.util.PasswordEncryption;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.validation.Valid;
 
@@ -34,11 +36,13 @@ public class LoginAndRegisterController {
 
     @PostMapping(value = "/login")
     public String login(Model model, @Valid @RequestBody UserLoginDTO user) throws LoginFailedException {
+
+        // TODO: minimize logic, transfer to service
         String phone = user.getPhone();
         UserCreditsDTO userByPhone = userService.getUserByPhone(phone);
         if (userByPhone == null) {
             String message = String.format("User with this login (phone number %s) not found!", phone);
-            log.info(message);
+            log.trace(message);
             throw new LoginFailedException(message);
         }
         byte[] password = userByPhone.getPassword();
@@ -48,7 +52,7 @@ public class LoginAndRegisterController {
             return "redirect:profile";
         } else {
             String message = String.format("Wrong password for login %s", phone);
-            log.info(message);
+            log.trace(message);
             throw new LoginFailedException(message);
         }
     }

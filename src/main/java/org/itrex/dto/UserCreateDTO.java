@@ -26,7 +26,7 @@ public class UserCreateDTO {
     @Size(min = 9, max = 13, message = "Phone number must be between 9 and 13 digits")
     private String phone;
 
-    @Email
+    @Email(message = "Should match e-mail address format")
     private String email;
 
     @NotEmpty

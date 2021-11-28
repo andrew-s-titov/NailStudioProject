@@ -35,7 +35,7 @@ public class RoleServiceImpl implements RoleService {
     private RoleDTO entityToDTO(Role roleEntity) {
         return RoleDTO.builder()
                 .roleId(roleEntity.getRoleId())
-                .roletype(roleEntity.getRoletype())
+                .roleType(roleEntity.getRoletype())
                 .build();
     }
 }
