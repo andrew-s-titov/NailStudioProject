@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -135,7 +136,8 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("deleteUser with valid data - should delete User, all Records for User as client should be deleted")
+    @DisplayName("deleteUser with valid data - should delete User, all Records for User as client should be deleted, " +
+            "all Records for User as staff should remain with FK set to NULL")
     public void deleteUser() {
         // given
         session = getSessionFactory().openSession();
@@ -149,15 +151,14 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
         // then
         session = getSessionFactory().openSession();
         assertNull(session.find(User.class, userId));
-        List<Record> recordsForClient = session.createQuery("FROM Record WHERE client_id = :id", Record.class)
+        assertTrue(session.createQuery("FROM Record WHERE client_id = :id", Record.class)
                 .setParameter("id", userId)
-                .list();
-        assertTrue(recordsForClient.isEmpty());
+                .list()
+                .isEmpty());
 
-        List<Record> recordsForStaff = session.createQuery("FROM Record WHERE staff_id = :id", Record.class)
-                .setParameter("id", userId)
-                .list();
-        assertTrue(recordsForStaff.isEmpty());
+        List<Record> records = session.createQuery("FROM Record", Record.class).list();
+        assertEquals(2, records.size());
+        assertEquals(2, records.stream().map(Record::getStaff).filter(Objects::isNull).count());
 
         session.close();
     }

@@ -56,7 +56,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDTO createUser(UserCreateDTO user) throws UserExistsException {
         String phone = user.getPhone();
-        checkExistingUser(phone);
+        if (userRepo.getUserByPhone(phone) != null) {
+            throw new UserExistsException(phone);
+        }
         User newUser = converter.fromUserCreateDTO(user);
         User createdUser = userRepo.createUser(newUser);
         return converter.toUserResponseDTO(createdUser);
@@ -66,7 +68,9 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long userId) throws DeletingClientWithActiveRecordsException {
         User userEntity = userRepo.getUserById(userId);
         List<Record> records = recordRepo.getRecordsForClient(userId);
-        checkActiveRecords(records);
+        if (hasActiveRecords(records)) {
+            throw new DeletingClientWithActiveRecordsException(userId);
+        }
         userRepo.deleteUser(userEntity);
     }
 
@@ -120,19 +124,11 @@ public class UserServiceImpl implements UserService {
         userRepo.updateUserInfo(user);
     }
 
-    private void checkExistingUser(String phone) throws UserExistsException {
-        if (userRepo.getUserByPhone(phone) != null) {
-            throw new UserExistsException();
-        }
-    }
-
-    private void checkActiveRecords(List<Record> records) throws DeletingClientWithActiveRecordsException {
+    private boolean hasActiveRecords(List<Record> records) {
         if (!records.isEmpty()) {
-            boolean hasActiveRecords = records.stream()
+            return records.stream()
                     .anyMatch(r -> r.getDate().compareTo(LocalDate.now()) >= 0);
-            if (hasActiveRecords) {
-                throw new DeletingClientWithActiveRecordsException();
-            }
         }
+        return false;
     }
 }

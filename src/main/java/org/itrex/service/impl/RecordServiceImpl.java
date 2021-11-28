@@ -95,7 +95,9 @@ public class RecordServiceImpl implements RecordService {
         boolean booked = recordRepo.getRecordsForStaffToDo(record.getStaffId()).stream()
                 .anyMatch(r -> r.getDate().equals(record.getDate()) && r.getTime().equals(record.getTime()));
         if (booked) {
-            throw new BookingUnavailableException();
+            LocalDate date = record.getDate();
+            RecordTime time = record.getTime();
+            throw new BookingUnavailableException(date, time);
         }
     }
 }

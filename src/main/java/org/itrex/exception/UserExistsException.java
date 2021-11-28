@@ -1,7 +1,9 @@
 package org.itrex.exception;
 
 public class UserExistsException extends Exception {
-    public UserExistsException() {
-        super("User with the same phone number already exists!");
+    public UserExistsException(String phone) {
+        super("User with the same login (phone number " +
+                phone +
+                " already exists!");
     }
 }

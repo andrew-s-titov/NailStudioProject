@@ -6,15 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.itrex.dto.UserLoginDTO;
 import org.itrex.dto.UserCreditsDTO;
 import org.itrex.dto.UserResponseDTO;
-import org.itrex.service.RoleService;
+import org.itrex.exception.LoginFailedException;
 import org.itrex.service.UserService;
 import org.itrex.util.PasswordEncryption;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -35,14 +32,14 @@ public class LoginAndRegisterController {
         return "login";
     }
 
-    @PostMapping("/login")
-    public String login(Model model, @Valid @RequestBody UserLoginDTO user) {
+    @PostMapping(value = "/login")
+    public String login(Model model, @Valid @RequestBody UserLoginDTO user) throws LoginFailedException {
         String phone = user.getPhone();
         UserCreditsDTO userByPhone = userService.getUserByPhone(phone);
         if (userByPhone == null) {
             String message = String.format("User with this login (phone number %s) not found!", phone);
             log.info(message);
-            throw new IllegalArgumentException(message);
+            throw new LoginFailedException(message);
         }
         byte[] password = userByPhone.getPassword();
         if (PasswordEncryption.authenticate(user.getPassword(), password)) {
@@ -52,7 +49,7 @@ public class LoginAndRegisterController {
         } else {
             String message = String.format("Wrong password for login %s", phone);
             log.info(message);
-            throw new IllegalArgumentException(message);
+            throw new LoginFailedException(message);
         }
     }
 
@@ -68,6 +65,8 @@ public class LoginAndRegisterController {
         if (user != null) {
             model.addAttribute("exists", true);
             model.addAttribute("isClient", true);
+
+            // TODO: add logic to check roles for user
             model.addAttribute("isStaff", false);
             model.addAttribute("isAdmin", false);
         }

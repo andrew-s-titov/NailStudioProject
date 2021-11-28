@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -118,10 +119,11 @@ public class UserServiceImplTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("deleteUser with valid data - should delete User, all Records for User should be deleted")
-    public void deleteUser() throws DeletingClientWithActiveRecordsException {
+    @DisplayName("deleteUser with valid data - should delete User, all Records for User as client should be deleted, " +
+            "all record for User as staff should remain with FK null")
+    public void deleteUser1() throws DeletingClientWithActiveRecordsException {
         // given
-        Long userId = 1L;
+        Long userId = 1L; // this User has 2 records as client and 2 records as staff (tasks)
 
         // when
         service.deleteUser(userId);
@@ -131,11 +133,27 @@ public class UserServiceImplTest extends TestBaseHibernate {
 
         assertNull(session.find(User.class, userId));
 
-        Query<Record> query = session.createQuery("FROM Record WHERE user_id = :userId", Record.class);
-        query.setParameter("userId", userId);
-        assertTrue(query.list().isEmpty());
+
+        assertTrue(session.createQuery("FROM Record WHERE client_id = :userId", Record.class)
+                .setParameter("userId", userId)
+                .list()
+                .isEmpty());
+
+        List<Record> records = session.createQuery("FROM Record", Record.class).list();
+        assertEquals(2, records.size());
+        assertEquals(2, records.stream().map(Record::getStaff).filter(Objects::isNull).count());
 
         session.close();
+    }
+
+    @Test
+    @DisplayName("deleteUser with invalid data - should throw DeletingClientWithActiveRecordsException")
+    public void deleteUser2() {
+        // given
+        Long userId = 2L; // this User has 1 future record
+
+        // when & then
+        assertThrows(DeletingClientWithActiveRecordsException.class, () -> service.deleteUser(userId));
     }
 
     @Test

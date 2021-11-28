@@ -37,6 +37,9 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private Discount discount = Discount.ZERO;
 
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    private Set<Record> clientRecords = new HashSet<>();
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles", schema = "public",
             joinColumns = @JoinColumn(name = "user_id"),

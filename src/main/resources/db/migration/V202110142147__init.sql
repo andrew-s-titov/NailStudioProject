@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS users
 (
-    user_id    IDENTITY    NOT NULL,
+    user_id    IDENTITY     NOT NULL,
     password   BINARY(1000) NOT NULL,
-    first_name VARCHAR(50) NOT NULL,
-    last_name  VARCHAR(50) NOT NULL,
+    first_name VARCHAR(50)  NOT NULL,
+    last_name  VARCHAR(50)  NOT NULL,
     phone      VARCHAR(13) UNIQUE,
     e_mail     VARCHAR(255),
     discount   ENUM ('ZERO', 'TWO', 'THREE', 'FIVE', 'TEN') DEFAULT 'ZERO',
@@ -41,7 +41,9 @@ CREATE TABLE IF NOT EXISTS records
     time      ENUM ('NINE', 'THIRTEEN', 'SEVENTEEN') NOT NULL,
     PRIMARY KEY (record_id),
     FOREIGN KEY (client_id) REFERENCES users (user_id),
-    FOREIGN KEY (staff_id) REFERENCES users (user_id),
+    CONSTRAINT fk_staff_id
+        FOREIGN KEY (staff_id) REFERENCES users (user_id)
+            ON DELETE SET NULL,
     UNIQUE (date, time, staff_id)
 );
 

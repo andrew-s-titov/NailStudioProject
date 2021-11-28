@@ -33,7 +33,7 @@ public class UserController {
         return userService.getUserById(userId);
     }
 
-    @PostMapping(value = "/create")
+    @PostMapping("/create")
     public UserResponseDTO createUser(@Valid @RequestBody UserCreateDTO user) throws UserExistsException {
         return userService.createUser(user);
     }
