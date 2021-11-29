@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,16 +29,15 @@ public class HibernateRecordRepo implements RecordRepo {
     }
 
     @Override
-    public Record getRecordById(Long id) {
+    public Optional<Record> getRecordById(Long id) {
+        Optional<Record> optionalRecord = Optional.empty();
         session = sessionFactory.openSession();
         Record record = session.get(Record.class, id);
         session.close();
-        if (record == null) {
-            String message = String.format("Record with id %s wasn't found.", id);
-            log.debug(message + "DatabaseEntryNotFoundException was thrown while executing getRecordById method.");
-            throw new DatabaseEntryNotFoundException(message);
+        if (record != null) {
+            optionalRecord = Optional.of(record);
         }
-        return record;
+        return optionalRecord;
     }
 
     @Override
@@ -63,9 +63,8 @@ public class HibernateRecordRepo implements RecordRepo {
 
     @Override
     public Record createRecord(Record record) {
-        Long recordId;
         session = sessionFactory.openSession();
-        recordId = (Long) session.save(record);
+        Long recordId = (Long) session.save(record);
         Record createdRecord = session.load(Record.class, recordId);
         session.close();
         return createdRecord;

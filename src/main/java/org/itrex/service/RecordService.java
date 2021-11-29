@@ -6,6 +6,7 @@ import org.itrex.dto.RecordForStaffToDoDTO;
 import org.itrex.dto.RecordOfClientDTO;
 import org.itrex.entity.enums.RecordTime;
 import org.itrex.exception.BookingUnavailableException;
+import org.itrex.exception.DatabaseEntryNotFoundException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,13 +15,14 @@ import java.util.Map;
 public interface RecordService {
     List<RecordForAdminDTO> getAll();
 
-    List<RecordOfClientDTO> getRecordsForClient(Long clientId);
+    List<RecordOfClientDTO> getRecordsForClient(Long clientId) throws DatabaseEntryNotFoundException;
 
-    List<RecordForStaffToDoDTO> getRecordsForStaffToDo(Long staffId);
+    List<RecordForStaffToDoDTO> getRecordsForStaffToDo(Long staffId) throws DatabaseEntryNotFoundException;
 
-    Map<LocalDate, List<RecordTime>> getFreeRecordsFor3MonthsByStaffId(Long staffId);
+    Map<LocalDate, List<RecordTime>> getFreeRecordsFor3MonthsByStaffId(Long staffId) throws DatabaseEntryNotFoundException;
 
-    RecordOfClientDTO createRecord(RecordCreateDTO recordCreateDTO) throws BookingUnavailableException;
+    RecordOfClientDTO createRecord(RecordCreateDTO recordCreateDTO)
+            throws BookingUnavailableException, DatabaseEntryNotFoundException;
 
-    void deleteRecord(Long recordId);
+    void deleteRecord(Long recordId) throws DatabaseEntryNotFoundException;
 }

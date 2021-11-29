@@ -1,19 +1,19 @@
 package org.itrex.repository.impl;
 
-import org.itrex.TestBaseHibernate;
+import org.itrex.TestBaseHibernateRepository;
 import org.itrex.entity.Role;
 import org.itrex.entity.enums.RoleType;
-import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.repository.RoleRepo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HibernateRoleRepoTest extends TestBaseHibernate {
+public class HibernateRoleRepoTest extends TestBaseHibernateRepository {
     @Autowired
     private RoleRepo repo;
 
@@ -33,8 +33,8 @@ public class HibernateRoleRepoTest extends TestBaseHibernate {
         // given & when
         String roleName1 = "admin";
         String roleName2 = "AdmIN";
-        Role role1 = repo.getRoleByName(roleName1);
-        Role role2 = repo.getRoleByName(roleName2);
+        Role role1 = repo.getRoleByName(roleName1).get();
+        Role role2 = repo.getRoleByName(roleName2).get();
 
         // then
         assertEquals(RoleType.ADMIN, role1.getRoletype());
@@ -43,13 +43,16 @@ public class HibernateRoleRepoTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("getRoleByName with invalid data - should throw DatabaseEntryNotFoundException")
+    @DisplayName("getRoleByName with invalid data - should return empty Optional")
     public void getRoleByName2() {
         // given
         String roleName = "noRole"; // no such role
 
-        // when & then
-        assertThrows(DatabaseEntryNotFoundException.class, () -> repo.getRoleByName(roleName));
+        // when
+        Optional<Role> roleByName = repo.getRoleByName(roleName);
+
+        // then
+        assertTrue(roleByName.isEmpty());
     }
 
     @Test
@@ -59,7 +62,7 @@ public class HibernateRoleRepoTest extends TestBaseHibernate {
         Integer roleId = 1;
 
         // when
-        Role role = repo.getRoleById(roleId);
+        Role role = repo.getRoleById(roleId).get();
 
         // then
         assertEquals(1, role.getRoleId());
@@ -67,12 +70,15 @@ public class HibernateRoleRepoTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("getRoleById with invalid data - should throw DatabaseEntryNotFoundException")
+    @DisplayName("getRoleById with invalid data - should return empty Optional")
     public void getRoleById2() {
         // given
         Integer roleId = 150;
 
-        // when & then
-        assertThrows(DatabaseEntryNotFoundException.class, () -> repo.getRoleById(roleId));
+        // when
+        Optional<Role> roleById = repo.getRoleById(roleId);
+
+        // then
+        assertTrue(roleById.isEmpty());
     }
 }

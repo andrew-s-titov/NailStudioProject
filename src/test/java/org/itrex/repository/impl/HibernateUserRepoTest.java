@@ -1,11 +1,9 @@
 package org.itrex.repository.impl;
 
 import org.hibernate.Session;
-import org.itrex.TestBaseHibernate;
+import org.itrex.TestBaseHibernateRepository;
 import org.itrex.entity.Record;
-import org.itrex.entity.Role;
 import org.itrex.entity.User;
-import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.repository.UserRepo;
 import org.itrex.util.PasswordEncryption;
 
@@ -15,10 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HibernateUserRepoTest extends TestBaseHibernate {
+public class HibernateUserRepoTest extends TestBaseHibernateRepository {
     @Autowired
     private UserRepo repo;
     private final int usersTableInitialTestSize = 4;
@@ -48,7 +47,7 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
         Long userId = 1L;
 
         // when
-        User user = repo.getUserById(userId);
+        User user = repo.getUserById(userId).get();
 
         // then
         assertEquals(userId, user.getUserId());
@@ -61,8 +60,11 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
         // given
         Long userId = 7L; // there are no Users with this id
 
+        // when
+        Optional<User> userById = repo.getUserById(userId);
+
         // when & then
-        assertThrows(DatabaseEntryNotFoundException.class, () -> repo.getUserById(userId));
+        assertTrue(userById.isEmpty());
     }
 
     @Test
@@ -72,7 +74,7 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
         String phone = "+1946484888";
 
         // when
-        User user = repo.getUserByPhone(phone);
+        User user = repo.getUserByPhone(phone).get();
 
         // then
         assertEquals(phone, user.getPhone());
@@ -87,10 +89,10 @@ public class HibernateUserRepoTest extends TestBaseHibernate {
         String phone = "+7777777777"; // there are no Users with this phone number
 
         // when
-        User user = repo.getUserByPhone(phone);
+        Optional<User> userByPhone = repo.getUserByPhone(phone);
 
         // then
-        assertNull(user);
+        assertTrue(userByPhone.isEmpty());
     }
 
     @Test

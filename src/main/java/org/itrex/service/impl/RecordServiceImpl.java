@@ -11,9 +11,11 @@ import org.itrex.entity.Record;
 import org.itrex.entity.User;
 import org.itrex.entity.enums.RecordTime;
 import org.itrex.exception.BookingUnavailableException;
+import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.repository.RecordRepo;
 import org.itrex.repository.UserRepo;
 import org.itrex.service.RecordService;
+import org.mockito.Mockito;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -37,39 +39,82 @@ public class RecordServiceImpl implements RecordService {
     }
 
     @Override
-    public List<RecordOfClientDTO> getRecordsForClient(Long clientId) {
+    public List<RecordOfClientDTO> getRecordsForClient(Long clientId) throws DatabaseEntryNotFoundException {
+        // TODO: change tests, add postman queries for exception
+        Optional<User> optionalUser = userRepo.getUserById(clientId);
+        if (optionalUser.isEmpty()) {
+            String message = String.format("User (client) with id %s wasn't found.", clientId);
+            log.debug("DatabaseEntryNotFoundException was thrown while executing getRecordsForClient method: {}", message);
+            throw new DatabaseEntryNotFoundException(message);
+        }
         return recordRepo.getRecordsForClient(clientId).stream()
                 .map(converter::toRecordOfClientDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<RecordForStaffToDoDTO> getRecordsForStaffToDo(Long staffId) {
+    public List<RecordForStaffToDoDTO> getRecordsForStaffToDo(Long staffId) throws DatabaseEntryNotFoundException {
+        // TODO: change tests, add postman queries for exception
+        Optional<User> optionalUser = userRepo.getUserById(staffId);
+        if (optionalUser.isEmpty()) {
+            String message = String.format("User (staff) with id %s wasn't found.", staffId);
+            log.debug("DatabaseEntryNotFoundException was thrown while executing getRecordsForStaffToDo method: {}", message);
+            throw new DatabaseEntryNotFoundException(message);
+        }
         return recordRepo.getRecordsForStaffToDo(staffId).stream()
                 .map(converter::toRecordForStaffToDoDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public RecordOfClientDTO createRecord(RecordCreateDTO recordCreateDTO) throws BookingUnavailableException {
-        User client = userRepo.getUserById(recordCreateDTO.getClientId());
-        User staff = userRepo.getUserById(recordCreateDTO.getStaffId());
+    public RecordOfClientDTO createRecord(RecordCreateDTO recordCreateDTO)
+            throws BookingUnavailableException, DatabaseEntryNotFoundException {
+        String message;
+
+        Optional<User> optionalClient = userRepo.getUserById(recordCreateDTO.getClientId());
+        if (optionalClient.isEmpty()) {
+            message = String.format("User (client) with id %s wasn't found.", recordCreateDTO.getClientId());
+            log.debug("DatabaseEntryNotFoundException was thrown while executing createRecord method: {}", message);
+            throw new DatabaseEntryNotFoundException(message);
+        }
+
+        Optional<User> optionalStaff = userRepo.getUserById(recordCreateDTO.getStaffId());
+        if (optionalStaff.isEmpty()) {
+            message = String.format("User (staff) with id %s wasn't found.", recordCreateDTO.getClientId());
+            log.debug("DatabaseEntryNotFoundException was thrown while executing createRecord method: {}", message);
+            throw new DatabaseEntryNotFoundException(message);
+        }
+
         Record newRecord = converter.fromRecordCreateDTO(recordCreateDTO);
-        newRecord.setClient(client);
-        newRecord.setStaff(staff);
+        newRecord.setClient(optionalClient.get());
+        newRecord.setStaff(optionalStaff.get());
+
         checkRecordAvailability(recordCreateDTO);
+
         Record createdRecord = recordRepo.createRecord(newRecord);
         return converter.toRecordOfClientDTO(createdRecord);
     }
 
     @Override
-    public void deleteRecord(Long recordId) {
-        Record recordEntity = recordRepo.getRecordById(recordId);
-        recordRepo.deleteRecord(recordEntity);
+    public void deleteRecord(Long recordId) throws DatabaseEntryNotFoundException {
+        Optional<Record> optionalRecord = recordRepo.getRecordById(recordId);
+        if (optionalRecord.isEmpty()) {
+            String message = String.format("Record with id %s wasn't found.", recordId);
+            log.debug("DatabaseEntryNotFoundException was thrown while executing getRecordById method: {}", message);
+            throw new DatabaseEntryNotFoundException(message);
+        }
+        recordRepo.deleteRecord(optionalRecord.get());
     }
 
     @Override
-    public Map<LocalDate, List<RecordTime>> getFreeRecordsFor3MonthsByStaffId(Long staffId) {
+    public Map<LocalDate, List<RecordTime>> getFreeRecordsFor3MonthsByStaffId(Long staffId) throws DatabaseEntryNotFoundException {
+        Optional<User> optionalUser = userRepo.getUserById(staffId);
+        if (optionalUser.isEmpty()) {
+            String message = String.format("User (staff) with id %s wasn't found.", staffId);
+            log.debug("DatabaseEntryNotFoundException was thrown while executing getRecordsForStaffToDo method: {}", message);
+            throw new DatabaseEntryNotFoundException(message);
+        }
+
         LocalDate now = LocalDate.now();
         LocalDate lastDate = now.plusMonths(3);
 

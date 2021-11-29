@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.itrex.dto.UserCreditsDTO;
 import org.itrex.dto.UserLoginDTO;
 import org.itrex.dto.UserResponseDTO;
+import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.exception.LoginFailedException;
 import org.itrex.service.UserService;
 import org.itrex.util.PasswordEncryption;
@@ -35,7 +36,7 @@ public class LoginAndRegisterController {
     }
 
     @PostMapping(value = "/login")
-    public String login(Model model, @Valid @RequestBody UserLoginDTO user) throws LoginFailedException {
+    public String login(Model model, @Valid @RequestBody UserLoginDTO user) throws LoginFailedException, DatabaseEntryNotFoundException {
 
         // TODO: minimize logic, transfer to service
         String phone = user.getPhone();

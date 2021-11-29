@@ -2,6 +2,7 @@ package org.itrex.controller;
 
 import lombok.AllArgsConstructor;
 import org.itrex.dto.RoleDTO;
+import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.service.RoleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,13 +26,13 @@ public class RoleController {
     }
 
     @GetMapping("/get/name/{roleName}")
-    public ResponseEntity<RoleDTO> getRoleByName(@PathVariable String roleName) {
+    public ResponseEntity<RoleDTO> getRoleByName(@PathVariable String roleName) throws DatabaseEntryNotFoundException {
         RoleDTO role = roleService.getRoleByName(roleName);
         return new ResponseEntity<>(role, HttpStatus.OK);
     }
 
     @GetMapping("/get/id/{roleId}")
-    public ResponseEntity<RoleDTO> getRoleById(@PathVariable Integer roleId) {
+    public ResponseEntity<RoleDTO> getRoleById(@PathVariable Integer roleId) throws DatabaseEntryNotFoundException {
         RoleDTO role = roleService.getRoleById(roleId);
         return new ResponseEntity<>(role, HttpStatus.OK);
     }

@@ -3,13 +3,14 @@ package org.itrex.repository;
 import org.itrex.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserRepo {
     List<User> getAll();
 
-    User getUserById(Long userId);
+    Optional<User> getUserById(Long userId);
 
-    User getUserByPhone(String phone);
+    Optional<User> getUserByPhone(String phone);
 
     User createUser(User user);
 

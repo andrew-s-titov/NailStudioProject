@@ -3,11 +3,12 @@ package org.itrex.repository;
 import org.itrex.entity.Role;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RoleRepo {
     List<Role> getRoles();
 
-    Role getRoleByName(String name);
+    Optional<Role> getRoleByName(String name);
 
-    Role getRoleById(Integer id);
+    Optional<Role> getRoleById(Integer id);
 }

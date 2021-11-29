@@ -6,7 +6,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.itrex.entity.Role;
 import org.itrex.entity.enums.RoleType;
-import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.repository.RoleRepo;
 import org.springframework.stereotype.Repository;
 
@@ -31,25 +30,24 @@ public class HibernateRoleRepo implements RoleRepo {
     }
 
     @Override
-    public Role getRoleByName(String name) {
+    public Optional<Role> getRoleByName(String name) {
+        Optional<Role> roleResult = Optional.empty();
         List<String> roleNames = Arrays.stream(RoleType.values())
                 .map(RoleType::name)
                 .collect(Collectors.toList());
-        if (!roleNames.contains(name.toUpperCase())) {
-            String message = String.format("Role \"%s\" wasn't found", name);
-            log.debug(message + "DatabaseEntryNotFoundException was thrown while executing getRoleByName method.");
-            throw new DatabaseEntryNotFoundException(message);
+        if (roleNames.contains(name.toUpperCase())) {
+            session = sessionFactory.openSession();
+            Role role = session.createQuery("FROM Role WHERE role_name = :name", Role.class)
+                    .setParameter("name", name.toUpperCase())
+                    .getSingleResult();
+            session.close();
+            roleResult = Optional.of(role);
         }
-        session = sessionFactory.openSession();
-        Role role = session.createQuery("FROM Role WHERE role_name = :name", Role.class)
-                .setParameter("name", name.toUpperCase())
-                .getSingleResult();
-        session.close();
-        return role;
+        return roleResult;
     }
 
     @Override
-    public Role getRoleById(Integer id) {
+    public Optional<Role> getRoleById(Integer id) {
         Optional<Role> role;
         session = sessionFactory.openSession();
         role = session.createQuery("FROM Role WHERE role_id = :id", Role.class)
@@ -58,11 +56,6 @@ public class HibernateRoleRepo implements RoleRepo {
                 .stream()
                 .findAny();
         session.close();
-        if (role.isEmpty()) {
-            String message = String.format("Role with id %s wasn't found", id);
-            log.debug(message + "DatabaseEntryNotFoundException was thrown while executing getRoleById method.");
-            throw new DatabaseEntryNotFoundException(message);
-        }
-        return role.get();
+        return role;
     }
 }

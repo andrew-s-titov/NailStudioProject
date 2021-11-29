@@ -1,10 +1,11 @@
 package org.itrex.util;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PasswordEncryptionTest {
     @Test
@@ -18,7 +19,7 @@ public class PasswordEncryptionTest {
         boolean result = PasswordEncryption.authenticate(password, encryptedPassword);
 
         // then
-        Assertions.assertNotEquals(password.getBytes(StandardCharsets.UTF_8), encryptedPassword);
-        Assertions.assertTrue(result);
+        assertNotEquals(password.getBytes(StandardCharsets.UTF_8), encryptedPassword);
+        assertTrue(result);
     }
 }

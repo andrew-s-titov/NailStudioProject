@@ -1,11 +1,10 @@
 package org.itrex.repository.impl;
 
 import org.hibernate.Session;
-import org.itrex.TestBaseHibernate;
+import org.itrex.TestBaseHibernateRepository;
 import org.itrex.entity.Record;
 import org.itrex.entity.User;
 import org.itrex.entity.enums.RecordTime;
-import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.repository.RecordRepo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,10 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HibernateRecordRepoTest extends TestBaseHibernate {
+public class HibernateRecordRepoTest extends TestBaseHibernateRepository {
     @Autowired
     private RecordRepo repo;
     private final int recordsTableInitialTestSize = 4;
@@ -43,8 +43,8 @@ public class HibernateRecordRepoTest extends TestBaseHibernate {
     @DisplayName("getRecordById with valid data - should return existing Record")
     public void getRecordById1() {
         // given & when
-        Record record1 = repo.getRecordById(1L);
-        Record record3 = repo.getRecordById(3L);
+        Record record1 = repo.getRecordById(1L).get();
+        Record record3 = repo.getRecordById(3L).get();
 
         // then
         assertEquals(1, record1.getRecordId());
@@ -58,15 +58,19 @@ public class HibernateRecordRepoTest extends TestBaseHibernate {
     }
 
     @Test
-    @DisplayName("getRecordById with invalid data - should throw DatabaseEntryNotFoundException")
+    @DisplayName("getRecordById with invalid data - should return empty Optional")
     public void getRecordById2() {
         // given
         Long recordId1 = 7L;
         Long recordId2 = 180L;
 
+        // when
+        Optional<Record> recordById1 = repo.getRecordById(recordId1);
+        Optional<Record> recordById2 = repo.getRecordById(recordId2);
+
         // when & then
-        assertThrows(DatabaseEntryNotFoundException.class, () -> repo.getRecordById(recordId1));
-        assertThrows(DatabaseEntryNotFoundException.class, () -> repo.getRecordById(recordId2));
+        assertTrue(recordById1.isEmpty());
+        assertTrue(recordById2.isEmpty());
     }
 
     @Test

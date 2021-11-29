@@ -9,17 +9,18 @@ import org.itrex.entity.Record;
 import org.itrex.entity.Role;
 import org.itrex.entity.User;
 import org.itrex.entity.enums.Discount;
+import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.exception.DeletingClientWithActiveRecordsException;
 import org.itrex.exception.RoleManagementException;
 import org.itrex.exception.UserExistsException;
 import org.itrex.repository.RecordRepo;
-import org.itrex.repository.RoleRepo;
 import org.itrex.repository.UserRepo;
 import org.itrex.service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,20 +30,24 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final RecordRepo recordRepo;
-    private final RoleRepo roleRepo;
     private final UserDTOConverter userDTOConverter;
     private final RoleDTOConverter roleDTOConverter;
 
     @Override
-    public UserResponseDTO getUserById(Long userId) {
-        User userEntity = userRepo.getUserById(userId);
-        return userDTOConverter.toUserResponseDTO(userEntity);
+    public UserResponseDTO getUserById(Long userId) throws DatabaseEntryNotFoundException {
+        User user = checkIfUserExists(userId);
+        return userDTOConverter.toUserResponseDTO(user);
     }
 
     @Override
-    public UserCreditsDTO getUserByPhone(String phone) {
-        User userEntity = userRepo.getUserByPhone(phone);
-        return userEntity == null ? null : userDTOConverter.toUserCreditsDTO(userEntity);
+    public UserCreditsDTO getUserByPhone(String phone) throws DatabaseEntryNotFoundException {
+        Optional<User> optionalUser = userRepo.getUserByPhone(phone);
+        if (optionalUser.isEmpty()) {
+            String message = String.format("User with phone number %s wasn't found", phone);
+            log.debug("DatabaseEntryNotFoundException was thrown while executing getUserById method: {}", message);
+            throw new DatabaseEntryNotFoundException(message);
+        }
+        return userDTOConverter.toUserCreditsDTO(optionalUser.get());
     }
 
     @Override
@@ -55,7 +60,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDTO createUser(UserCreateDTO user) throws UserExistsException {
         String phone = user.getPhone();
-        if (userRepo.getUserByPhone(phone) != null) {
+        if (userRepo.getUserByPhone(phone).isPresent()) {
             throw new UserExistsException(phone);
         }
         User newUser = userDTOConverter.fromUserCreateDTO(user);
@@ -64,18 +69,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(Long userId) throws DeletingClientWithActiveRecordsException {
-        User userEntity = userRepo.getUserById(userId);
+    public void deleteUser(Long userId) throws DeletingClientWithActiveRecordsException, DatabaseEntryNotFoundException {
+        User user = checkIfUserExists(userId);
         List<Record> records = recordRepo.getRecordsForClient(userId);
         if (hasActiveRecords(records)) {
             throw new DeletingClientWithActiveRecordsException(userId);
         }
-        userRepo.deleteUser(userEntity);
+        userRepo.deleteUser(user);
     }
 
     @Override
-    public void updateUserInfo(UserUpdateDTO userUpdateDTO) {
-        User user = userRepo.getUserById(userUpdateDTO.getUserId());
+    public void updateUserInfo(UserUpdateDTO userUpdateDTO) throws DatabaseEntryNotFoundException {
+        User user = checkIfUserExists(userUpdateDTO.getUserId());
         boolean needUpdate = false;
         if (!user.getFirstName().equals(userUpdateDTO.getFirstName())) {
             needUpdate = true;
@@ -95,8 +100,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changeClientDiscount(Long clientId, Discount newDiscount) {
-        User user = userRepo.getUserById(clientId);
+    public void changeClientDiscount(Long clientId, Discount newDiscount) throws DatabaseEntryNotFoundException {
+        User user = checkIfUserExists(clientId);
         if (!user.getDiscount().equals(newDiscount)) { // avoiding unnecessary request to db
             user.setDiscount(newDiscount);
             userRepo.updateUserInfo(user);
@@ -104,8 +109,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addRoleForUser(Long userId, RoleDTO roleDTO) throws RoleManagementException {
-        User user = userRepo.getUserById(userId);
+    public void addRoleForUser(Long userId, RoleDTO roleDTO)
+            throws RoleManagementException, DatabaseEntryNotFoundException {
+
+        User user = checkIfUserExists(userId);
         Role role = roleDTOConverter.fromRoleDTO(roleDTO);
         Set<Role> userRoles = user.getUserRoles();
         if (userRoles.contains(role)) {
@@ -118,8 +125,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void revokeRole(Long userId, RoleDTO roleDTO) throws RoleManagementException {
-        User user = userRepo.getUserById(userId);
+    public void revokeRole(Long userId, RoleDTO roleDTO) throws RoleManagementException, DatabaseEntryNotFoundException {
+        User user = checkIfUserExists(userId);
         Role role = roleDTOConverter.fromRoleDTO(roleDTO);
         Set<Role> userRoles = user.getUserRoles();
         if (userRoles.size() == 1) {
@@ -141,5 +148,15 @@ public class UserServiceImpl implements UserService {
                     .anyMatch(r -> r.getDate().compareTo(LocalDate.now()) >= 0);
         }
         return false;
+    }
+
+    private User checkIfUserExists(Long userId) throws DatabaseEntryNotFoundException {
+        Optional<User> optionalUser = userRepo.getUserById(userId);
+        if (optionalUser.isEmpty()) {
+            String message = String.format("User with id %s wasn't found", userId);
+            log.debug(message + "DatabaseEntryNotFoundException was thrown while executing getUserById method.");
+            throw new DatabaseEntryNotFoundException(message);
+        }
+        return optionalUser.get();
     }
 }

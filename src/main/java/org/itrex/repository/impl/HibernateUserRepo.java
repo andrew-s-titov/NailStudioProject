@@ -31,30 +31,28 @@ public class HibernateUserRepo implements UserRepo {
     }
 
     @Override
-    public User getUserById(Long userId) {
-        User user;
+    public Optional<User> getUserById(Long userId) {
+        Optional <User> optionalUser = Optional.empty();
         session = sessionFactory.openSession();
-        user = session.get(User.class, userId);
+        User user = session.get(User.class, userId);
         session.close();
-        if (user == null) {
-            String message = String.format("User with id %s wasn't found", userId);
-            log.debug(message + "DatabaseEntryNotFoundException was thrown while executing getUserById method.");
-            throw new DatabaseEntryNotFoundException(message);
+        if (user != null) {
+            optionalUser = Optional.of(user);
         }
-        return user;
+        return optionalUser;
     }
 
     @Override
-    public User getUserByPhone(String phone) {
-        Optional<User> user;
+    public Optional<User> getUserByPhone(String phone) {
+        Optional <User> optionalUser;
         session = sessionFactory.openSession();
-        user = session.createQuery("FROM User WHERE phone = :phone", User.class)
+        optionalUser = session.createQuery("FROM User WHERE phone = :phone", User.class)
                 .setParameter("phone", phone)
                 .list()
                 .stream()
                 .findAny();
         session.close();
-        return user.orElse(null);
+        return optionalUser;
     }
 
     @Override
