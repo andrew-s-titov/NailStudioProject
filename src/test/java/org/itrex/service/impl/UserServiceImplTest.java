@@ -179,8 +179,8 @@ public class UserServiceImplTest {
     }
 
     @Test
-    @DisplayName("updateUserInfo with valid data - shouldn't throw exceptions")
-    public void updateUserInfo() {
+    @DisplayName("updateUserInfo with valid data - shouldn't throw exceptions, should invoke repo method")
+    public void updateUserInfo1() {
         // given
         Long userId = 1L;
         when(userRepo.getUserById(userId)).thenReturn(Optional.of(user1));
@@ -197,6 +197,27 @@ public class UserServiceImplTest {
 
         verify(userRepo).getUserById(userId);
         verify(userRepo).updateUserInfo(user1);
+    }
+
+    @Test
+    @DisplayName("updateUserInfo with data equal to User's data - shouldn't throw exceptions, shouldn't invoke repo method")
+    public void updateUserInfo2() {
+        // given
+        Long userId = 1L;
+        when(userRepo.getUserById(userId)).thenReturn(Optional.of(user1));
+
+        UserUpdateDTO user = UserUpdateDTO.builder()
+                .userId(user1.getUserId())
+                .firstName(user1.getFirstName())
+                .lastName(user1.getLastName())
+                .email(user1.getEmail())
+                .build();
+
+        // when & then
+        assertDoesNotThrow(() -> service.updateUserInfo(user));
+
+        verify(userRepo).getUserById(userId);
+        verify(userRepo, never()).updateUserInfo(user1);
     }
 
     @Test

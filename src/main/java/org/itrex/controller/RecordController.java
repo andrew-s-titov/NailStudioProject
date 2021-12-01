@@ -9,7 +9,6 @@ import org.itrex.entity.enums.RecordTime;
 import org.itrex.exception.BookingUnavailableException;
 import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.service.RecordService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,42 +28,37 @@ public class RecordController {
     // TODO: restrict use - only for admin
     @GetMapping("/get/all")
     public ResponseEntity<List<RecordForAdminDTO>> getAll() {
-        List<RecordForAdminDTO> recordsForAdmin = recordService.getAll();
-        return new ResponseEntity<>(recordsForAdmin, HttpStatus.OK);
+        return ResponseEntity.ok(recordService.getAll());
     }
 
     @GetMapping("/get/for_client/{clientId}")
     public ResponseEntity<List<RecordOfClientDTO>> getRecordsForClient(@PathVariable Long clientId)
             throws DatabaseEntryNotFoundException {
-        List<RecordOfClientDTO> recordsForClient = recordService.getRecordsForClient(clientId);
-        return new ResponseEntity<>(recordsForClient, HttpStatus.OK);
+        return ResponseEntity.ok(recordService.getRecordsForClient(clientId));
     }
 
     // TODO: restrict use - only for staff and admin
     @GetMapping("/get/for_staff/{staffId}")
     public ResponseEntity<List<RecordForStaffToDoDTO>> getRecordsForStaffToDo(@PathVariable Long staffId)
             throws DatabaseEntryNotFoundException {
-        List<RecordForStaffToDoDTO> recordsForStaff = recordService.getRecordsForStaffToDo(staffId);
-        return new ResponseEntity<>(recordsForStaff, HttpStatus.OK);
+        return ResponseEntity.ok(recordService.getRecordsForStaffToDo(staffId));
     }
 
     @GetMapping("/get/free/staff/{staffId}")
     public ResponseEntity<Map<LocalDate, List<RecordTime>>> getFreeRecordsFor3MonthsByStaffId(@PathVariable Long staffId)
             throws DatabaseEntryNotFoundException {
-        Map<LocalDate, List<RecordTime>> freeRecords = recordService.getFreeRecordsFor3MonthsByStaffId(staffId);
-        return new ResponseEntity<>(freeRecords, HttpStatus.OK);
+        return ResponseEntity.ok(recordService.getFreeRecordsFor3MonthsByStaffId(staffId));
     }
 
     @PostMapping("/create")
     public ResponseEntity<RecordOfClientDTO> createRecord(@Valid @RequestBody RecordCreateDTO recordCreateDTO)
             throws BookingUnavailableException, DatabaseEntryNotFoundException {
-        RecordOfClientDTO createdRecord = recordService.createRecord(recordCreateDTO);
-        return new ResponseEntity<>(createdRecord, HttpStatus.CREATED);
+        return ResponseEntity.ok(recordService.createRecord(recordCreateDTO));
     }
 
     @DeleteMapping("/delete/{recordId}")
     public ResponseEntity<Object> deleteRecord(@PathVariable Long recordId) throws DatabaseEntryNotFoundException {
         recordService.deleteRecord(recordId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 }

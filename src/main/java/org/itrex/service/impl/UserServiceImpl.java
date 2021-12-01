@@ -82,15 +82,15 @@ public class UserServiceImpl implements UserService {
     public void updateUserInfo(UserUpdateDTO userUpdateDTO) throws DatabaseEntryNotFoundException {
         User user = checkIfUserExists(userUpdateDTO.getUserId());
         boolean needUpdate = false;
-        if (!user.getFirstName().equals(userUpdateDTO.getFirstName())) {
+        if (!user.getFirstName().equals(userUpdateDTO.getFirstName()) && userUpdateDTO.getFirstName() != null) {
             needUpdate = true;
             user.setFirstName(userUpdateDTO.getFirstName());
         }
-        if (!user.getLastName().equals(userUpdateDTO.getLastName())) {
+        if (!user.getLastName().equals(userUpdateDTO.getLastName()) && userUpdateDTO.getLastName() != null) {
             needUpdate = true;
             user.setLastName(userUpdateDTO.getLastName());
         }
-        if (!user.getEmail().equals(userUpdateDTO.getEmail())) {
+        if (!user.getEmail().equals(userUpdateDTO.getEmail()) && userUpdateDTO.getEmail() != null) {
             needUpdate = true;
             user.setEmail(userUpdateDTO.getEmail());
         }
