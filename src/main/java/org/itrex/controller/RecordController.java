@@ -9,6 +9,10 @@ import org.itrex.entity.enums.RecordTime;
 import org.itrex.exception.BookingUnavailableException;
 import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.service.RecordService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,11 +28,15 @@ public class RecordController {
 
     private final RecordService recordService;
 
-    // TODO: pagination
     // TODO: restrict use - only for admin
     @GetMapping("/get/all")
-    public ResponseEntity<List<RecordForAdminDTO>> getAll() {
-        return ResponseEntity.ok(recordService.findAll());
+    public ResponseEntity<List<RecordForAdminDTO>> getAll
+    (@PageableDefault(size = 50)
+     @SortDefault.SortDefaults({
+             @SortDefault(sort = "date", direction = Sort.Direction.ASC),
+             @SortDefault(sort = "time", direction = Sort.Direction.ASC)
+     }) Pageable pageable) {
+        return ResponseEntity.ok(recordService.findAll(pageable));
     }
 
     @GetMapping("/get/for_client/{clientId}")

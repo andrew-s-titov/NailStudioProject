@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -27,6 +29,7 @@ import org.springframework.validation.BindException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -70,13 +73,24 @@ public class UserControllerTest extends BaseControllerTest {
     @DisplayName("getAll - should return json with data about all users")
     public void getAll() throws Exception {
         // given
+        PageRequest defaultPageRequest = PageRequest.of(0, 20, Sort.by("lastName", "firstName"));
+        PageRequest somePageRequest = PageRequest.of(1, 1, Sort.by("lastName", "firstName"));
         List<UserResponseDTO> users = Arrays.asList(converter.toUserResponseDTO(user1), converter.toUserResponseDTO(user2));
-        when(userService.getAll()).thenReturn(users);
+        when(userService.getAll(defaultPageRequest)).thenReturn(users);
+        when(userService.getAll(somePageRequest)).thenReturn(Collections.singletonList(converter.toUserResponseDTO(user1)));
 
         // when & then
         mockMvc.perform(get("/users/get/all"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(toJson(users)));
+
+        mockMvc.perform(get("/users/get/all")
+                .param("page", String.valueOf(1))
+                .param("size", String.valueOf(1))
+                .param("sort", "lastName,asc")
+                .param("sort", "firstName,asc"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(toJson(Collections.singletonList(converter.toUserResponseDTO(user1)))));
     }
 
     @Test

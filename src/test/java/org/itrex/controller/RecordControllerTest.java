@@ -13,15 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.doNothing;
@@ -42,16 +41,31 @@ public class RecordControllerTest extends BaseControllerTest {
     @DisplayName("getAll - shouldn't throw exceptions, status OK")
     public void getAll() throws Exception {
         // given
-        List<RecordForAdminDTO> records = Collections.singletonList(RecordForAdminDTO.builder().recordId(4L).build());
-        when(recordService.findAll()).thenReturn(records);
+        PageRequest defaultPageRequest = PageRequest.of(0, 50, Sort.by("date", "time"));
+        PageRequest somePageRequest = PageRequest.of(1, 1, Sort.by("date", "time"));
+        List<RecordForAdminDTO> records = Arrays.asList
+                (RecordForAdminDTO.builder().recordId(1L).build(), RecordForAdminDTO.builder().recordId(4L).build());
+        when(recordService.findAll(defaultPageRequest)).thenReturn(records);
+        when(recordService.findAll(somePageRequest))
+                .thenReturn(Collections.singletonList(RecordForAdminDTO.builder().recordId(4L).build()));
 
         // when & then
-        MvcResult mvcResult = mockMvc.perform(get("/records/get/all"))
+        MvcResult mvcResult1 = mockMvc.perform(get("/records/get/all"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(toJson(records)))
                 .andReturn();
 
-        assertNull(mvcResult.getResolvedException());
+        MvcResult mvcResult2 = mockMvc.perform(get("/records/get/all")
+                .param("page", String.valueOf(1))
+                .param("size", String.valueOf(1))
+                .param("sort", "date,asc")
+                .param("sort", "time,asc"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(toJson(Collections.singletonList(RecordForAdminDTO.builder().recordId(4L).build()))))
+                .andReturn();
+
+        assertNull(mvcResult1.getResolvedException());
+        assertNull(mvcResult2.getResolvedException());
     }
 
     @Test

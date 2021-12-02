@@ -241,13 +241,52 @@
 			"response": []
 		},
 		{
+			"name": "/users/get/all pagination",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/users/get/all?page=2&size=1&sort=lastName,desc&sort=firstName,asc",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"get",
+						"all"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "2"
+						},
+						{
+							"key": "size",
+							"value": "1"
+						},
+						{
+							"key": "sort",
+							"value": "lastName,desc"
+						},
+						{
+							"key": "sort",
+							"value": "firstName,asc"
+						}
+					]
+				},
+				"description": "get all users"
+			},
+			"response": []
+		},
+		{
 			"name": "/users/update",
 			"request": {
 				"method": "PUT",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"userId\": 1,\r\n    \"firstName\": \"Eddy\",\r\n    \"lastName\": \"Scissorhands\", \r\n    \"email\": \"myNewEmail@gmail.com\"\r\n}",
+					"raw": "{\r\n    \"userId\": 1,\r\n    \"firstName\": \"Eddy\",\r\n    \"lastName\": null, \r\n    \"email\": null\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -564,7 +603,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/roles/get/name/client",
+					"raw": "localhost:8080/roles/get/name/cLiEnT",
 					"host": [
 						"localhost"
 					],
@@ -573,7 +612,7 @@
 						"roles",
 						"get",
 						"name",
-						"client"
+						"cLiEnT"
 					]
 				},
 				"description": "get role with a name \"client\""
@@ -690,27 +729,6 @@
 			"response": []
 		},
 		{
-			"name": "/records/delete/2",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "localhost:8080/records/delete/2",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"records",
-						"delete",
-						"2"
-					]
-				},
-				"description": "delete record with id 2"
-			},
-			"response": []
-		},
-		{
 			"name": "/records/get/for_client/2",
 			"request": {
 				"method": "GET",
@@ -776,6 +794,45 @@
 			"response": []
 		},
 		{
+			"name": "/records/get/all pagination",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/records/get/all?page=1&size=1&sort=date,desc&sort=time,asc",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"records",
+						"get",
+						"all"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "size",
+							"value": "1"
+						},
+						{
+							"key": "sort",
+							"value": "date,desc"
+						},
+						{
+							"key": "sort",
+							"value": "time,asc"
+						}
+					]
+				},
+				"description": "get all records"
+			},
+			"response": []
+		},
+		{
 			"name": "/records/get/free/staff/1",
 			"request": {
 				"method": "GET",
@@ -795,6 +852,27 @@
 					]
 				},
 				"description": "get free time slots for future 3 months for staff with id 1"
+			},
+			"response": []
+		},
+		{
+			"name": "/records/delete/2",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/records/delete/2",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"records",
+						"delete",
+						"2"
+					]
+				},
+				"description": "delete record with id 2"
 			},
 			"response": []
 		}

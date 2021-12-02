@@ -32,8 +32,8 @@ public class RecordServiceImpl implements RecordService {
     private final RecordDTOConverter converter;
 
     @Override
-    public List<RecordForAdminDTO> findAll() {
-        Slice<Record> slice = recordRepo.findAll(Pageable.ofSize(50));
+    public List<RecordForAdminDTO> findAll(Pageable pageable) {
+        Slice<Record> slice = recordRepo.findAll(pageable);
         if (slice.hasContent()) {
             return slice.getContent().stream()
                     .map(converter::toRecordForAdminDTO)

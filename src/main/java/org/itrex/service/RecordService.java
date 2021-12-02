@@ -7,13 +7,14 @@ import org.itrex.dto.RecordOfClientDTO;
 import org.itrex.entity.enums.RecordTime;
 import org.itrex.exception.BookingUnavailableException;
 import org.itrex.exception.DatabaseEntryNotFoundException;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 public interface RecordService {
-    List<RecordForAdminDTO> findAll();
+    List<RecordForAdminDTO> findAll(Pageable pageable);
 
     List<RecordOfClientDTO> getRecordsForClient(Long clientId) throws DatabaseEntryNotFoundException;
 

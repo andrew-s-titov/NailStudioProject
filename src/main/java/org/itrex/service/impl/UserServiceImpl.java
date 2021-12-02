@@ -13,8 +13,6 @@ import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.exception.DeletingClientWithActiveRecordsException;
 import org.itrex.exception.RoleManagementException;
 import org.itrex.exception.UserExistsException;
-import org.itrex.repository.RecordRepo;
-import org.itrex.repository.UserRepo;
 import org.itrex.repository.data.RecordRepository;
 import org.itrex.repository.data.UserRepository;
 import org.itrex.service.UserService;
@@ -56,8 +54,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserResponseDTO> getAll() {
-        Slice<User> slice = userRepo.findAll(Pageable.ofSize(20));
+    public List<UserResponseDTO> getAll(Pageable pageable) {
+        Slice<User> slice = userRepo.findAll(pageable);
         if (slice.hasContent()) {
             return slice.getContent().stream()
                     .map(userDTOConverter::toUserResponseDTO)

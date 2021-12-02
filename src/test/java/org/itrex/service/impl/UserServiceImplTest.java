@@ -50,13 +50,15 @@ public class UserServiceImplTest {
     public void getAll() {
         // given
         List<User> someUsers = Arrays.asList(user1, user4);
-        when(userRepo.findAll(Pageable.ofSize(20))).thenReturn(new PageImpl<>(someUsers));
+        when(userRepo.findAll(Pageable.unpaged())).thenReturn(new PageImpl<>(someUsers));
+        when(userRepo.findAll(Pageable.ofSize(1))).thenReturn(new PageImpl<>(Collections.singletonList(user1)));
 
         // when
-        List<UserResponseDTO> users = service.getAll();
+        List<UserResponseDTO> users = service.getAll(Pageable.unpaged());
+        List<UserResponseDTO> users2 = service.getAll(Pageable.ofSize(1));
 
         // then
-        assertEquals(2, users.size());
+        assertEquals(someUsers.size(), users.size());
         assertEquals(user1.getUserId(), users.get(0).getUserId());
         assertEquals(user1.getFirstName(), users.get(0).getFirstName());
         assertEquals(user1.getLastName(), users.get(0).getLastName());
@@ -65,7 +67,12 @@ public class UserServiceImplTest {
         assertEquals(user4.getUserId(), users.get(1).getUserId());
         assertEquals(user4.getPhone(), users.get(1).getPhone());
 
-        verify(userRepo).findAll(Pageable.ofSize(20));
+        assertEquals(1, users2.size());
+        assertEquals(user1.getUserId(), users2.get(0).getUserId());
+        assertEquals(user1.getPhone(), users2.get(0).getPhone());
+
+        verify(userRepo).findAll(Pageable.unpaged());
+        verify(userRepo).findAll(Pageable.ofSize(1));
     }
 
     @Test

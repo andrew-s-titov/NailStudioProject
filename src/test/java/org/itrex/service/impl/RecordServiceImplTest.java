@@ -18,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -49,25 +51,36 @@ public class RecordServiceImplTest {
     @DisplayName("findAll - should return list of RecordForAdminDTO with data from Records")
     public void findAll() {
         // given
+        PageRequest defaultPageRequest = PageRequest.of(0, 50, Sort.by("date", "time"));
+        PageRequest somePageRequest = PageRequest.of(1, 1, Sort.by("date", "time"));
         List<Record> records = Arrays.asList(record1, record2);
-        when(recordRepo.findAll(Pageable.ofSize(50))).thenReturn(new PageImpl<>(records));
+        when(recordRepo.findAll(defaultPageRequest)).thenReturn(new PageImpl<>(records));
+        when(recordRepo.findAll(somePageRequest)).thenReturn(new PageImpl<>(Collections.singletonList(record1)));
+
         // when
-        List<RecordForAdminDTO> returnedRecords = service.findAll();
+        List<RecordForAdminDTO> returnedRecords1 = service.findAll(defaultPageRequest);
+        List<RecordForAdminDTO> returnedRecords2 = service.findAll(somePageRequest);
+
 
         // then
-        assertEquals(records.size(), returnedRecords.size());
+        assertEquals(records.size(), returnedRecords1.size());
 
-        assertEquals(record1.getRecordId(), returnedRecords.get(0).getRecordId());
-        assertEquals(record1.getDate(), returnedRecords.get(0).getDate());
-        assertEquals(record1.getTime(), returnedRecords.get(0).getTime());
-        assertEquals("wow@gmail.com", returnedRecords.get(0).getClientEmail());
-        assertEquals("Senior", returnedRecords.get(0).getStaffLastName());
+        assertEquals(record1.getRecordId(), returnedRecords1.get(0).getRecordId());
+        assertEquals(record1.getDate(), returnedRecords1.get(0).getDate());
+        assertEquals(record1.getTime(), returnedRecords1.get(0).getTime());
+        assertEquals("wow@gmail.com", returnedRecords1.get(0).getClientEmail());
+        assertEquals("Senior", returnedRecords1.get(0).getStaffLastName());
 
-        assertEquals(record2.getRecordId(), returnedRecords.get(1).getRecordId());
-        assertEquals(record2.getDate(), returnedRecords.get(1).getDate());
-        assertEquals(record2.getTime(), returnedRecords.get(1).getTime());
+        assertEquals(record2.getRecordId(), returnedRecords1.get(1).getRecordId());
+        assertEquals(record2.getDate(), returnedRecords1.get(1).getDate());
+        assertEquals(record2.getTime(), returnedRecords1.get(1).getTime());
 
-        verify(recordRepo).findAll(Pageable.ofSize(50));
+        assertEquals(1, returnedRecords2.size());
+        assertEquals(record1.getRecordId(), returnedRecords2.get(0).getRecordId());
+        assertEquals(record1.getClient().getPhone(), returnedRecords2.get(0).getClientPhone());
+
+        verify(recordRepo).findAll(defaultPageRequest);
+        verify(recordRepo).findAll(somePageRequest);
     }
 
     @Test

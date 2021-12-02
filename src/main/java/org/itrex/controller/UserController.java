@@ -11,6 +11,10 @@ import org.itrex.exception.DeletingClientWithActiveRecordsException;
 import org.itrex.exception.RoleManagementException;
 import org.itrex.exception.UserExistsException;
 import org.itrex.service.UserService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,10 +28,14 @@ public class UserController {
     private final UserService userService;
 
     // TODO: restrict use - only for admin and staff
-    // TODO: pagination
     @GetMapping("/get/all")
-    public ResponseEntity<List<UserResponseDTO>> getAll() {
-        return ResponseEntity.ok(userService.getAll());
+    public ResponseEntity<List<UserResponseDTO>> getAll
+    (@PageableDefault(size = 20)
+     @SortDefault.SortDefaults({
+             @SortDefault(sort = "lastName", direction = Sort.Direction.ASC),
+             @SortDefault(sort = "firstName", direction = Sort.Direction.ASC)
+     }) Pageable pageable) {
+        return ResponseEntity.ok(userService.getAll(pageable));
     }
 
     @GetMapping("/get/{userId}")
