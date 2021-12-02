@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class RoleServiceImpl implements RoleService {
+public class RoleServiceImpl extends BaseService implements RoleService {
     private final RoleRepository roleRepo;
     private final RoleDTOConverter roleDTOConverter;
 
@@ -32,27 +32,18 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleDTO getByName(String roleName) throws DatabaseEntryNotFoundException {
-        Optional<Role> role = Optional.empty();
+        Optional<Role> optionalRole = Optional.empty();
         if (Arrays.stream(RoleType.values()).anyMatch(r -> r.name().equals(roleName.toUpperCase()))) {
             RoleType roleType = RoleType.valueOf(roleName.toUpperCase());
-            role = roleRepo.findByRoleType(roleType);
+            optionalRole = roleRepo.findByRoleType(roleType);
         }
-        if (role.isEmpty()) {
-            String message = String.format("Role \"%s\" wasn't found", roleName);
-            log.debug(message + "DatabaseEntryNotFoundException was thrown while executing getRoleByName method.");
-            throw new DatabaseEntryNotFoundException(message);
-        }
-        return roleDTOConverter.toRoleDTO(role.get());
+        Role role = entityExists(optionalRole, "Role", roleName, "name");
+        return roleDTOConverter.toRoleDTO(role);
     }
 
     @Override
     public RoleDTO getRoleById(Integer roleId) throws DatabaseEntryNotFoundException {
-        Optional<Role> role = roleRepo.findById(roleId);
-        if (role.isEmpty()) {
-            String message = String.format("Role with id %s wasn't found", roleId);
-            log.debug(message + "DatabaseEntryNotFoundException was thrown while executing getRoleById method.");
-            throw new DatabaseEntryNotFoundException(message);
-        }
-        return roleDTOConverter.toRoleDTO(role.get());
+        Role role = entityExists(roleRepo.findById(roleId), "Role", roleId, "id");
+        return roleDTOConverter.toRoleDTO(role);
     }
 }

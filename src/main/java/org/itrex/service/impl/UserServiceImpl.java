@@ -23,14 +23,13 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends BaseService implements UserService {
     private final UserRepository userRepo;
     private final RecordRepository recordRepo;
     private final UserDTOConverter userDTOConverter;
@@ -38,19 +37,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO getUserById(Long userId) throws DatabaseEntryNotFoundException {
-        User user = checkIfUserExists(userId);
+        User user = entityExists(userRepo.findById(userId), "User", userId, "id");
         return userDTOConverter.toUserResponseDTO(user);
     }
 
     @Override
     public UserCreditsDTO getUserByPhone(String phone) throws DatabaseEntryNotFoundException {
-        Optional<User> optionalUser = userRepo.findByPhone(phone);
-        if (optionalUser.isEmpty()) {
-            String message = String.format("User with phone number %s wasn't found", phone);
-            log.debug("DatabaseEntryNotFoundException was thrown while executing getUserById method: {}", message);
-            throw new DatabaseEntryNotFoundException(message);
-        }
-        return userDTOConverter.toUserCreditsDTO(optionalUser.get());
+        User user = entityExists(userRepo.findByPhone(phone), "User", phone, "phone");
+        return userDTOConverter.toUserCreditsDTO(user);
     }
 
     @Override
@@ -78,7 +72,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long userId) throws DeletingClientWithActiveRecordsException, DatabaseEntryNotFoundException {
-        User user = checkIfUserExists(userId);
+        User user = entityExists(userRepo.findById(userId), "User", userId, "id");
         List<Record> records = recordRepo.getByClientUserId(userId);
         if (hasActiveRecords(records)) {
             throw new DeletingClientWithActiveRecordsException(userId);
@@ -88,7 +82,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUserInfo(UserUpdateDTO userUpdateDTO) throws DatabaseEntryNotFoundException {
-        User user = checkIfUserExists(userUpdateDTO.getUserId());
+        Long userId = userUpdateDTO.getUserId();
+        User user = entityExists(userRepo.findById(userId), "User", userId, "id");
         boolean needUpdate = false;
         if (!user.getFirstName().equals(userUpdateDTO.getFirstName()) && userUpdateDTO.getFirstName() != null) {
             needUpdate = true;
@@ -109,7 +104,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changeClientDiscount(Long clientId, Discount newDiscount) throws DatabaseEntryNotFoundException {
-        User user = checkIfUserExists(clientId);
+        User user = entityExists(userRepo.findById(clientId), "User (client)", clientId, "id");
         if (!user.getDiscount().equals(newDiscount)) { // avoiding unnecessary request to db
             user.setDiscount(newDiscount);
             userRepo.save(user);
@@ -119,8 +114,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void addRoleForUser(Long userId, RoleDTO roleDTO)
             throws RoleManagementException, DatabaseEntryNotFoundException {
-
-        User user = checkIfUserExists(userId);
+        User user = entityExists(userRepo.findById(userId), "User", userId, "id");
         Role role = roleDTOConverter.fromRoleDTO(roleDTO);
         Set<Role> userRoles = user.getUserRoles();
         if (userRoles.contains(role)) {
@@ -134,7 +128,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void revokeRole(Long userId, RoleDTO roleDTO) throws RoleManagementException, DatabaseEntryNotFoundException {
-        User user = checkIfUserExists(userId);
+        User user = entityExists(userRepo.findById(userId), "User", userId, "id");
         Role role = roleDTOConverter.fromRoleDTO(roleDTO);
         Set<Role> userRoles = user.getUserRoles();
         if (userRoles.size() == 1) {
@@ -156,15 +150,5 @@ public class UserServiceImpl implements UserService {
                     .anyMatch(r -> r.getDate().compareTo(LocalDate.now()) >= 0);
         }
         return false;
-    }
-
-    private User checkIfUserExists(Long userId) throws DatabaseEntryNotFoundException {
-        Optional<User> optionalUser = userRepo.findById(userId);
-        if (optionalUser.isEmpty()) {
-            String message = String.format("User with id %s wasn't found", userId);
-            log.debug(message + "DatabaseEntryNotFoundException was thrown while executing getUserById method.");
-            throw new DatabaseEntryNotFoundException(message);
-        }
-        return optionalUser.get();
     }
 }

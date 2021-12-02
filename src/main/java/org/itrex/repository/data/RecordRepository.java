@@ -12,7 +12,7 @@ import java.util.List;
 public interface RecordRepository extends PagingAndSortingRepository<Record, Long> {
     List<Record> getByClientUserId(Long clientId);
 
-    List<Record> getByStaffUserIdAndDateGreaterThanEqual(Long clientId, LocalDate date);
+    List<Record> getByStaffUserIdAndDateGreaterThanEqual(Long staffId, LocalDate date);
 
     boolean existsByDateIsAndTimeIs(LocalDate date, RecordTime time);
 }
