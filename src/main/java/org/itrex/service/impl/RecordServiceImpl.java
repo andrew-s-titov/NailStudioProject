@@ -64,7 +64,7 @@ public class RecordServiceImpl implements RecordService {
             log.debug("DatabaseEntryNotFoundException was thrown while executing getRecordsForStaffToDo method: {}", message);
             throw new DatabaseEntryNotFoundException(message);
         }
-        return recordRepo.getByStaffUserId(staffId).stream()
+        return recordRepo.getByStaffUserIdAndDateGreaterThanEqual(staffId, LocalDate.now()).stream()
                 .map(converter::toRecordForStaffToDoDTO)
                 .collect(Collectors.toList());
     }
@@ -131,7 +131,7 @@ public class RecordServiceImpl implements RecordService {
         }
 
         // remove booked time slot from the map for staff person
-        List<Record> recordsForStaffToDo = recordRepo.getByStaffUserId(staffId);
+        List<Record> recordsForStaffToDo = recordRepo.getByStaffUserIdAndDateGreaterThanEqual(staffId, LocalDate.now());
         recordsForStaffToDo.stream()
                 .filter(r -> timeSlotsFor3Months.containsKey(r.getDate()))
                 .forEach(r -> timeSlotsFor3Months.get(r.getDate()).remove(r.getTime()));

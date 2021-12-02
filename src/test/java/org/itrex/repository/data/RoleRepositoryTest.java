@@ -1,29 +1,29 @@
-package org.itrex.repository.impl;
+package org.itrex.repository.data;
 
-import org.itrex.TestBaseHibernateRepository;
 import org.itrex.entity.Role;
 import org.itrex.entity.enums.RoleType;
-import org.itrex.repository.RoleRepo;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Disabled("Using deprecated repository class")
-public class HibernateRoleRepoTest extends TestBaseHibernateRepository {
+@DataJpaTest
+public class RoleRepositoryTest {
+
     @Autowired
-    private RoleRepo repo;
+    RoleRepository roleRepository;
 
     @Test
     @DisplayName("findAll - should return a list of Roles")
     public void findAll() {
         // given & when
-        List<Role> roles = repo.findAll();
+        List<Role> roles = roleRepository.findAll();
 
         // then
         assertEquals(3, roles.size());
@@ -35,15 +35,14 @@ public class HibernateRoleRepoTest extends TestBaseHibernateRepository {
         // given & when
         RoleType roleType1 = RoleType.ADMIN;
         RoleType roleType2 = RoleType.STAFF;
-        Role role1 = repo.findByRoleType(roleType1).get();
-        Role role2 = repo.findByRoleType(roleType2).get();
+        Role role1 = roleRepository.findByRoleType(roleType1).get();
+        Role role2 = roleRepository.findByRoleType(roleType2).get();
 
         // then
         assertEquals(RoleType.ADMIN, role1.getRoleType());
         assertEquals(RoleType.STAFF, role2.getRoleType());
         assertEquals(1, role1.getRoleId());
     }
-
 
     @Test
     @DisplayName("findById with valid data - should return a Role with given id")
@@ -52,7 +51,7 @@ public class HibernateRoleRepoTest extends TestBaseHibernateRepository {
         Integer roleId = 1;
 
         // when
-        Role role = repo.findById(roleId).get();
+        Role role = roleRepository.findById(roleId).get();
 
         // then
         assertEquals(1, role.getRoleId());
@@ -66,7 +65,7 @@ public class HibernateRoleRepoTest extends TestBaseHibernateRepository {
         Integer roleId = 150;
 
         // when
-        Optional<Role> roleById = repo.findById(roleId);
+        Optional<Role> roleById = roleRepository.findById(roleId);
 
         // then
         assertTrue(roleById.isEmpty());

@@ -19,8 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -113,7 +111,7 @@ public class RecordServiceImplTest {
         // given
         Long staffId = 4L; // User with this id has 1 record-task as staff to-do and 1 done record-task
         when(userRepo.findById(staffId)).thenReturn(Optional.of(staff));
-        when(recordRepo.getByStaffUserId(staffId)).thenReturn(Collections.singletonList(record2));
+        when(recordRepo.getByStaffUserIdAndDateGreaterThanEqual(staffId, LocalDate.now())).thenReturn(Collections.singletonList(record2));
 
         // when
         List<RecordForStaffToDoDTO> recordsForStaffToDo = service.getRecordsForStaffToDo(staffId);
@@ -124,7 +122,7 @@ public class RecordServiceImplTest {
         assertEquals(record2.getDate(), recordsForStaffToDo.get(0).getDate());
 
         verify(userRepo).findById(staffId);
-        verify(recordRepo).getByStaffUserId(staffId);
+        verify(recordRepo).getByStaffUserIdAndDateGreaterThanEqual(staffId, LocalDate.now());
     }
 
     @Test
@@ -138,7 +136,7 @@ public class RecordServiceImplTest {
         assertThrows(DatabaseEntryNotFoundException.class, () -> service.getRecordsForStaffToDo(staffId));
 
         verify(userRepo).findById(staffId);
-        verify(recordRepo, never()).getByStaffUserId(staffId);
+        verify(recordRepo, never()).getByStaffUserIdAndDateGreaterThanEqual(staffId, LocalDate.now());
     }
 
     @Test
@@ -148,7 +146,7 @@ public class RecordServiceImplTest {
         // given
         Long staffId = 4L; // User with this id has 1 record as staff to-do
         when(userRepo.findById(staffId)).thenReturn(Optional.of(staff));
-        when(recordRepo.getByStaffUserId(staffId)).thenReturn(Collections.singletonList(record2));
+        when(recordRepo.getByStaffUserIdAndDateGreaterThanEqual(staffId, LocalDate.now())).thenReturn(Collections.singletonList(record2));
 
         // when
         Map<LocalDate, List<RecordTime>> result = service.getFreeRecordsFor3MonthsByStaffId(staffId);
@@ -158,7 +156,7 @@ public class RecordServiceImplTest {
         assertFalse(result.get(LocalDate.of(2021, 12, 31)).contains(RecordTime.SEVENTEEN));
 
         verify(userRepo).findById(staffId);
-        verify(recordRepo).getByStaffUserId(staffId);
+        verify(recordRepo).getByStaffUserIdAndDateGreaterThanEqual(staffId, LocalDate.now());
     }
 
     @Test
