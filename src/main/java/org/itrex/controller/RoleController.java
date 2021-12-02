@@ -25,7 +25,7 @@ public class RoleController {
 
     @GetMapping("/get/name/{roleName}")
     public ResponseEntity<RoleDTO> getRoleByName(@PathVariable String roleName) throws DatabaseEntryNotFoundException {
-        return ResponseEntity.ok(roleService.getRoleByName(roleName));
+        return ResponseEntity.ok(roleService.getByName(roleName));
     }
 
     @GetMapping("/get/id/{roleId}")

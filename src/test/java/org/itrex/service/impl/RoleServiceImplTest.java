@@ -4,7 +4,7 @@ import org.itrex.dto.RoleDTO;
 import org.itrex.entity.Role;
 import org.itrex.entity.enums.RoleType;
 import org.itrex.exception.DatabaseEntryNotFoundException;
-import org.itrex.repository.RoleRepo;
+import org.itrex.repository.data.RoleRepository;
 import org.itrex.service.RoleService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,13 +18,12 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class RoleServiceImplTest {
     @MockBean
-    private RoleRepo roleRepo;
+    private RoleRepository roleRepo;
     @Autowired
     private RoleService service;
 
@@ -35,7 +34,7 @@ public class RoleServiceImplTest {
         List<Role> roles = Arrays.asList(new Role(1, RoleType.ADMIN),
                 new Role(2, RoleType.STAFF),
                 new Role(3, RoleType.CLIENT));
-        when(roleRepo.getRoles()).thenReturn(roles);
+        when(roleRepo.findAll()).thenReturn(roles);
 
         // & when
         List<RoleDTO> returnedRoles = service.getRoles();
@@ -46,43 +45,38 @@ public class RoleServiceImplTest {
         assertEquals(RoleType.STAFF, returnedRoles.get(1).getRoleType());
         assertEquals(RoleType.CLIENT, returnedRoles.get(2).getRoleType());
 
-        verify(roleRepo).getRoles();
+        verify(roleRepo).findAll();
     }
 
     @Test
-    @DisplayName("getRoleByName with valid data - should return single RoleDTO with given name")
-    public void getRoleByName1() throws DatabaseEntryNotFoundException {
+    @DisplayName("getByName with valid data - should return single RoleDTO with given name")
+    public void getByName1() throws DatabaseEntryNotFoundException {
         // given
         String roleName1 = "admin";
-        String roleName2 = "AdmIN";
+        String roleName2 = "aDmIn";
         Role admin = new Role(1, RoleType.ADMIN);
-        when(roleRepo.getRoleByName(roleName1)).thenReturn(Optional.of(admin));
-        when(roleRepo.getRoleByName(roleName2)).thenReturn(Optional.of(admin));
+        when(roleRepo.findByRoleType(RoleType.ADMIN)).thenReturn(Optional.of(admin));
 
         // when
-        RoleDTO roleDTO1 = service.getRoleByName(roleName1);
-        RoleDTO roleDTO2 = service.getRoleByName(roleName2);
+        RoleDTO roleDTO1 = service.getByName(roleName1);
+        RoleDTO roleDTO2 = service.getByName(roleName2);
 
         // then
         assertEquals(RoleType.ADMIN, roleDTO1.getRoleType());
         assertEquals(RoleType.ADMIN, roleDTO2.getRoleType());
         assertEquals(1, roleDTO1.getRoleId());
 
-        verify(roleRepo).getRoleByName(roleName1);
-        verify(roleRepo).getRoleByName(roleName2);
+        verify(roleRepo, times(2)).findByRoleType(RoleType.ADMIN);
     }
 
     @Test
-    @DisplayName("getRoleByName with invalid data - should throw DatabaseEntryNotFoundException")
-    public void getRoleByName2() {
+    @DisplayName("getByName with invalid data - should throw DatabaseEntryNotFoundException")
+    public void getByName2() {
         // given
-        String roleName = "noRole"; // no such role
-        when(roleRepo.getRoleByName(roleName)).thenReturn(Optional.empty());
+        String roleName1 = "noRole"; // no such role
 
         // when & then
-        assertThrows(DatabaseEntryNotFoundException.class, () -> service.getRoleByName(roleName));
-
-        verify(roleRepo).getRoleByName(roleName);
+        assertThrows(DatabaseEntryNotFoundException.class, () -> service.getByName("noRole"));
     }
 
     @Test
@@ -90,7 +84,7 @@ public class RoleServiceImplTest {
     public void getRoleById1() throws DatabaseEntryNotFoundException {
         // given
         Integer roleId = 1;
-        when(roleRepo.getRoleById(roleId)).thenReturn(Optional.of(new Role(1, RoleType.ADMIN)));
+        when(roleRepo.findById(roleId)).thenReturn(Optional.of(new Role(1, RoleType.ADMIN)));
 
         // when
         RoleDTO roleDTO = service.getRoleById(roleId);
@@ -99,7 +93,7 @@ public class RoleServiceImplTest {
         assertEquals(1, roleDTO.getRoleId());
         assertEquals(RoleType.ADMIN, roleDTO.getRoleType());
 
-        verify(roleRepo).getRoleById(roleId);
+        verify(roleRepo).findById(roleId);
     }
 
     @Test
@@ -107,11 +101,11 @@ public class RoleServiceImplTest {
     public void getRoleById2() {
         // given
         Integer roleId = 150;
-        when(roleRepo.getRoleById(roleId)).thenReturn(Optional.empty());
+        when(roleRepo.findById(roleId)).thenReturn(Optional.empty());
 
         // when & then
         assertThrows(DatabaseEntryNotFoundException.class, () -> service.getRoleById(roleId));
 
-        verify(roleRepo).getRoleById(roleId);
+        verify(roleRepo).findById(roleId);
     }
 }

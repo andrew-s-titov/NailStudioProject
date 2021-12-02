@@ -5,16 +5,17 @@ import org.itrex.entity.User;
 import java.util.List;
 import java.util.Optional;
 
+@Deprecated
 public interface UserRepo {
-    List<User> getAll();
+    List<User> findAll();
 
-    Optional<User> getUserById(Long userId);
+    Optional<User> findById(Long userId);
 
-    Optional<User> getUserByPhone(String phone);
+    Optional<User> findByPhone(String phone);
 
-    User createUser(User user);
+    User save(User user);
 
-    void deleteUser(User user);
+    void delete(User user);
 
     void updateUserInfo(User user);
 }

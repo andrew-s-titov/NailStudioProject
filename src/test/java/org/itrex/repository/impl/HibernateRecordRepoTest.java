@@ -6,6 +6,7 @@ import org.itrex.entity.Record;
 import org.itrex.entity.User;
 import org.itrex.entity.enums.RecordTime;
 import org.itrex.repository.RecordRepo;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled("Using deprecated repository class")
 public class HibernateRecordRepoTest extends TestBaseHibernateRepository {
     @Autowired
     private RecordRepo repo;
@@ -23,10 +25,10 @@ public class HibernateRecordRepoTest extends TestBaseHibernateRepository {
     private Session session;
 
     @Test
-    @DisplayName("getAll - should return 4 Records equal to testdata migration script")
-    public void getAll() {
+    @DisplayName("findAll - should return 4 Records equal to testdata migration script")
+    public void findAll() {
         // given & when
-        List<Record> records = repo.getAll();
+        List<Record> records = repo.findAll();
 
         // then
         assertEquals(recordsTableInitialTestSize, records.size());
@@ -40,11 +42,11 @@ public class HibernateRecordRepoTest extends TestBaseHibernateRepository {
     }
 
     @Test
-    @DisplayName("getRecordById with valid data - should return existing Record")
-    public void getRecordById1() {
+    @DisplayName("findById with valid data - should return existing Record")
+    public void findById1() {
         // given & when
-        Record record1 = repo.getRecordById(1L).get();
-        Record record3 = repo.getRecordById(3L).get();
+        Record record1 = repo.findById(1L).get();
+        Record record3 = repo.findById(3L).get();
 
         // then
         assertEquals(1, record1.getRecordId());
@@ -58,15 +60,15 @@ public class HibernateRecordRepoTest extends TestBaseHibernateRepository {
     }
 
     @Test
-    @DisplayName("getRecordById with invalid data - should return empty Optional")
-    public void getRecordById2() {
+    @DisplayName("findById with invalid data - should return empty Optional")
+    public void findById2() {
         // given
         Long recordId1 = 7L;
         Long recordId2 = 180L;
 
         // when
-        Optional<Record> recordById1 = repo.getRecordById(recordId1);
-        Optional<Record> recordById2 = repo.getRecordById(recordId2);
+        Optional<Record> recordById1 = repo.findById(recordId1);
+        Optional<Record> recordById2 = repo.findById(recordId2);
 
         // when & then
         assertTrue(recordById1.isEmpty());
@@ -118,8 +120,8 @@ public class HibernateRecordRepoTest extends TestBaseHibernateRepository {
     }
 
     @Test
-    @DisplayName("createRecord with valid data - records table should contain added Record")
-    public void createRecord() {
+    @DisplayName("save with valid data - records table should contain added Record")
+    public void save() {
         // given
         session = getSessionFactory().openSession();
         Long userId = 1L; // this User client has 2 records
@@ -136,11 +138,11 @@ public class HibernateRecordRepoTest extends TestBaseHibernateRepository {
                 .build();
 
         // when
-        Record createdRecord = repo.createRecord(record);
+        Record createdRecord = repo.save(record);
 
         // then
         session = getSessionFactory().openSession();
-        assertEquals(recordsTableInitialTestSize + 1, repo.getAll().size());
+        assertEquals(recordsTableInitialTestSize + 1, repo.findAll().size());
         assertEquals(1, session.createQuery("FROM Record WHERE date = :date")
                 .setParameter("date", LocalDate.of(2021, 12, 30))
                 .list().size());

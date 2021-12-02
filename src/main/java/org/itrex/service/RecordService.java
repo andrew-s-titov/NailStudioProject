@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface RecordService {
-    List<RecordForAdminDTO> getAll();
+    List<RecordForAdminDTO> findAll();
 
     List<RecordOfClientDTO> getRecordsForClient(Long clientId) throws DatabaseEntryNotFoundException;
 

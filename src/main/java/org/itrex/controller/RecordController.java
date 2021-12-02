@@ -28,7 +28,7 @@ public class RecordController {
     // TODO: restrict use - only for admin
     @GetMapping("/get/all")
     public ResponseEntity<List<RecordForAdminDTO>> getAll() {
-        return ResponseEntity.ok(recordService.getAll());
+        return ResponseEntity.ok(recordService.findAll());
     }
 
     @GetMapping("/get/for_client/{clientId}")

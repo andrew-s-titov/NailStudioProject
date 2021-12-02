@@ -5,16 +5,17 @@ import org.itrex.entity.Record;
 import java.util.List;
 import java.util.Optional;
 
+@Deprecated
 public interface RecordRepo {
-    List<Record> getAll();
+    List<Record> findAll();
 
-    Optional<Record> getRecordById(Long id);
+    Optional<Record> findById(Long id);
 
     List<Record> getRecordsForClient(Long clientId);
 
     List<Record> getRecordsForStaffToDo(Long staffId);
 
-    Record createRecord(Record record);
+    Record save(Record record);
 
     void deleteRecord(Record record);
 }

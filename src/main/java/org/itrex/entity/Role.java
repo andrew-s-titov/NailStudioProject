@@ -21,7 +21,7 @@ public class Role {
 
     @Column(name = "role_name", nullable = false)
     @Enumerated(value = EnumType.STRING)
-    private RoleType roletype;
+    private RoleType roleType;
 
     @EqualsAndHashCode.Exclude
     @ManyToMany(mappedBy = "userRoles")
@@ -30,11 +30,11 @@ public class Role {
     @Builder
     public Role(Integer roleId, RoleType roleType) {
         this.roleId = roleId;
-        this.roletype = roleType;
+        this.roleType = roleType;
     }
 
     @Override
     public String toString() {
-        return roletype.name();
+        return roleType.name();
     }
 }

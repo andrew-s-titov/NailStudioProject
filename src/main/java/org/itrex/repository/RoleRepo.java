@@ -1,14 +1,16 @@
 package org.itrex.repository;
 
 import org.itrex.entity.Role;
+import org.itrex.entity.enums.RoleType;
 
 import java.util.List;
 import java.util.Optional;
 
+@Deprecated
 public interface RoleRepo {
-    List<Role> getRoles();
+    List<Role> findAll();
 
-    Optional<Role> getRoleByName(String name);
+    Optional<Role> findByRoleType(RoleType roleType);
 
-    Optional<Role> getRoleById(Integer id);
+    Optional<Role> findById(Integer roleId);
 }

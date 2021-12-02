@@ -1,11 +1,9 @@
 package org.itrex.repository.impl;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.itrex.entity.Record;
-import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.repository.RecordRepo;
 import org.springframework.stereotype.Repository;
 
@@ -13,15 +11,15 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @RequiredArgsConstructor
 @Repository
+@Deprecated
 public class HibernateRecordRepo implements RecordRepo {
     private final SessionFactory sessionFactory;
     private Session session;
 
     @Override
-    public List<Record> getAll() {
+    public List<Record> findAll() {
         session = sessionFactory.openSession();
         List<Record> records = session.createQuery("FROM Record", Record.class).list();
         session.close();
@@ -29,7 +27,7 @@ public class HibernateRecordRepo implements RecordRepo {
     }
 
     @Override
-    public Optional<Record> getRecordById(Long id) {
+    public Optional<Record> findById(Long id) {
         Optional<Record> optionalRecord = Optional.empty();
         session = sessionFactory.openSession();
         Record record = session.get(Record.class, id);
@@ -62,7 +60,7 @@ public class HibernateRecordRepo implements RecordRepo {
     }
 
     @Override
-    public Record createRecord(Record record) {
+    public Record save(Record record) {
         session = sessionFactory.openSession();
         Long recordId = (Long) session.save(record);
         Record createdRecord = session.load(Record.class, recordId);

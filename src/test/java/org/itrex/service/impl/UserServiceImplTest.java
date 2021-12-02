@@ -13,14 +13,16 @@ import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.exception.DeletingClientWithActiveRecordsException;
 import org.itrex.exception.RoleManagementException;
 import org.itrex.exception.UserExistsException;
-import org.itrex.repository.RecordRepo;
-import org.itrex.repository.UserRepo;
+import org.itrex.repository.data.RecordRepository;
+import org.itrex.repository.data.UserRepository;
 import org.itrex.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -32,9 +34,9 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 public class UserServiceImplTest {
     @MockBean
-    private UserRepo userRepo;
+    private UserRepository userRepo;
     @MockBean
-    private RecordRepo recordRepo;
+    private RecordRepository recordRepo;
     @Autowired
     private UserService service;
 
@@ -47,7 +49,8 @@ public class UserServiceImplTest {
     @DisplayName("getAll - should return all UserResponseDTO with data equal to given Users")
     public void getAll() {
         // given
-        when(userRepo.getAll()).thenReturn(Arrays.asList(user1, user4));
+        List<User> someUsers = Arrays.asList(user1, user4);
+        when(userRepo.findAll(Pageable.ofSize(20))).thenReturn(new PageImpl<>(someUsers));
 
         // when
         List<UserResponseDTO> users = service.getAll();
@@ -62,7 +65,7 @@ public class UserServiceImplTest {
         assertEquals(user4.getUserId(), users.get(1).getUserId());
         assertEquals(user4.getPhone(), users.get(1).getPhone());
 
-        verify(userRepo).getAll();
+        verify(userRepo).findAll(Pageable.ofSize(20));
     }
 
     @Test
@@ -70,7 +73,7 @@ public class UserServiceImplTest {
     public void getUserById1() throws DatabaseEntryNotFoundException {
         // given
         Long userId = 1L;
-        when(userRepo.getUserById(userId)).thenReturn(Optional.of(user1));
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user1));
 
         // when
         UserResponseDTO user = service.getUserById(userId);
@@ -79,7 +82,7 @@ public class UserServiceImplTest {
         assertEquals(userId, user.getUserId());
         assertEquals(user1.getPhone(), user.getPhone());
 
-        verify(userRepo).getUserById(userId);
+        verify(userRepo).findById(userId);
     }
 
     @Test
@@ -87,12 +90,12 @@ public class UserServiceImplTest {
     public void getUserById2() {
         // given
         long userId = 7L; // there are no Users with this id
-        when(userRepo.getUserById(userId)).thenReturn(Optional.empty());
+        when(userRepo.findById(userId)).thenReturn(Optional.empty());
 
         // when & then
         assertThrows(DatabaseEntryNotFoundException.class, () -> service.getUserById(userId));
 
-        verify(userRepo).getUserById(userId);
+        verify(userRepo).findById(userId);
     }
 
     @Test
@@ -110,8 +113,8 @@ public class UserServiceImplTest {
         User createdUser = getNewUser();
         createdUser.setUserId(2L);
 
-        when(userRepo.getUserByPhone(userCreateDTO.getPhone())).thenReturn(Optional.empty());
-        when(userRepo.createUser(newUser)).thenReturn(createdUser);
+        when(userRepo.findByPhone(userCreateDTO.getPhone())).thenReturn(Optional.empty());
+        when(userRepo.save(newUser)).thenReturn(createdUser);
 
         // when
         UserResponseDTO userResponseDTO = service.createUser(userCreateDTO);
@@ -120,8 +123,8 @@ public class UserServiceImplTest {
         assertEquals(userCreateDTO.getPhone(), userResponseDTO.getPhone());
         assertEquals(2, userResponseDTO.getUserId());
 
-        verify(userRepo).getUserByPhone(userCreateDTO.getPhone());
-        verify(userRepo).createUser(newUser);
+        verify(userRepo).findByPhone(userCreateDTO.getPhone());
+        verify(userRepo).save(newUser);
     }
 
     @Test
@@ -134,13 +137,13 @@ public class UserServiceImplTest {
                 .phone(user1.getPhone())
                 .build();
         String phone = user1.getPhone();
-        when(userRepo.getUserByPhone(phone)).thenReturn(Optional.of(user1));
+        when(userRepo.findByPhone(phone)).thenReturn(Optional.of(user1));
 
         // then & when
         assertThrows(UserExistsException.class, () -> service.createUser(userCreateDTO));
 
-        verify(userRepo).getUserByPhone(userCreateDTO.getPhone());
-        verify(userRepo, never()).createUser(user1);
+        verify(userRepo).findByPhone(userCreateDTO.getPhone());
+        verify(userRepo, never()).save(user1);
     }
 
     @Test
@@ -148,16 +151,16 @@ public class UserServiceImplTest {
     public void deleteUser1() {
         // given
         Long userId = 1L;
-        when(userRepo.getUserById(userId)).thenReturn(Optional.of(user1));
-        when(recordRepo.getRecordsForClient(userId)).thenReturn(Collections.emptyList());
-        doNothing().when(userRepo).deleteUser(user1);
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user1));
+        when(recordRepo.getByClientUserId(userId)).thenReturn(Collections.emptyList());
+        doNothing().when(userRepo).delete(user1);
 
         // when & then
         assertDoesNotThrow(() -> service.deleteUser(userId));
 
-        verify(userRepo).getUserById(userId);
-        verify(recordRepo).getRecordsForClient(userId);
-        verify(userRepo).deleteUser(user1);
+        verify(userRepo).findById(userId);
+        verify(recordRepo).getByClientUserId(userId);
+        verify(userRepo).delete(user1);
     }
 
     @Test
@@ -165,17 +168,17 @@ public class UserServiceImplTest {
     public void deleteUser2() {
         // given
         Long userId = 1L; // this User has 1 future record
-        when(userRepo.getUserById(userId)).thenReturn(Optional.of(user1));
-        when(recordRepo.getRecordsForClient(userId)).thenReturn(Collections.singletonList(Record.builder()
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user1));
+        when(recordRepo.getByClientUserId(userId)).thenReturn(Collections.singletonList(Record.builder()
                 .date(LocalDate.of(2050, 12, 31))
                 .build()));
 
         // when & then
         assertThrows(DeletingClientWithActiveRecordsException.class, () -> service.deleteUser(userId));
 
-        verify(userRepo).getUserById(userId);
-        verify(recordRepo).getRecordsForClient(userId);
-        verify(userRepo, never()).deleteUser(user1);
+        verify(userRepo).findById(userId);
+        verify(recordRepo).getByClientUserId(userId);
+        verify(userRepo, never()).delete(user1);
     }
 
     @Test
@@ -183,8 +186,8 @@ public class UserServiceImplTest {
     public void updateUserInfo1() {
         // given
         Long userId = 1L;
-        when(userRepo.getUserById(userId)).thenReturn(Optional.of(user1));
-        doNothing().when(userRepo).updateUserInfo(user1);
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user1));
+        when(userRepo.save(user1)).thenReturn(user1);
 
         String newEmail = "my_new_email@mail.ru";
         UserUpdateDTO user = UserUpdateDTO.builder()
@@ -195,8 +198,8 @@ public class UserServiceImplTest {
         // when & then
         assertDoesNotThrow(() -> service.updateUserInfo(user));
 
-        verify(userRepo).getUserById(userId);
-        verify(userRepo).updateUserInfo(user1);
+        verify(userRepo).findById(userId);
+        verify(userRepo).save(user1);
     }
 
     @Test
@@ -204,7 +207,7 @@ public class UserServiceImplTest {
     public void updateUserInfo2() {
         // given
         Long userId = 1L;
-        when(userRepo.getUserById(userId)).thenReturn(Optional.of(user1));
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user1));
 
         UserUpdateDTO user = UserUpdateDTO.builder()
                 .userId(user1.getUserId())
@@ -216,8 +219,8 @@ public class UserServiceImplTest {
         // when & then
         assertDoesNotThrow(() -> service.updateUserInfo(user));
 
-        verify(userRepo).getUserById(userId);
-        verify(userRepo, never()).updateUserInfo(user1);
+        verify(userRepo).findById(userId);
+        verify(userRepo, never()).save(user1);
     }
 
     @Test
@@ -225,7 +228,7 @@ public class UserServiceImplTest {
     public void changeClientDiscount() {
         // given
         Long userId = 1L;
-        when(userRepo.getUserById(userId)).thenReturn(Optional.of(user1));
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user1));
         Discount oldDiscount = user1.getDiscount();
         Discount newDiscount = Discount.TEN;
 
@@ -233,8 +236,8 @@ public class UserServiceImplTest {
         assertDoesNotThrow(() -> service.changeClientDiscount(userId, oldDiscount)); // shouldn't call repo method
         assertDoesNotThrow(() -> service.changeClientDiscount(userId, newDiscount));
 
-        verify(userRepo, times(2)).getUserById(userId);
-        verify(userRepo).updateUserInfo(user1);
+        verify(userRepo, times(2)).findById(userId);
+        verify(userRepo).save(user1);
     }
 
     @Test
@@ -244,13 +247,13 @@ public class UserServiceImplTest {
         Long userId = 1L;
         user1.setUserRoles(new HashSet<>(Collections.singletonList(new Role(1, RoleType.ADMIN))));
         RoleDTO role = new RoleDTO(2, RoleType.STAFF);
-        when(userRepo.getUserById(userId)).thenReturn(Optional.of(user1));
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user1));
 
         // when & then
         assertDoesNotThrow(() -> service.addRoleForUser(userId, role));
 
-        verify(userRepo).getUserById(userId);
-        verify(userRepo).updateUserInfo(user1);
+        verify(userRepo).findById(userId);
+        verify(userRepo).save(user1);
 
         user1.setUserRoles(null);
     }
@@ -262,13 +265,13 @@ public class UserServiceImplTest {
         Long userId = 1L;
         user1.setUserRoles(new HashSet<>(Collections.singletonList(new Role(1, RoleType.ADMIN))));
         RoleDTO role = new RoleDTO(1, RoleType.ADMIN);
-        when(userRepo.getUserById(userId)).thenReturn(Optional.of(user1));
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user1));
 
         // when & then
         assertThrows(RoleManagementException.class, () -> service.addRoleForUser(userId, role));
 
-        verify(userRepo).getUserById(userId);
-        verify(userRepo, never()).updateUserInfo(user1);
+        verify(userRepo).findById(userId);
+        verify(userRepo, never()).save(user1);
 
         user1.setUserRoles(null);
     }
@@ -280,13 +283,13 @@ public class UserServiceImplTest {
         Long userId = 1L;
         user1.setUserRoles(new HashSet<>(Arrays.asList(new Role(1, RoleType.ADMIN), new Role(2, RoleType.STAFF))));
         RoleDTO role = new RoleDTO(1, RoleType.ADMIN);
-        when(userRepo.getUserById(userId)).thenReturn(Optional.of(user1));
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user1));
 
         // when & then
         assertDoesNotThrow(() -> service.revokeRole(userId, role));
 
-        verify(userRepo).getUserById(userId);
-        verify(userRepo).updateUserInfo(user1);
+        verify(userRepo).findById(userId);
+        verify(userRepo).save(user1);
 
         user1.setUserRoles(null);
     }
@@ -298,13 +301,13 @@ public class UserServiceImplTest {
         Long userId = 1L;
         user1.setUserRoles(new HashSet<>(Collections.singletonList(new Role(1, RoleType.ADMIN))));
         RoleDTO role = new RoleDTO(1, RoleType.ADMIN);
-        when(userRepo.getUserById(userId)).thenReturn(Optional.of(user1));
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user1));
 
         // when & then
         assertThrows(RoleManagementException.class, () -> service.revokeRole(userId, role));
 
-        verify(userRepo).getUserById(userId);
-        verify(userRepo, never()).updateUserInfo(user1);
+        verify(userRepo).findById(userId);
+        verify(userRepo, never()).save(user1);
 
         user1.setUserRoles(null);
     }

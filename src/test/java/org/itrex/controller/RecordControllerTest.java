@@ -43,7 +43,7 @@ public class RecordControllerTest extends BaseControllerTest {
     public void getAll() throws Exception {
         // given
         List<RecordForAdminDTO> records = Collections.singletonList(RecordForAdminDTO.builder().recordId(4L).build());
-        when(recordService.getAll()).thenReturn(records);
+        when(recordService.findAll()).thenReturn(records);
 
         // when & then
         MvcResult mvcResult = mockMvc.perform(get("/records/get/all"))

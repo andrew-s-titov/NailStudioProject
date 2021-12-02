@@ -6,7 +6,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.itrex.entity.User;
-import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.repository.UserRepo;
 import org.springframework.stereotype.Repository;
 
@@ -17,12 +16,13 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @Repository
+@Deprecated
 public class HibernateUserRepo implements UserRepo {
     private final SessionFactory sessionFactory;
     private Session session;
 
     @Override
-    public List<User> getAll() {
+    public List<User> findAll() {
         List<User> users;
         session = sessionFactory.openSession();
         users = session.createQuery("FROM User", User.class).list();
@@ -31,7 +31,7 @@ public class HibernateUserRepo implements UserRepo {
     }
 
     @Override
-    public Optional<User> getUserById(Long userId) {
+    public Optional<User> findById(Long userId) {
         Optional <User> optionalUser = Optional.empty();
         session = sessionFactory.openSession();
         User user = session.get(User.class, userId);
@@ -43,7 +43,7 @@ public class HibernateUserRepo implements UserRepo {
     }
 
     @Override
-    public Optional<User> getUserByPhone(String phone) {
+    public Optional<User> findByPhone(String phone) {
         Optional <User> optionalUser;
         session = sessionFactory.openSession();
         optionalUser = session.createQuery("FROM User WHERE phone = :phone", User.class)
@@ -56,7 +56,7 @@ public class HibernateUserRepo implements UserRepo {
     }
 
     @Override
-    public User createUser(User user) {
+    public User save(User user) {
         Long userId;
         session = sessionFactory.openSession();
         userId = (Long) session.save(user);
@@ -66,7 +66,7 @@ public class HibernateUserRepo implements UserRepo {
     }
 
     @Override
-    public void deleteUser(User user) {
+    public void delete(User user) {
         inSession(() -> {
             session.beginTransaction();
             try {

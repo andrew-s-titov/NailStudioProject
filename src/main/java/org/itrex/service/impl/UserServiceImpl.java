@@ -15,10 +15,15 @@ import org.itrex.exception.RoleManagementException;
 import org.itrex.exception.UserExistsException;
 import org.itrex.repository.RecordRepo;
 import org.itrex.repository.UserRepo;
+import org.itrex.repository.data.RecordRepository;
+import org.itrex.repository.data.UserRepository;
 import org.itrex.service.UserService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -28,8 +33,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
-    private final UserRepo userRepo;
-    private final RecordRepo recordRepo;
+    private final UserRepository userRepo;
+    private final RecordRepository recordRepo;
     private final UserDTOConverter userDTOConverter;
     private final RoleDTOConverter roleDTOConverter;
 
@@ -41,7 +46,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserCreditsDTO getUserByPhone(String phone) throws DatabaseEntryNotFoundException {
-        Optional<User> optionalUser = userRepo.getUserByPhone(phone);
+        Optional<User> optionalUser = userRepo.findByPhone(phone);
         if (optionalUser.isEmpty()) {
             String message = String.format("User with phone number %s wasn't found", phone);
             log.debug("DatabaseEntryNotFoundException was thrown while executing getUserById method: {}", message);
@@ -52,30 +57,35 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponseDTO> getAll() {
-        return userRepo.getAll().stream()
-                .map(userDTOConverter::toUserResponseDTO)
-                .collect(Collectors.toList());
+        Slice<User> slice = userRepo.findAll(Pageable.ofSize(20));
+        if (slice.hasContent()) {
+            return slice.getContent().stream()
+                    .map(userDTOConverter::toUserResponseDTO)
+                    .collect(Collectors.toList());
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     @Override
     public UserResponseDTO createUser(UserCreateDTO user) throws UserExistsException {
         String phone = user.getPhone();
-        if (userRepo.getUserByPhone(phone).isPresent()) {
+        if (userRepo.findByPhone(phone).isPresent()) {
             throw new UserExistsException(phone);
         }
         User newUser = userDTOConverter.fromUserCreateDTO(user);
-        User createdUser = userRepo.createUser(newUser);
+        User createdUser = userRepo.save(newUser);
         return userDTOConverter.toUserResponseDTO(createdUser);
     }
 
     @Override
     public void deleteUser(Long userId) throws DeletingClientWithActiveRecordsException, DatabaseEntryNotFoundException {
         User user = checkIfUserExists(userId);
-        List<Record> records = recordRepo.getRecordsForClient(userId);
+        List<Record> records = recordRepo.getByClientUserId(userId);
         if (hasActiveRecords(records)) {
             throw new DeletingClientWithActiveRecordsException(userId);
         }
-        userRepo.deleteUser(user);
+        userRepo.delete(user);
     }
 
     @Override
@@ -95,7 +105,7 @@ public class UserServiceImpl implements UserService {
             user.setEmail(userUpdateDTO.getEmail());
         }
         if (needUpdate) { // avoiding unnecessary request to db
-            userRepo.updateUserInfo(user);
+            userRepo.save(user);
         }
     }
 
@@ -104,7 +114,7 @@ public class UserServiceImpl implements UserService {
         User user = checkIfUserExists(clientId);
         if (!user.getDiscount().equals(newDiscount)) { // avoiding unnecessary request to db
             user.setDiscount(newDiscount);
-            userRepo.updateUserInfo(user);
+            userRepo.save(user);
         }
     }
 
@@ -121,7 +131,7 @@ public class UserServiceImpl implements UserService {
             throw new RoleManagementException(message);
         }
         user.getUserRoles().add(role);
-        userRepo.updateUserInfo(user);
+        userRepo.save(user);
     }
 
     @Override
@@ -139,7 +149,7 @@ public class UserServiceImpl implements UserService {
             throw new RoleManagementException(message);
         }
         user.getUserRoles().remove(role);
-        userRepo.updateUserInfo(user);
+        userRepo.save(user);
     }
 
     private boolean hasActiveRecords(List<Record> records) {
@@ -151,7 +161,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private User checkIfUserExists(Long userId) throws DatabaseEntryNotFoundException {
-        Optional<User> optionalUser = userRepo.getUserById(userId);
+        Optional<User> optionalUser = userRepo.findById(userId);
         if (optionalUser.isEmpty()) {
             String message = String.format("User with id %s wasn't found", userId);
             log.debug(message + "DatabaseEntryNotFoundException was thrown while executing getUserById method.");

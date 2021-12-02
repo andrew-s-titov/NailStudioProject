@@ -8,7 +8,7 @@ import java.util.List;
 public interface RoleService {
     List<RoleDTO> getRoles();
 
-    RoleDTO getRoleByName(String name) throws DatabaseEntryNotFoundException;
+    RoleDTO getByName(String name) throws DatabaseEntryNotFoundException;
 
     RoleDTO getRoleById(Integer id) throws DatabaseEntryNotFoundException;
 }

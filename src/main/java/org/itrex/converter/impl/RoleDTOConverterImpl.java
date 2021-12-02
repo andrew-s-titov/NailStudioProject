@@ -19,7 +19,7 @@ public class RoleDTOConverterImpl implements RoleDTOConverter {
     public RoleDTO toRoleDTO(Role roleEntity) {
         return RoleDTO.builder()
                 .roleId(roleEntity.getRoleId())
-                .roleType(roleEntity.getRoletype())
+                .roleType(roleEntity.getRoleType())
                 .build();
     }
 }

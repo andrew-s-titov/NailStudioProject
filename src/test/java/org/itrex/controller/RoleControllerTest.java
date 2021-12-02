@@ -49,11 +49,11 @@ public class RoleControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @DisplayName("getRoleByName with valid data - should return json with data equal to Role with given name")
-    public void getRoleByName1() throws Exception {
+    @DisplayName("getByName with valid data - should return json with data equal to Role with given name")
+    public void getByName1() throws Exception {
         // given
         String roleName = "aDmIn";
-        when(roleService.getRoleByName(roleName)).thenReturn(role1);
+        when(roleService.getByName(roleName)).thenReturn(role1);
 
         // when & then
         MvcResult mvcResult = mockMvc.perform(get("/roles/get/name/" + roleName))
@@ -65,11 +65,11 @@ public class RoleControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @DisplayName("getRoleByName with invalid data - should handle DatabaseEntryNotFoundException")
-    public void getRoleByName2() throws Exception {
+    @DisplayName("getByName with invalid data - should handle DatabaseEntryNotFoundException")
+    public void getByName2() throws Exception {
         // given
         String roleName = "nonExistingRole";
-        when(roleService.getRoleByName(roleName)).thenThrow(DatabaseEntryNotFoundException.class);
+        when(roleService.getByName(roleName)).thenThrow(DatabaseEntryNotFoundException.class);
 
         // when & then
         MvcResult mvcResult = mockMvc.perform(get("/roles/get/name/" + roleName))

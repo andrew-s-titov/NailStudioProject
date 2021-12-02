@@ -7,6 +7,7 @@ import org.itrex.entity.User;
 import org.itrex.repository.UserRepo;
 import org.itrex.util.PasswordEncryption;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled("Using deprecated repository class")
 public class HibernateUserRepoTest extends TestBaseHibernateRepository {
     @Autowired
     private UserRepo repo;
@@ -24,10 +26,10 @@ public class HibernateUserRepoTest extends TestBaseHibernateRepository {
     private Session session;
 
     @Test
-    @DisplayName("getAll - should return all Users equal to testdata migration script")
-    public void getAll() {
+    @DisplayName("findAll - should return all Users equal to testdata migration script")
+    public void findAll() {
         // given & when
-        List<User> users = repo.getAll();
+        List<User> users = repo.findAll();
 
         // then
         assertEquals(usersTableInitialTestSize, users.size());
@@ -41,13 +43,13 @@ public class HibernateUserRepoTest extends TestBaseHibernateRepository {
     }
 
     @Test
-    @DisplayName("getUserById with valid data - should return a User with given id")
-    public void getUserById1() {
+    @DisplayName("findById with valid data - should return a User with given id")
+    public void findById1() {
         // given
         Long userId = 1L;
 
         // when
-        User user = repo.getUserById(userId).get();
+        User user = repo.findById(userId).get();
 
         // then
         assertEquals(userId, user.getUserId());
@@ -55,26 +57,26 @@ public class HibernateUserRepoTest extends TestBaseHibernateRepository {
     }
 
     @Test
-    @DisplayName("getUserById with invalid data - should throw DatabaseEntryNotFoundException")
-    public void getUserById2() {
+    @DisplayName("findById with invalid data - should throw DatabaseEntryNotFoundException")
+    public void findById2() {
         // given
         Long userId = 7L; // there are no Users with this id
 
         // when
-        Optional<User> userById = repo.getUserById(userId);
+        Optional<User> userById = repo.findById(userId);
 
         // when & then
         assertTrue(userById.isEmpty());
     }
 
     @Test
-    @DisplayName("getUserByPhone with valid data - should return a User with given phone number")
-    public void getUserByPhone1() {
+    @DisplayName("findByPhone with valid data - should return a User with given phone number")
+    public void findByPhone1() {
         // given
         String phone = "+1946484888";
 
         // when
-        User user = repo.getUserByPhone(phone).get();
+        User user = repo.findByPhone(phone).get();
 
         // then
         assertEquals(phone, user.getPhone());
@@ -83,21 +85,21 @@ public class HibernateUserRepoTest extends TestBaseHibernateRepository {
     }
 
     @Test
-    @DisplayName("getUserByPhone with invalid data - should return null")
-    public void getUserByPhone2() {
+    @DisplayName("findByPhone with invalid data - should return null")
+    public void findByPhone2() {
         // given
         String phone = "+7777777777"; // there are no Users with this phone number
 
         // when
-        Optional<User> userByPhone = repo.getUserByPhone(phone);
+        Optional<User> userByPhone = repo.findByPhone(phone);
 
         // then
         assertTrue(userByPhone.isEmpty());
     }
 
     @Test
-    @DisplayName("createUser with valid data - users table should contain given User")
-    public void createUser1() {
+    @DisplayName("save with valid data - users table should contain given User")
+    public void save1() {
         // given
         User user = User.builder()
                 .password(PasswordEncryption.getEncryptedPassword("notSoStrongPassword"))
@@ -108,7 +110,7 @@ public class HibernateUserRepoTest extends TestBaseHibernateRepository {
                 .build();
 
         // when
-        User returnedUser = repo.createUser(user);
+        User returnedUser = repo.save(user);
 
         // then
         session = getSessionFactory().openSession();
@@ -121,8 +123,8 @@ public class HibernateUserRepoTest extends TestBaseHibernateRepository {
     }
 
     @Test
-    @DisplayName("createUser with invalid data - should throw an Exception")
-    public void createUser2() {
+    @DisplayName("save with invalid data - should throw an Exception")
+    public void save2() {
         // given
         User user = User.builder()
                 .password(PasswordEncryption.getEncryptedPassword("notSoStrongPassword"))
@@ -134,13 +136,13 @@ public class HibernateUserRepoTest extends TestBaseHibernateRepository {
                 .build();
 
         // when & then
-        assertThrows(Exception.class, () -> repo.createUser(user));
+        assertThrows(Exception.class, () -> repo.save(user));
     }
 
     @Test
-    @DisplayName("deleteUser with valid data - should delete User, all Records for User as client should be deleted, " +
+    @DisplayName("delete with valid data - should delete User, all Records for User as client should be deleted, " +
             "all Records for User as staff should remain with FK set to NULL")
-    public void deleteUser() {
+    public void delete() {
         // given
         session = getSessionFactory().openSession();
         Long userId = 1L;
@@ -148,7 +150,7 @@ public class HibernateUserRepoTest extends TestBaseHibernateRepository {
         session.close();
 
         // when
-        repo.deleteUser(user);
+        repo.delete(user);
 
         // then
         session = getSessionFactory().openSession();
