@@ -22,3 +22,8 @@ spring:
     view:
       prefix: /WEB-INF/jsp/
       suffix: .jsp
+
+jwt:
+  secret_key: t33Th0FsH4rK4R3Sh4Rp4sFck
+  issuer: org.itrex.java.lab
+  expiration_millis: 86400000

@@ -1,7 +1,6 @@
 package org.itrex.repository.data;
 
 import org.itrex.entity.User;
-import org.itrex.util.PasswordEncryption;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,7 +102,7 @@ public class UserRepositoryTest {
     public void save1() {
         // given
         User user = User.builder()
-                .password(PasswordEncryption.getEncryptedPassword("notSoStrongPassword"))
+                .password("notSoStrongPassword")
                 .firstName("Freddy")
                 .lastName("Krueger")
                 .phone("1900909Fred")
@@ -124,7 +123,7 @@ public class UserRepositoryTest {
     public void save2() {
         // given
         User user = User.builder()
-                .password(PasswordEncryption.getEncryptedPassword("notSoStrongPassword"))
+                .password("notSoStrongPassword")
                 .firstName("Freddy")
                 .lastName("Krueger")
                 // shouldn't exceed 13 chars

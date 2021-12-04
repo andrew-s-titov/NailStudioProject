@@ -5,6 +5,7 @@ import org.itrex.dto.RoleDTO;
 import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.service.RoleService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @RestController
 @RequestMapping("roles")
+@Secured("ADMIN")
 public class RoleController {
     private final RoleService roleService;
 

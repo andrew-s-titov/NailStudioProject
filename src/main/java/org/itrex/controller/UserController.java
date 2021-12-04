@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -27,7 +28,7 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
-    // TODO: restrict use - only for admin and staff
+    @Secured({"ADMIN", "STAFF"})
     @GetMapping("/get/all")
     public ResponseEntity<List<UserResponseDTO>> getAll
     (@PageableDefault(size = 20)
@@ -38,44 +39,46 @@ public class UserController {
         return ResponseEntity.ok(userService.getAll(pageable));
     }
 
+    @Secured({"ADMIN", "STAFF"})
     @GetMapping("/get/{userId}")
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long userId) throws DatabaseEntryNotFoundException {
         return ResponseEntity.ok(userService.getUserById(userId));
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserCreateDTO user) throws UserExistsException {
+    @PostMapping("/register")
+    public ResponseEntity<UserResponseDTO> registerUser(@Valid @RequestBody UserCreateDTO user) throws UserExistsException {
         return ResponseEntity.ok(userService.createUser(user));
     }
 
-    // TODO: restrict use - only for admin
+    @Secured("ADMIN")
     @DeleteMapping("/delete/{userId}")
     public ResponseEntity<Object> deleteUser(@PathVariable Long userId) throws DeletingClientWithActiveRecordsException, DatabaseEntryNotFoundException {
         userService.deleteUser(userId);
         return ResponseEntity.ok().build();
     }
 
+    @Secured("CLIENT")
     @PutMapping("/update")
     public ResponseEntity<Object> updateUserInfo(@Valid @RequestBody UserUpdateDTO userUpdateDTO) throws DatabaseEntryNotFoundException {
         userService.updateUserInfo(userUpdateDTO);
         return ResponseEntity.noContent().build();
     }
 
-    // TODO: restrict use - only for admin and staff
+    @Secured({"ADMIN", "STAFF"})
     @PutMapping("/change_discount")
     public ResponseEntity<Object> changeClientDiscount(@RequestParam Long clientId, @RequestParam Discount newDiscount) throws DatabaseEntryNotFoundException {
         userService.changeClientDiscount(clientId, newDiscount);
         return ResponseEntity.noContent().build();
     }
 
-    // TODO: restrict use - only for admin
+    @Secured("ADMIN")
     @PostMapping("/add_role")
     public ResponseEntity<Object> addRoleForUser(@RequestParam Long userId, @RequestBody RoleDTO roleDTO) throws RoleManagementException, DatabaseEntryNotFoundException {
         userService.addRoleForUser(userId, roleDTO);
         return ResponseEntity.ok().build();
     }
 
-    // TODO: restrict use - only for admin
+    @Secured("ADMIN")
     @DeleteMapping("/revoke_role")
     public ResponseEntity<Object> revokeRole(@RequestParam Long userId, @RequestBody RoleDTO roleDTO) throws RoleManagementException, DatabaseEntryNotFoundException {
         userService.revokeRole(userId, roleDTO);

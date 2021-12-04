@@ -8,5 +8,5 @@ import lombok.Data;
 public class UserCreditsDTO {
     private Long userId;
     private String phone;
-    private byte[] password;
+    private String password;
 }

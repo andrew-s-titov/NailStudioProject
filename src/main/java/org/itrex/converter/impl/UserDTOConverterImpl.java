@@ -1,15 +1,19 @@
 package org.itrex.converter.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.itrex.converter.UserDTOConverter;
 import org.itrex.dto.UserCreateDTO;
 import org.itrex.dto.UserCreditsDTO;
 import org.itrex.dto.UserResponseDTO;
 import org.itrex.entity.User;
-import org.itrex.util.PasswordEncryption;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class UserDTOConverterImpl implements UserDTOConverter {
+
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponseDTO toUserResponseDTO(User userEntity) {
@@ -37,7 +41,7 @@ public class UserDTOConverterImpl implements UserDTOConverter {
         return User.builder()
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
-                .password(PasswordEncryption.getEncryptedPassword(dto.getPassword()))
+                .password(passwordEncoder.encode(dto.getPassword()))
                 .phone(dto.getPhone())
                 .email(dto.getEmail())
                 .build();

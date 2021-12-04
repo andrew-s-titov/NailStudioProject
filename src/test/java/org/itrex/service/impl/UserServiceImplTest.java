@@ -24,7 +24,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -40,9 +39,9 @@ public class UserServiceImplTest {
     @Autowired
     private UserService service;
 
-    private final User user1 = new User(1L, "password1".getBytes(StandardCharsets.UTF_8),
+    private final User user1 = new User(1L, "password1",
             "Andrew", "T", "375293000000", "wow@gmail.com");
-    private final User user4 = new User(4L, "password2".getBytes(StandardCharsets.UTF_8),
+    private final User user4 = new User(4L, "password2",
             "Staff", "Senior", "375295055055", "staff1@nailstudio.com");
 
     @Test

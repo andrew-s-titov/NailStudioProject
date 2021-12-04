@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -28,7 +29,7 @@ public class RecordController {
 
     private final RecordService recordService;
 
-    // TODO: restrict use - only for admin
+    @Secured("ADMIN")
     @GetMapping("/get/all")
     public ResponseEntity<List<RecordForAdminDTO>> getAll
     (@PageableDefault(size = 50)
@@ -39,13 +40,14 @@ public class RecordController {
         return ResponseEntity.ok(recordService.findAll(pageable));
     }
 
+    @Secured({"ADMIN", "STAFF", "CLIENT"})
     @GetMapping("/get/for_client/{clientId}")
     public ResponseEntity<List<RecordOfClientDTO>> getRecordsForClient(@PathVariable Long clientId)
             throws DatabaseEntryNotFoundException {
         return ResponseEntity.ok(recordService.getRecordsForClient(clientId));
     }
 
-    // TODO: restrict use - only for staff and admin
+    @Secured({"ADMIN", "STAFF"})
     @GetMapping("/get/for_staff/{staffId}")
     public ResponseEntity<List<RecordForStaffToDoDTO>> getRecordsForStaffToDo(@PathVariable Long staffId)
             throws DatabaseEntryNotFoundException {
@@ -58,6 +60,7 @@ public class RecordController {
         return ResponseEntity.ok(recordService.getFreeRecordsFor3MonthsByStaffId(staffId));
     }
 
+    @Secured({"ADMIN", "STAFF", "CLIENT"})
     @PostMapping("/create")
     public ResponseEntity<RecordOfClientDTO> createRecord(@Valid @RequestBody RecordCreateDTO recordCreateDTO)
             throws BookingUnavailableException, DatabaseEntryNotFoundException {

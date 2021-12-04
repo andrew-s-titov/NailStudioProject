@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserLoginDTO {
+public class UserLoginRequestDTO {
 
     @NotEmpty(message = "Field must not be empty")
     @Size(min = 9, max = 13, message = "Phone number must be between 9 and 13 digits")

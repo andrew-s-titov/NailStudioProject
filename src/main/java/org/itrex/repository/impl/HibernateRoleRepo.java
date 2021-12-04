@@ -1,7 +1,6 @@
 package org.itrex.repository.impl;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.itrex.entity.Role;

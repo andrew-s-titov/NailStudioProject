@@ -113,6 +113,7 @@ public class RecordServiceImpl extends BaseService implements RecordService {
         LocalDate date = record.getDate();
         RecordTime time = record.getTime();
         if (recordRepo.existsByDateIsAndTimeIs(date, time)) {
+            log.trace("Attempt to create a record for booked time slot");
             throw new BookingUnavailableException(date, time);
         }
     }

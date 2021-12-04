@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS users
 (
-    user_id    IDENTITY     NOT NULL,
-    password   BINARY(1000) NOT NULL,
-    first_name VARCHAR(50)  NOT NULL,
-    last_name  VARCHAR(50)  NOT NULL,
+    user_id    IDENTITY      NOT NULL,
+    password   VARCHAR(1000) NOT NULL,
+    first_name VARCHAR(50)   NOT NULL,
+    last_name  VARCHAR(50)   NOT NULL,
     phone      VARCHAR(13) UNIQUE,
     e_mail     VARCHAR(255),
     discount   ENUM ('ZERO', 'TWO', 'THREE', 'FIVE', 'TEN') DEFAULT 'ZERO',

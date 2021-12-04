@@ -9,6 +9,7 @@ import org.itrex.entity.Record;
 import org.itrex.entity.Role;
 import org.itrex.entity.User;
 import org.itrex.entity.enums.Discount;
+import org.itrex.entity.enums.RoleType;
 import org.itrex.exception.DatabaseEntryNotFoundException;
 import org.itrex.exception.DeletingClientWithActiveRecordsException;
 import org.itrex.exception.RoleManagementException;
@@ -66,6 +67,9 @@ public class UserServiceImpl extends BaseService implements UserService {
             throw new UserExistsException(phone);
         }
         User newUser = userDTOConverter.fromUserCreateDTO(user);
+
+        newUser.getUserRoles().add(Role.builder().roleId(3).roleType(RoleType.CLIENT).build());
+
         User createdUser = userRepo.save(newUser);
         return userDTOConverter.toUserResponseDTO(createdUser);
     }
@@ -75,6 +79,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         User user = entityExists(userRepo.findById(userId), "User", userId, "id");
         List<Record> records = recordRepo.getByClientUserId(userId);
         if (hasActiveRecords(records)) {
+            log.info("Attempt to delete client with active roles");
             throw new DeletingClientWithActiveRecordsException(userId);
         }
         userRepo.delete(user);
@@ -120,6 +125,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         if (userRoles.contains(role)) {
             String message = String.format("Failed to add role: User with id %s already has role %s.",
                     userId, roleDTO.getRoleType().name());
+            log.info(message);
             throw new RoleManagementException(message);
         }
         user.getUserRoles().add(role);
@@ -133,11 +139,13 @@ public class UserServiceImpl extends BaseService implements UserService {
         Set<Role> userRoles = user.getUserRoles();
         if (userRoles.size() == 1) {
             String message = String.format("Failed to revoke role: User with id %s has only one role", userId);
+            log.info(message);
             throw new RoleManagementException(message);
         }
         if (!userRoles.contains(role)) {
             String message = String.format("Failed to revoke role: User with id %s doesn't have role %s.",
                     userId, roleDTO.getRoleType().name());
+            log.info(message);
             throw new RoleManagementException(message);
         }
         user.getUserRoles().remove(role);
