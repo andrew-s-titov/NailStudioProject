@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface RecordService {
+
     List<RecordForAdminDTO> findAll(Pageable pageable);
 
     List<RecordOfClientDTO> getRecordsForClient(Long clientId) throws DatabaseEntryNotFoundException;

@@ -6,6 +6,7 @@ import org.itrex.exception.DatabaseEntryNotFoundException;
 import java.util.List;
 
 public interface RoleService {
+
     List<RoleDTO> getRoles();
 
     RoleDTO getByName(String name) throws DatabaseEntryNotFoundException;

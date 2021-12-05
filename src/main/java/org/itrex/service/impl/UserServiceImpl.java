@@ -17,10 +17,13 @@ import org.itrex.exception.UserExistsException;
 import org.itrex.repository.data.RecordRepository;
 import org.itrex.repository.data.UserRepository;
 import org.itrex.service.UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,17 +38,15 @@ public class UserServiceImpl extends BaseService implements UserService {
     private final RecordRepository recordRepo;
     private final UserDTOConverter userDTOConverter;
     private final RoleDTOConverter roleDTOConverter;
+    private final PasswordEncoder passwordEncoder;
+
+    @Value("${spring.datasource.password}")
+    private String password;
 
     @Override
     public UserResponseDTO getUserById(Long userId) throws DatabaseEntryNotFoundException {
         User user = entityExists(userRepo.findById(userId), "User", userId, "id");
         return userDTOConverter.toUserResponseDTO(user);
-    }
-
-    @Override
-    public UserCreditsDTO getUserByPhone(String phone) throws DatabaseEntryNotFoundException {
-        User user = entityExists(userRepo.findByPhone(phone), "User", phone, "phone");
-        return userDTOConverter.toUserCreditsDTO(user);
     }
 
     @Override
@@ -67,7 +68,9 @@ public class UserServiceImpl extends BaseService implements UserService {
             throw new UserExistsException(phone);
         }
         User newUser = userDTOConverter.fromUserCreateDTO(user);
+        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
 
+        // default role for every registered user
         newUser.getUserRoles().add(Role.builder().roleId(3).roleType(RoleType.CLIENT).build());
 
         User createdUser = userRepo.save(newUser);
@@ -158,5 +161,18 @@ public class UserServiceImpl extends BaseService implements UserService {
                     .anyMatch(r -> r.getDate().compareTo(LocalDate.now()) >= 0);
         }
         return false;
+    }
+
+    @PostConstruct
+    private void firstLaunchCreateAdmin() {
+        User admin = User.builder()
+                .firstName("Admin")
+                .lastName("Admin")
+                .email("admin@nailstudio.com")
+                .phone("375291001010")
+                .password(passwordEncoder.encode(password))
+                .build();
+        admin.getUserRoles().add(Role.builder().roleId(1).roleType(RoleType.ADMIN).build());
+        userRepo.save(admin);
     }
 }

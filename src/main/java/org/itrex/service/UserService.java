@@ -11,11 +11,10 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface UserService {
+
     List<UserResponseDTO> getAll(Pageable pageable);
 
     UserResponseDTO getUserById(Long userId) throws DatabaseEntryNotFoundException;
-
-    UserCreditsDTO getUserByPhone(String phone) throws DatabaseEntryNotFoundException;
 
     UserResponseDTO createUser(UserCreateDTO userCreateDTO) throws UserExistsException;
 

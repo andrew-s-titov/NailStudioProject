@@ -50,7 +50,11 @@ public class Record {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Record record = (Record) o;
-        return Objects.equals(getRecordId(), record.getRecordId()) && getDate().equals(record.getDate()) && getTime() == record.getTime() && Objects.equals(getClient(), record.getClient()) && Objects.equals(getStaff(), record.getStaff());
+        return Objects.equals(getRecordId(), record.getRecordId())
+                && getDate().equals(record.getDate())
+                && getTime() == record.getTime()
+                && Objects.equals(getClient(), record.getClient())
+                && Objects.equals(getStaff(), record.getStaff());
     }
 
     @Override

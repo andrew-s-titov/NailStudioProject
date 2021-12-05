@@ -1,134 +1,19 @@
 {
 	"info": {
 		"_postman_id": "6f96f4d8-d0ba-46a2-a763-f309275bab5a",
-		"name": "NailStudioPostmanCollection",
+		"name": "NailStudio",
+		"description": "Postman collection for an ITRex Java Lab project by Andrew Titov",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "/users/create 1",
+			"name": "admin invalid login - code 401",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"firstName\": \"Edward\",\r\n    \"lastName\": \"Scissorhands\",\r\n    \"phone\": \"375291001010\",\r\n    \"email\": \"IAmNotComplete@yahoo.com\",\r\n    \"password\": \"strongpassword1111\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "localhost:8080/users/create",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"users",
-						"create"
-					]
-				},
-				"description": "create user 1"
-			},
-			"response": []
-		},
-		{
-			"name": "/users/create 2",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"firstName\": \"Freddy\",\r\n    \"lastName\": \"Krueger\",\r\n    \"phone\": \"19008604Fred\",\r\n    \"email\": \"freshmeat@google.com\",\r\n    \"password\": \"pass2222\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "localhost:8080/users/create",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"users",
-						"create"
-					]
-				},
-				"description": "create user 2"
-			},
-			"response": []
-		},
-		{
-			"name": "/users/create 3",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"firstName\": \"Logan\",\r\n    \"lastName\": \"Wolverine\",\r\n    \"phone\": \"1946484888\",\r\n    \"email\": \"hughjackman@gmail.com\",\r\n    \"password\": \"adamantium\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "localhost:8080/users/create",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"users",
-						"create"
-					]
-				},
-				"description": "create user 3"
-			},
-			"response": []
-		},
-		{
-			"name": "/users/create 4 - code 400",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"firstName\": \"L\",\r\n    \"lastName\": \"W\",\r\n    \"phone\": \"1\",\r\n    \"email\": \"hu\",\r\n    \"password\": \"a1\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "localhost:8080/users/create",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"users",
-						"create"
-					]
-				},
-				"description": "create user with invalid request"
-			},
-			"response": []
-		},
-		{
-			"name": "/login",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"phone\": \"375291001010\",\r\n    \"password\": \"strongpassword1111\"\r\n}",
+					"raw": "{\r\n    \"phone\": \"375291001010\",\r\n    \"password\": \"5555\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -145,12 +30,12 @@
 						"login"
 					]
 				},
-				"description": "login for user 1"
+				"description": "login for admin (user1) with invalid credits"
 			},
 			"response": []
 		},
 		{
-			"name": "/login - code 401",
+			"name": "admin login",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -173,13 +58,309 @@
 						"login"
 					]
 				},
-				"description": "login for user 1 with invalid credits"
+				"description": "login for admin (user1)"
 			},
 			"response": []
 		},
 		{
-			"name": "/users/get/1",
+			"name": "user2 register",
 			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Edward\",\r\n    \"lastName\": \"Scissorhands\",\r\n    \"phone\": \"375291001111\",\r\n    \"email\": \"IAmNotComplete@yahoo.com\",\r\n    \"password\": \"strongpassword1111\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/register",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"register"
+					]
+				},
+				"description": "create user2"
+			},
+			"response": []
+		},
+		{
+			"name": "user2 login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"phone\": \"375291001111\",\r\n    \"password\": \"strongpassword1111\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"login"
+					]
+				},
+				"description": "login for user2"
+			},
+			"response": []
+		},
+		{
+			"name": "user3 register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Freddy\",\r\n    \"lastName\": \"Krueger\",\r\n    \"phone\": \"19008604Fred\",\r\n    \"email\": \"freshmeat@google.com\",\r\n    \"password\": \"pass2222\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/register",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"register"
+					]
+				},
+				"description": "create user3"
+			},
+			"response": []
+		},
+		{
+			"name": "user4 register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Logan\",\r\n    \"lastName\": \"Wolverine\",\r\n    \"phone\": \"1946484888\",\r\n    \"email\": \"hughjackman@gmail.com\",\r\n    \"password\": \"adamantium\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/register",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"register"
+					]
+				},
+				"description": "create user4"
+			},
+			"response": []
+		},
+		{
+			"name": "user5 register with invalid data - code 400",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"L\",\r\n    \"lastName\": \"W\",\r\n    \"phone\": \"1\",\r\n    \"email\": \"hu\",\r\n    \"password\": \"a1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/register",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"register"
+					]
+				},
+				"description": "attempt to create user with invalid request"
+			},
+			"response": []
+		},
+		{
+			"name": "add role STAFF for user2",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"roleId\": 2,\r\n    \"roleType\": \"STAFF\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/add_role?userId=2",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"add_role"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "2"
+						}
+					]
+				},
+				"description": "add role \"staff\" for user2 (using admin JWT token obtained after login)"
+			},
+			"response": []
+		},
+		{
+			"name": "add role ADMIN for user2",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"roleId\": 1,\r\n    \"roleType\": \"ADMIN\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/add_role?userId=2",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"add_role"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "2"
+						}
+					]
+				},
+				"description": "add role \"admin\" for user2 (using admin JWT token obtained after login)"
+			},
+			"response": []
+		},
+		{
+			"name": "add role ADMIN for user2 again - code 400",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"roleId\": 1,\r\n    \"roleType\": \"ADMIN\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/add_role?userId=2",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"add_role"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "2"
+						}
+					]
+				},
+				"description": "attempt to add role \"admin\" for user2 again (using admin JWT token obtained after login)"
+			},
+			"response": []
+		},
+		{
+			"name": "get user with id 1",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -194,13 +375,23 @@
 						"1"
 					]
 				},
-				"description": "get user 1"
+				"description": "get user1 (using admin JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/users/get/1000 - code 404",
+			"name": "get user with id 1000 - code 404",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -215,13 +406,23 @@
 						"1000"
 					]
 				},
-				"description": "get non-existing user with id 1000"
+				"description": "attempt to get non-existing user with id 1000 (using admin JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/users/get/all",
+			"name": "get all users",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -236,13 +437,23 @@
 						"all"
 					]
 				},
-				"description": "get all users"
+				"description": "get all users (using admin JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/users/get/all pagination",
+			"name": "get all users with pagination",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -275,18 +486,28 @@
 						}
 					]
 				},
-				"description": "get all users"
+				"description": "get all users with pagination and sorting (using admin JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/users/update",
+			"name": "update user2 info",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user2_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"userId\": 1,\r\n    \"firstName\": \"Eddy\",\r\n    \"lastName\": null, \r\n    \"email\": null\r\n}",
+					"raw": "{\r\n    \"userId\": 2,\r\n    \"firstName\": \"Eddy\",\r\n    \"lastName\": null, \r\n    \"email\": null\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -304,17 +525,27 @@
 						"update"
 					]
 				},
-				"description": "update info for user 1"
+				"description": "update info for user2 (using user2JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/users/change_discount",
+			"name": "change discount for user2",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/users/change_discount?clientId=2&newDiscount=TWO",
+					"raw": "localhost:8080/users/change_discount?clientId=2&newDiscount=TEN",
 					"host": [
 						"localhost"
 					],
@@ -330,122 +561,27 @@
 						},
 						{
 							"key": "newDiscount",
-							"value": "TWO"
+							"value": "TEN"
 						}
 					]
 				},
-				"description": "change discount for user 2"
+				"description": "change discount for user2 (using admin JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/users/add_role 1",
+			"name": "revoke role ADMIN for user2",
 			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"roleId\": 2,\r\n    \"roleType\": \"STAFF\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "localhost:8080/users/add_role?userId=1",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"users",
-						"add_role"
-					],
-					"query": [
+				"auth": {
+					"type": "bearer",
+					"bearer": [
 						{
-							"key": "userId",
-							"value": "1"
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
 						}
 					]
 				},
-				"description": "add role \"staff\" for user 1"
-			},
-			"response": []
-		},
-		{
-			"name": "/users/add_role 2",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"roleId\": 1,\r\n    \"roleType\": \"ADMIN\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "localhost:8080/users/add_role?userId=1",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"users",
-						"add_role"
-					],
-					"query": [
-						{
-							"key": "userId",
-							"value": "1"
-						}
-					]
-				},
-				"description": "add role \"admin\" for user 1"
-			},
-			"response": []
-		},
-		{
-			"name": "/users/add_role 3 - code 400",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"roleId\": 1,\r\n    \"roleType\": \"ADMIN\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "localhost:8080/users/add_role?userId=1",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"users",
-						"add_role"
-					],
-					"query": [
-						{
-							"key": "userId",
-							"value": "1"
-						}
-					]
-				},
-				"description": "trying to add role \"admin\" for user 1 again"
-			},
-			"response": []
-		},
-		{
-			"name": "/users/revoke_role",
-			"request": {
 				"method": "DELETE",
 				"header": [],
 				"body": {
@@ -458,7 +594,7 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8080/users/revoke_role?userId=1",
+					"raw": "localhost:8080/users/revoke_role?userId=2",
 					"host": [
 						"localhost"
 					],
@@ -470,17 +606,27 @@
 					"query": [
 						{
 							"key": "userId",
-							"value": "1"
+							"value": "2"
 						}
 					]
 				},
-				"description": "revoke role \"admin\" for user 1"
+				"description": "revoke role \"admin\" for user2 (using admin JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/users/revoke_role - code 400",
+			"name": "revoke role ADMIN for user2 again - code 400",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "DELETE",
 				"header": [],
 				"body": {
@@ -493,7 +639,7 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8080/users/revoke_role?userId=1",
+					"raw": "localhost:8080/users/revoke_role?userId=2",
 					"host": [
 						"localhost"
 					],
@@ -505,21 +651,31 @@
 					"query": [
 						{
 							"key": "userId",
-							"value": "1"
+							"value": "2"
 						}
 					]
 				},
-				"description": "trying to revoke role \"admin\" for user 1 who doesn't have this role"
+				"description": "attempt to revoke role \"admin\" for user2 who doesn't have this role (using admin JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/users/delete/3",
+			"name": "delete user4",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/users/delete/3",
+					"raw": "localhost:8080/users/delete/4",
 					"host": [
 						"localhost"
 					],
@@ -527,16 +683,26 @@
 					"path": [
 						"users",
 						"delete",
-						"3"
+						"4"
 					]
 				},
-				"description": "delete user with id 3"
+				"description": "delete user with id 4 (using admin JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/roles",
+			"name": "get all roles",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -549,13 +715,23 @@
 						"roles"
 					]
 				},
-				"description": "get all roles"
+				"description": "get all roles (using admin JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/roles/get/id/1",
+			"name": "get role with id 1",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -571,13 +747,23 @@
 						"1"
 					]
 				},
-				"description": "get role with id 1"
+				"description": "get role with id 1 (using admin JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/roles/get/id/500 - code 404",
+			"name": "get role with id 500 - code 404",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -593,13 +779,23 @@
 						"500"
 					]
 				},
-				"description": "get rnon-existing role with id 500"
+				"description": "attempt to get non-existing role with id 500 (using admin JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/roles/get/name/client",
+			"name": "get role with name \"client\"",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -615,13 +811,23 @@
 						"cLiEnT"
 					]
 				},
-				"description": "get role with a name \"client\""
+				"description": "get role with name \"client\" (using admin JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/roles/get/name/somethingElse - code 404",
+			"name": "get role with non-existing name - code 404",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -637,18 +843,28 @@
 						"somethingElse"
 					]
 				},
-				"description": "get non-existing role with a name \"somethingElse\""
+				"description": "attempt to get non-existing role with a name \"somethingElse\" (using admin JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/records/create 1",
+			"name": "create new record1",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user2_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"date\": \"2022-01-01\",\r\n    \"time\": \"NINE\",\r\n    \"clientId\": 2,\r\n    \"staffId\": 1\r\n}",
+					"raw": "{\r\n    \"date\": \"2022-01-01\",\r\n    \"time\": \"NINE\",\r\n    \"clientId\": 3,\r\n    \"staffId\": 2\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -666,18 +882,28 @@
 						"create"
 					]
 				},
-				"description": "create record 1 for client with id 2, set staff with id 1"
+				"description": "create record 1 for client with id 3, set staff with id 2 (using user2 JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/records/create 2",
+			"name": "create new record2",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user2_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"date\": \"2022-01-01\",\r\n    \"time\": \"SEVENTEEN\",\r\n    \"clientId\": 2,\r\n    \"staffId\": 1\r\n}",
+					"raw": "{\r\n    \"date\": \"2022-01-01\",\r\n    \"time\": \"SEVENTEEN\",\r\n    \"clientId\": 3,\r\n    \"staffId\": 2\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -695,18 +921,28 @@
 						"create"
 					]
 				},
-				"description": "create record 2 for client with id 2, set staff with id 1"
+				"description": "create record 2 for client with id 3, set staff with id 2 (using user2 JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/records/create 2 - code 409",
+			"name": "create new record1 again - code 409",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user2_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"date\": \"2022-01-01\",\r\n    \"time\": \"SEVENTEEN\",\r\n    \"clientId\": 2,\r\n    \"staffId\": 1\r\n}",
+					"raw": "{\r\n    \"date\": \"2022-01-01\",\r\n    \"time\": \"SEVENTEEN\",\r\n    \"clientId\": 3,\r\n    \"staffId\": 2\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -724,17 +960,27 @@
 						"create"
 					]
 				},
-				"description": "trying to create booked record for staff with id 1"
+				"description": "trying to create booked record for staff with id 2 (using user2 JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/records/get/for_client/2",
+			"name": "get records for client user3",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user2_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/records/get/for_client/2",
+					"raw": "localhost:8080/records/get/for_client/3",
 					"host": [
 						"localhost"
 					],
@@ -743,20 +989,30 @@
 						"records",
 						"get",
 						"for_client",
-						"2"
+						"3"
 					]
 				},
-				"description": "get records for client with id 2"
+				"description": "get records for client with id 3 (using user2 JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/records/get/for_staff/1",
+			"name": "get records for staff user2",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user2_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/records/get/for_staff/1",
+					"raw": "localhost:8080/records/get/for_staff/2",
 					"host": [
 						"localhost"
 					],
@@ -765,16 +1021,26 @@
 						"records",
 						"get",
 						"for_staff",
-						"1"
+						"2"
 					]
 				},
-				"description": "get records for staff with id 1"
+				"description": "get records for staff with id 2 (using user2 JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/records/get/all",
+			"name": "get all records",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -789,13 +1055,23 @@
 						"all"
 					]
 				},
-				"description": "get all records"
+				"description": "get all records (using admin JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/records/get/all pagination",
+			"name": "get all records with pagination",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -828,17 +1104,27 @@
 						}
 					]
 				},
-				"description": "get all records"
+				"description": "get all records with pagination (using admin JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/records/get/free/staff/1",
+			"name": "get free time slots for staff user2",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user2_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/records/get/free/staff/1",
+					"raw": "localhost:8080/records/get/free/staff/2",
 					"host": [
 						"localhost"
 					],
@@ -848,16 +1134,26 @@
 						"get",
 						"free",
 						"staff",
-						"1"
+						"2"
 					]
 				},
-				"description": "get free time slots for future 3 months for staff with id 1"
+				"description": "get free time slots for future 3 months for staff with id 2 (using user2 JWT token obtained after login)"
 			},
 			"response": []
 		},
 		{
-			"name": "/records/delete/2",
+			"name": "delete record with id 2",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "DELETE",
 				"header": [],
 				"url": {
@@ -872,9 +1168,19 @@
 						"2"
 					]
 				},
-				"description": "delete record with id 2"
+				"description": "delete record with id 2 (using admin JWT token obtained after login)"
 			},
 			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "admin_token",
+			"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxLDM3NTI5MTAwMTAxMCIsImlzcyI6Im9yZy5pdHJleC5qYXZhLmxhYiIsImlhdCI6MTYzODcwMTMzOSwiZXhwIjoxNjM4Nzg3NzM5fQ.vh3cYCLoqZGk4Je8YBqrvkMkfLDDZ8YPsDrx4bFQZf66aqc1HX81DKa5v-7PwYDyddvETtfl1Ab3Bk0No1qhiA"
+		},
+		{
+			"key": "user2_token",
+			"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyLDM3NTI5MTAwMTExMSIsImlzcyI6Im9yZy5pdHJleC5qYXZhLmxhYiIsImlhdCI6MTYzODcwMTk1MCwiZXhwIjoxNjM4Nzg4MzUwfQ.m0HL5TYOkLi5lbk2u_v7rxKkk7UQ1Yht6UNMWTZxrudmHTW2vRl8KKnRWEGJR_e90gE5isuAgIA3wqN2p6fhCw"
 		}
 	]
 }

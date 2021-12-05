@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public interface RoleDTOConverter {
+
     Role fromRoleDTO(RoleDTO roleDTO);
+
     RoleDTO toRoleDTO(Role roleEntity);
 }

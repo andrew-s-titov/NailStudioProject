@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -43,16 +42,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .orElseThrow(
                         () -> new UsernameNotFoundException(
                                 String.format("User with login (phone number) %s wasn't found", username))));
-
-        /*
-        User.class implements UserDetails class
-
-        other methods:
-        - change method getUserByPhone in UserService.class to loadUserByUsername, user spring.User class or
-        implement UserDetails to UserCreditsDTO;
-        - implement method UserDetails loadUserByUsername(String username) in UserService.class;
-
-         */
     }
 
     @Override

@@ -11,8 +11,7 @@ import java.security.spec.KeySpec;
 import java.util.Arrays;
 
 @Slf4j
-@Deprecated()
-// use Spring Security BCryptPasswordEncoder
+@Deprecated // use Spring Security BCryptPasswordEncoder
 public class PasswordEncryption {
     private static final byte[] SALT = "notPepper".getBytes(StandardCharsets.UTF_8);
     private static final String ALGORITHM = "PBKDF2WithHmacSHA1";

@@ -6,9 +6,7 @@ import java.time.LocalDate;
 
 public class BookingUnavailableException extends Exception {
     public BookingUnavailableException(LocalDate date, RecordTime time) {
-        super("Oooops... Someone has already booked " +
-                time.digitsText +
-                " on " +
-                date + " for chosen professional. Please, try again.");
+        super(String.format("Oooops... Someone has already booked %s on %s for chosen professional. Please, try again.",
+                time.digitsText, date));
     }
 }

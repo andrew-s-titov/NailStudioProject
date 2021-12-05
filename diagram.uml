@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>DATABASE</ID>
+  <OriginalElement>524b1acf-23f5-45ec-a979-271e73a5502a.TABLE:TEST3.PUBLIC.RECORDS</OriginalElement>
+  <nodes>
+    <node x="385.75" y="270.5">524b1acf-23f5-45ec-a979-271e73a5502a.TABLE:TEST3.PUBLIC.USERS_ROLES</node>
+    <node x="347.75" y="55.0">524b1acf-23f5-45ec-a979-271e73a5502a.TABLE:TEST3.PUBLIC.ROLES</node>
+    <node x="0.0" y="237.0">524b1acf-23f5-45ec-a979-271e73a5502a.TABLE:TEST3.PUBLIC.RECORDS</node>
+    <node x="39.75" y="0.0">524b1acf-23f5-45ec-a979-271e73a5502a.TABLE:TEST3.PUBLIC.USERS</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="524b1acf-23f5-45ec-a979-271e73a5502a.TABLE:TEST3.PUBLIC.RECORDS" target="524b1acf-23f5-45ec-a979-271e73a5502a.TABLE:TEST3.PUBLIC.USERS">
+      <point x="-61.25" y="-71.5" />
+      <point x="61.25" y="212.0" />
+      <point x="87.75" y="212.0" />
+      <point x="-96.0" y="93.5" />
+    </edge>
+    <edge source="524b1acf-23f5-45ec-a979-271e73a5502a.TABLE:TEST3.PUBLIC.USERS_ROLES" target="524b1acf-23f5-45ec-a979-271e73a5502a.TABLE:TEST3.PUBLIC.USERS">
+      <point x="-30.0" y="-38.0" />
+      <point x="415.75" y="212.0" />
+      <point x="279.75" y="212.0" />
+      <point x="96.0" y="93.5" />
+    </edge>
+    <edge source="524b1acf-23f5-45ec-a979-271e73a5502a.TABLE:TEST3.PUBLIC.USERS_ROLES" target="524b1acf-23f5-45ec-a979-271e73a5502a.TABLE:TEST3.PUBLIC.ROLES">
+      <point x="30.0" y="-38.0" />
+      <point x="0.0" y="38.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="302.0" y="190.0" />
+  <SelectedNodes>
+    <node>524b1acf-23f5-45ec-a979-271e73a5502a.TABLE:TEST3.PUBLIC.RECORDS</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Key columns</Category>
+    <Category>Columns</Category>
+    <Category>Virtual foreign keys</Category>
+  </Categories>
+</Diagram>
+

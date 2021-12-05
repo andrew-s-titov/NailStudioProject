@@ -32,15 +32,14 @@ public class RecordController {
     @Secured("ADMIN")
     @GetMapping("/get/all")
     public ResponseEntity<List<RecordForAdminDTO>> getAll
-    (@PageableDefault(size = 50)
-     @SortDefault.SortDefaults({
-             @SortDefault(sort = "date", direction = Sort.Direction.ASC),
-             @SortDefault(sort = "time", direction = Sort.Direction.ASC)
-     }) Pageable pageable) {
+            (@PageableDefault(size = 50)
+             @SortDefault.SortDefaults({
+                     @SortDefault(sort = "date", direction = Sort.Direction.ASC),
+                     @SortDefault(sort = "time", direction = Sort.Direction.ASC)
+             }) Pageable pageable) {
         return ResponseEntity.ok(recordService.findAll(pageable));
     }
 
-    @Secured({"ADMIN", "STAFF", "CLIENT"})
     @GetMapping("/get/for_client/{clientId}")
     public ResponseEntity<List<RecordOfClientDTO>> getRecordsForClient(@PathVariable Long clientId)
             throws DatabaseEntryNotFoundException {
@@ -60,7 +59,6 @@ public class RecordController {
         return ResponseEntity.ok(recordService.getFreeRecordsFor3MonthsByStaffId(staffId));
     }
 
-    @Secured({"ADMIN", "STAFF", "CLIENT"})
     @PostMapping("/create")
     public ResponseEntity<RecordOfClientDTO> createRecord(@Valid @RequestBody RecordCreateDTO recordCreateDTO)
             throws BookingUnavailableException, DatabaseEntryNotFoundException {

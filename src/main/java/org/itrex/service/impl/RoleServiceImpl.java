@@ -1,7 +1,6 @@
 package org.itrex.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.itrex.converter.RoleDTOConverter;
 import org.itrex.dto.RoleDTO;
 import org.itrex.entity.Role;

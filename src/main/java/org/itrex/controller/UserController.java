@@ -31,11 +31,11 @@ public class UserController {
     @Secured({"ADMIN", "STAFF"})
     @GetMapping("/get/all")
     public ResponseEntity<List<UserResponseDTO>> getAll
-    (@PageableDefault(size = 20)
-     @SortDefault.SortDefaults({
-             @SortDefault(sort = "lastName", direction = Sort.Direction.ASC),
-             @SortDefault(sort = "firstName", direction = Sort.Direction.ASC)
-     }) Pageable pageable) {
+            (@PageableDefault(size = 20)
+             @SortDefault.SortDefaults({
+                     @SortDefault(sort = "lastName", direction = Sort.Direction.ASC),
+                     @SortDefault(sort = "firstName", direction = Sort.Direction.ASC)
+             }) Pageable pageable) {
         return ResponseEntity.ok(userService.getAll(pageable));
     }
 
