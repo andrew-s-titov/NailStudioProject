@@ -1,6 +1,5 @@
 package org.itrex.controller;
 
-import org.itrex.converter.impl.RecordDTOConverterImpl;
 import org.itrex.dto.RecordCreateDTO;
 import org.itrex.dto.RecordForAdminDTO;
 import org.itrex.dto.RecordForStaffToDoDTO;
@@ -10,12 +9,14 @@ import org.itrex.service.RecordService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -29,15 +30,18 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(RecordController.class)
-@Import(RecordDTOConverterImpl.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class RecordControllerTest extends BaseControllerTest {
+
     @Autowired
     private MockMvc mockMvc;
     @MockBean
     RecordService recordService;
 
     @Test
+    @WithUserDetails("+375295055055")
     @DisplayName("getAll - shouldn't throw exceptions, status OK")
     public void getAll() throws Exception {
         // given
@@ -69,6 +73,7 @@ public class RecordControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @WithUserDetails("+375293000000")
     @DisplayName("getRecordsForStaffToDo with valid data - should return json with records, status OK")
     public void getRecordsForStaffToDo() throws Exception {
         // given
@@ -86,6 +91,7 @@ public class RecordControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @WithUserDetails("+18465463222")
     @DisplayName("getRecordsForClient with valid data - should return json with records, status OK")
     public void getRecordsForClient() throws Exception {
         // given
@@ -103,6 +109,7 @@ public class RecordControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @WithUserDetails("+18465463222")
     @DisplayName("getFreeRecordsFor3MonthsByStaffId with valid data - should return json with data from a map, status OK")
     public void getFreeRecordsFor3MonthsByStaffId() throws Exception {
         // given
@@ -121,6 +128,7 @@ public class RecordControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @WithUserDetails("+18465463222")
     @DisplayName("createRecord with valid data - should return json with new Record data, status OK")
     public void createRecord() throws Exception {
         // given
@@ -152,6 +160,7 @@ public class RecordControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @WithUserDetails("+18465463222")
     @DisplayName("deleteRecord with valid data - shouldn't throw exception, status OK")
     public void deleteRecord() throws Exception {
         // given

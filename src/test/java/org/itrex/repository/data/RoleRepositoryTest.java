@@ -32,9 +32,11 @@ public class RoleRepositoryTest {
     @Test
     @DisplayName("findByRoleType with valid data - should return single Role of given type")
     public void findByRoleType() {
-        // given & when
+        // given
         RoleType roleType1 = RoleType.ADMIN;
         RoleType roleType2 = RoleType.STAFF;
+
+        // when
         Role role1 = roleRepository.findByRoleType(roleType1).get();
         Role role2 = roleRepository.findByRoleType(roleType2).get();
 

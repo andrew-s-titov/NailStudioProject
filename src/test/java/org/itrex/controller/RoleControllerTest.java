@@ -7,8 +7,11 @@ import org.itrex.service.RoleService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -21,13 +24,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(RoleController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@WithUserDetails("+375295055055")
+@ActiveProfiles("test")
 public class RoleControllerTest extends BaseControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    RoleService roleService;
+    private RoleService roleService;
 
     private final RoleDTO role1 = RoleDTO.builder().roleId(1).roleType(RoleType.ADMIN).build();
     private final RoleDTO role2 = RoleDTO.builder().roleId(2).roleType(RoleType.STAFF).build();

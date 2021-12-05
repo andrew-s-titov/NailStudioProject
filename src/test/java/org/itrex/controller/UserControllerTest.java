@@ -1,7 +1,6 @@
 package org.itrex.controller;
 
 import org.itrex.converter.UserDTOConverter;
-import org.itrex.converter.impl.UserDTOConverterImpl;
 import org.itrex.dto.RoleDTO;
 import org.itrex.dto.UserCreateDTO;
 import org.itrex.dto.UserResponseDTO;
@@ -17,17 +16,18 @@ import org.itrex.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.validation.BindException;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -39,37 +39,38 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserController.class)
-@Import(UserDTOConverterImpl.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class UserControllerTest extends BaseControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    UserService userService;
-
+    private UserService userService;
     @Autowired
-    UserDTOConverter converter;
+    private UserDTOConverter converter;
 
-    private final static User user1 = User.builder()
+    private final User user1 = User.builder()
             .userId(1L)
             .firstName("Thomas")
             .lastName("Anderson")
             .email("wakeUpNeo@yahoo.com")
             .phone("(312)555-0690")
-            .password("theOne".getBytes(StandardCharsets.UTF_8))
+            .password("theOne")
             .build();
 
-    private final static User user2 = User.builder()
+    private final User user2 = User.builder()
             .userId(2L)
             .firstName("Morpheus")
             .lastName("NoName")
             .email("Nebuchadnezzar@yahoo.com")
             .phone("(313)010-0690")
-            .password("redPill".getBytes(StandardCharsets.UTF_8))
+            .password("redPill")
             .build();
 
     @Test
+    @WithUserDetails("+375293000000")
     @DisplayName("getAll - should return json with data about all users")
     public void getAll() throws Exception {
         // given
@@ -94,6 +95,7 @@ public class UserControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @WithUserDetails("+375293000000")
     @DisplayName("getUserById with valid data - should return json with data about User with given id")
     public void getUserById1() throws Exception {
         // given
@@ -110,6 +112,7 @@ public class UserControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @WithUserDetails("+375293000000")
     @DisplayName("getUserById with invalid data - should handle DatabaseEntryNotFoundException, status 404")
     public void getUserById2() throws Exception {
         // given
@@ -125,15 +128,15 @@ public class UserControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @DisplayName("createUser with valid data - shouldn't throw exceptions, status OK")
-    public void createUser1() throws Exception {
+    @DisplayName("registerUser with valid data - shouldn't throw exceptions, status OK")
+    public void registerUser1() throws Exception {
         // given
         UserCreateDTO userCreateDTO = getValidUserCreateDTO();
         UserResponseDTO userResponseDTO = converter.toUserResponseDTO(converter.fromUserCreateDTO(userCreateDTO));
         when(userService.createUser(userCreateDTO)).thenReturn(userResponseDTO);
 
         // when & then
-        MvcResult mvcResult = mockMvc.perform(post("/users/create/")
+        MvcResult mvcResult = mockMvc.perform(post("/users/register/")
                 .content(toJson(userCreateDTO))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -145,14 +148,14 @@ public class UserControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @DisplayName("createUser with invalid data (not unique phone) - should handle UserExistsException, status 419")
-    public void createUser2() throws Exception {
+    @DisplayName("registerUser2 with invalid data (not unique phone) - should handle UserExistsException, status 419")
+    public void registerUser2() throws Exception {
         // given
         UserCreateDTO userCreateDTO = getValidUserCreateDTO();
         when(userService.createUser(userCreateDTO)).thenThrow(UserExistsException.class);
 
         // when & then
-        MvcResult mvcResult = mockMvc.perform(post("/users/create/")
+        MvcResult mvcResult = mockMvc.perform(post("/users/register/")
                 .content(toJson(userCreateDTO))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -163,14 +166,14 @@ public class UserControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @DisplayName("createUser with invalid DTO fields - should handle BindException, status 400")
-    public void createUser3() throws Exception {
+    @DisplayName("registerUser with invalid DTO fields - should handle BindException, status 400")
+    public void registerUser3() throws Exception {
         // given
         UserCreateDTO userCreateDTO = getValidUserCreateDTO();
         userCreateDTO.setPhone("303"); // not valid length
 
         // when & then
-        MvcResult mvcResult = mockMvc.perform(post("/users/create/")
+        MvcResult mvcResult = mockMvc.perform(post("/users/register/")
                 .content(toJson(userCreateDTO))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -181,6 +184,7 @@ public class UserControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @WithUserDetails("+375295055055")
     @DisplayName("deleteUser with valid data - shouldn't throw exceptions, status OK")
     public void deleteUser() throws Exception {
         // given
@@ -196,6 +200,7 @@ public class UserControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @WithUserDetails("+375295055055")
     @DisplayName("deleteUser with invalid data (id) - should handle DatabaseEntryNotFoundException, status 404")
     public void deleteUser2() throws Exception {
         // given
@@ -211,6 +216,7 @@ public class UserControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @WithUserDetails("+375295055055")
     @DisplayName("deleteUser with invalid data (user with active Records) - " +
             "should handle DeletingClientWithActiveRecordsException, status 403")
     public void deleteUser3() throws Exception {
@@ -227,6 +233,7 @@ public class UserControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @WithUserDetails("+18465463222")
     @DisplayName("updateUserInfo with valid data - shouldn't throw exceptions, status 204")
     public void updateUserInfo1() throws Exception {
         // given
@@ -245,6 +252,7 @@ public class UserControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @WithUserDetails("+18465463222")
     @DisplayName("updateUserInfo with invalid data (id) - should handle DatabaseEntryNotFoundException, status 404")
     public void updateUserInfo2() throws Exception {
         // given
@@ -263,6 +271,7 @@ public class UserControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @WithUserDetails("+375293000000")
     @DisplayName("changeClientDiscount with valid data - shouldn't throw exception, status 204")
     public void changeClientDiscount() throws Exception {
         // given
@@ -281,6 +290,7 @@ public class UserControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @WithUserDetails("+375295055055")
     @DisplayName("addRoleForUser with valid data - shouldn't throw exception, status OK")
     public void addRoleForUser1() throws Exception {
         // given
@@ -302,6 +312,7 @@ public class UserControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @WithUserDetails("+375295055055")
     @DisplayName("addRoleForUser with invalid data (user has the given role) - " +
             "should handle RoleManagementException exception, status 400")
     public void addRoleForUser2() throws Exception {
@@ -323,6 +334,7 @@ public class UserControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @WithUserDetails("+375295055055")
     @DisplayName("revokeRole with valid data - shouldn't throw exception, status OK")
     public void revokeRole() throws Exception {
         // given

@@ -102,7 +102,7 @@ public class HibernateUserRepoTest extends TestBaseHibernateRepository {
     public void save1() {
         // given
         User user = User.builder()
-                .password(PasswordEncryption.getEncryptedPassword("notSoStrongPassword"))
+                .password("notSoStrongPassword")
                 .firstName("Freddy")
                 .lastName("Krueger")
                 .phone("1900909Fred")
@@ -127,7 +127,7 @@ public class HibernateUserRepoTest extends TestBaseHibernateRepository {
     public void save2() {
         // given
         User user = User.builder()
-                .password(PasswordEncryption.getEncryptedPassword("notSoStrongPassword"))
+                .password("notSoStrongPassword")
                 .firstName("Freddy")
                 .lastName("Krueger")
                 // shouldn't exceed 13 chars

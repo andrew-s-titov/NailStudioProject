@@ -17,13 +17,12 @@ import org.itrex.exception.UserExistsException;
 import org.itrex.repository.data.RecordRepository;
 import org.itrex.repository.data.UserRepository;
 import org.itrex.service.UserService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.test.context.ActiveProfiles;
 
-import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,15 +32,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@ActiveProfiles
 public class UserServiceImpl extends BaseService implements UserService {
     private final UserRepository userRepo;
     private final RecordRepository recordRepo;
     private final UserDTOConverter userDTOConverter;
     private final RoleDTOConverter roleDTOConverter;
     private final PasswordEncoder passwordEncoder;
-
-    @Value("${spring.datasource.password}")
-    private String password;
 
     @Override
     public UserResponseDTO getUserById(Long userId) throws DatabaseEntryNotFoundException {
@@ -161,18 +158,5 @@ public class UserServiceImpl extends BaseService implements UserService {
                     .anyMatch(r -> r.getDate().compareTo(LocalDate.now()) >= 0);
         }
         return false;
-    }
-
-    @PostConstruct
-    private void firstLaunchCreateAdmin() {
-        User admin = User.builder()
-                .firstName("Admin")
-                .lastName("Admin")
-                .email("admin@nailstudio.com")
-                .phone("375291001010")
-                .password(passwordEncoder.encode(password))
-                .build();
-        admin.getUserRoles().add(Role.builder().roleId(1).roleType(RoleType.ADMIN).build());
-        userRepo.save(admin);
     }
 }

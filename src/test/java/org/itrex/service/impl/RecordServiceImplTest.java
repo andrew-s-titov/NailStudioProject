@@ -19,10 +19,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -38,9 +36,9 @@ public class RecordServiceImplTest {
     @Autowired
     private RecordService service;
 
-    private final User client = new User(1L, "password1".getBytes(StandardCharsets.UTF_8),
+    private final User client = new User(1L, "password1",
             "Andrew", "T", "375293000000", "wow@gmail.com");
-    private final User staff = new User(4L, "password2".getBytes(StandardCharsets.UTF_8),
+    private final User staff = new User(4L, "password2",
             "Staff", "Senior", "375295055055", "staff1@nailstudio.com");
     private final Record record1 = new Record(1L, LocalDate.of(2021, 10, 18),
             RecordTime.NINE, client, staff);
