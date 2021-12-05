@@ -1,5 +1,6 @@
 package org.itrex.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.itrex.dto.RoleDTO;
 import org.itrex.dto.UserCreateDTO;
@@ -25,6 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("users")
+@Tag(name = "users", description = "Information about users and operations with them")
 public class UserController {
     private final UserService userService;
 

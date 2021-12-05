@@ -1,0 +1,1264 @@
+openapi: 3.0.1
+info:
+  title: NailStudio
+  version: v1.0
+  description: This is a simple web service for creating and storing appointments to a nail salon workers
+servers:
+- url: http://localhost:8080
+tags:
+- name: users
+  description: Information about users and operations with them
+- name: records
+  description: Information about appointments and operations with users
+- name: roles
+  description: Information about roles
+
+paths:
+  /users/update:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+      - users
+      operationId: updateUserInfo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateDTO'
+        required: true
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /users/change_discount:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+      - users
+      operationId: changeClientDiscount
+      parameters:
+      - name: clientId
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: newDiscount
+        in: query
+        required: true
+        schema:
+          type: string
+          enum:
+          - ZERO
+          - TWO
+          - THREE
+          - FIVE
+          - TEN
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /users/register:
+    post:
+      tags:
+      - users
+      operationId: registerUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateDTO'
+        required: true
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserResponseDTO'
+  /users/add_role:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+      - users
+      operationId: addRoleForUser
+      parameters:
+      - name: userId
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleDTO'
+        required: true
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /records/create:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+      - records
+      operationId: createRecord
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordCreateDTO'
+        required: true
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RecordOfClientDTO'
+  /logout:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+      - authentication
+      operationId: logout
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+  /login:
+    post:
+      tags:
+      - authentication
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequestDTO'
+        required: true
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserResponseDTO'
+  /users/get/{userId}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+      - users
+      operationId: getUserById
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserResponseDTO'
+  /users/get/all:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+      - users
+      operationId: getAll
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Pageable'
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponseDTO'
+  /roles:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+      - roles
+      operationId: getAllRoles
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoleDTO'
+  /roles/get/name/{roleName}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+      - roles
+      operationId: getRoleByName
+      parameters:
+      - name: roleName
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RoleDTO'
+  /roles/get/id/{roleId}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+      - roles
+      operationId: getRoleById
+      parameters:
+      - name: roleId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RoleDTO'
+  /records/get/free/staff/{staffId}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+      - records
+      operationId: getFreeRecordsFor3MonthsByStaffId
+      parameters:
+      - name: staffId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                    - NINE
+                    - THIRTEEN
+                    - SEVENTEEN
+  /records/get/for_staff/{staffId}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+      - records
+      operationId: getRecordsForStaffToDo
+      parameters:
+      - name: staffId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecordForStaffToDoDTO'
+  /records/get/for_client/{clientId}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+      - records
+      operationId: getRecordsForClient
+      parameters:
+      - name: clientId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecordOfClientDTO'
+  /records/get/all:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+      - records
+      operationId: getAll_1
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Pageable'
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecordForAdminDTO'
+  /users/revoke_role:
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+      - users
+      operationId: revokeRole
+      parameters:
+      - name: userId
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleDTO'
+        required: true
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /users/delete/{userId}:
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+      - users
+      operationId: deleteUser
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /records/delete/{recordId}:
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+      - records
+      operationId: deleteRecord
+      parameters:
+      - name: recordId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ValidationErrorDTO'
+                - type: string
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ValidationErrorDTO:
+      type: object
+      properties:
+        message:
+          type: string
+        validationErrors:
+          type: object
+          additionalProperties:
+            type: string
+    UserUpdateDTO:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+        firstName:
+          maxLength: 50
+          minLength: 2
+          type: string
+        lastName:
+          maxLength: 50
+          minLength: 2
+          type: string
+        email:
+          type: string
+    UserCreateDTO:
+      required:
+      - firstName
+      - lastName
+      - password
+      - phone
+      type: object
+      properties:
+        firstName:
+          maxLength: 50
+          minLength: 2
+          type: string
+        lastName:
+          maxLength: 50
+          minLength: 2
+          type: string
+        phone:
+          maxLength: 13
+          minLength: 9
+          type: string
+        email:
+          type: string
+        password:
+          maxLength: 2147483647
+          minLength: 4
+          type: string
+    UserResponseDTO:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        discount:
+          type: string
+          enum:
+          - ZERO
+          - TWO
+          - THREE
+          - FIVE
+          - TEN
+    RoleDTO:
+      type: object
+      properties:
+        roleId:
+          type: integer
+          format: int32
+        roleType:
+          type: string
+          enum:
+          - ADMIN
+          - STAFF
+          - CLIENT
+    RecordCreateDTO:
+      required:
+      - clientId
+      - date
+      - staffId
+      - time
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        time:
+          type: string
+          enum:
+          - NINE
+          - THIRTEEN
+          - SEVENTEEN
+        clientId:
+          type: integer
+          format: int64
+        staffId:
+          type: integer
+          format: int64
+    RecordOfClientDTO:
+      type: object
+      properties:
+        recordId:
+          type: integer
+          format: int64
+        date:
+          type: string
+          format: date
+        time:
+          type: string
+          enum:
+          - NINE
+          - THIRTEEN
+          - SEVENTEEN
+        staffFirstName:
+          type: string
+        staffLastName:
+          type: string
+    UserLoginRequestDTO:
+      required:
+      - password
+      - phone
+      type: object
+      properties:
+        phone:
+          maxLength: 13
+          minLength: 9
+          type: string
+        password:
+          maxLength: 2147483647
+          minLength: 4
+          type: string
+    Pageable:
+      type: object
+      properties:
+        page:
+          minimum: 0
+          type: integer
+          format: int32
+        size:
+          minimum: 1
+          type: integer
+          format: int32
+        sort:
+          type: array
+          items:
+            type: string
+    RecordForStaffToDoDTO:
+      type: object
+      properties:
+        recordId:
+          type: integer
+          format: int64
+        date:
+          type: string
+          format: date
+        time:
+          type: string
+          enum:
+          - NINE
+          - THIRTEEN
+          - SEVENTEEN
+        clientFirstName:
+          type: string
+        clientLastName:
+          type: string
+        clientPhone:
+          type: string
+        clientEmail:
+          type: string
+        clientDiscount:
+          type: string
+          enum:
+          - ZERO
+          - TWO
+          - THREE
+          - FIVE
+          - TEN
+    RecordForAdminDTO:
+      type: object
+      properties:
+        recordId:
+          type: integer
+          format: int64
+        date:
+          type: string
+          format: date
+        time:
+          type: string
+          enum:
+          - NINE
+          - THIRTEEN
+          - SEVENTEEN
+        clientFirstName:
+          type: string
+        clientLastName:
+          type: string
+        clientPhone:
+          type: string
+        clientEmail:
+          type: string
+        clientDiscount:
+          type: string
+          enum:
+          - ZERO
+          - TWO
+          - THREE
+          - FIVE
+          - TEN
+        staffFirstName:
+          type: string
+        staffLastName:
+          type: string

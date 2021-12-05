@@ -1,5 +1,6 @@
 package org.itrex.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.itrex.dto.RecordCreateDTO;
 import org.itrex.dto.RecordForAdminDTO;
@@ -25,6 +26,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("records")
+@Tag(name = "records", description = "Information about appointments and operations with users")
 public class RecordController {
 
     private final RecordService recordService;

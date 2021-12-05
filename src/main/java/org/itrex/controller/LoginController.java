@@ -1,5 +1,6 @@
 package org.itrex.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.itrex.converter.impl.UserDTOConverterImpl;
 import org.itrex.dto.UserLoginRequestDTO;
@@ -23,6 +24,7 @@ import javax.validation.Valid;
 
 @RequiredArgsConstructor
 @RestController
+@Tag(name = "authentication")
 public class LoginController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;

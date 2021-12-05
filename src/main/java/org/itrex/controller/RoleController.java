@@ -1,5 +1,6 @@
 package org.itrex.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.itrex.dto.RoleDTO;
 import org.itrex.exception.DatabaseEntryNotFoundException;
@@ -17,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("roles")
 @Secured("ADMIN")
+@Tag(name = "roles", description = "Information about roles")
 public class RoleController {
     private final RoleService roleService;
 
