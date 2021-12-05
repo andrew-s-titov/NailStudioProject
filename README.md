@@ -32,3 +32,12 @@ Every user can have 3 roles: admin, staff and client.
 - revoke a roles of a user;
 - browse all appointments;
 - delete any user without active (future) appointments.
+
+
+**HOW TO RUN:**
+1) via IDE: src\main\java\org\itrex\App.java
+2) via terminal:
+   - gradle bootRun
+   - gradlew bootRun
+    
+port: `http://localhost:8080` 
