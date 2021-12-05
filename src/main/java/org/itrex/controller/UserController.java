@@ -57,7 +57,6 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @Secured("CLIENT")
     @PutMapping("/update")
     public ResponseEntity<Object> updateUserInfo(@Valid @RequestBody UserUpdateDTO userUpdateDTO) throws DatabaseEntryNotFoundException {
         userService.updateUserInfo(userUpdateDTO);
